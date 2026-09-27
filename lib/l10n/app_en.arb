@@ -1,0 +1,719 @@
+{
+  "@@locale": "en",
+  "routingAttribution": "Valhalla · © OpenStreetMap",
+  "noJoinSegment": "This GPX has no segment to join.",
+  "alreadyNearTrail": "You are already near the trail. Use Go to follow it from here.",
+  "cachedApproach": "Using a saved route · recalculation unavailable offline",
+  "gpsUnavailable": "Cannot find an accurate GPS position. Try again outdoors.",
+  "noWatchData": "No measurements shared for this period. Sync your watch in Zepp, then try again.",
+  "watchDataAdded": "Health Connect measurements added to this walk",
+  "walkSavedPending": "Walk saved here · sync pending",
+  "changesSavedPending": "Changes saved here · sync pending",
+  "localMaps": "Local maps",
+  "mapsStorageUnavailable": "Maps not prepared: check available storage.",
+  "demoNotice": "Demo: sample GPX and elevations, real map of Florence.",
+  "syncPending": "Sync pending",
+  "itemsSaved": "{arg1, plural, =0{No items saved on this phone} =1{One item saved on this phone} other{{arg1} items saved on this phone}}",
+  "@itemsSaved": {
+    "placeholders": {
+      "arg1": {
+        "type": "int"
+      }
+    }
+  },
+  "mapSaved": "Map verified and saved offline",
+  "syncRetry": "Saved on this phone · sync will resume",
+  "sessionRestoreFailed": "Cannot open the saved session. Please sign in again.",
+  "localDev": "Local Dev (Docker)",
+  "missingApiUrl": "{arg1}: set API_URL in {arg2}, then restart F5. Offline access requires a successful first sign-in.",
+  "@missingApiUrl": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "invalidApiUrl": "{arg1}: invalid API URL in {arg2} (no credentials, query or fragment allowed).",
+  "@invalidApiUrl": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "localhostApiUrl": "{arg1}: localhost refers to the phone. Use your computer's LAN IP in {arg2}.",
+  "@localhostApiUrl": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "prodHttpsRequired": "Prod: API_URL must start with https:// in {arg1}. No request will be sent.",
+  "@prodHttpsRequired": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "devPrivateIpRequired": "Dev: HTTP requires a private LAN IPv4 address (10.x, 172.16–31.x or 192.168.x). Otherwise use HTTPS.",
+  "mapProgress": "Maps: {arg1}/{arg2} areas · {arg3}%",
+  "@mapProgress": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      },
+      "arg3": {
+        "type": "Object"
+      }
+    }
+  },
+  "savedAreas": "{arg1, plural, =0{0 areas saved on this phone} =1{1 area saved on this phone} other{{arg1} areas saved on this phone}}",
+  "@savedAreas": {
+    "placeholders": {
+      "arg1": {
+        "type": "int"
+      }
+    }
+  },
+  "mapPreparationPending": "Preparation pending · connection or storage unavailable. Maps already received remain available.",
+  "freeWalk": "Free walk",
+  "recordingSuspended": "Recording suspended: {arg1}",
+  "@recordingSuspended": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "walkSaveFailed": "Cannot save this walk: {arg1}",
+  "@walkSaveFailed": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "syncRunning": "Sync in progress",
+  "librarySynced": "Library synced",
+  "syncConflicts": "{arg1, plural, =0{No conflicts} =1{1 conflict: local copy preserved. Resolve it in settings.} other{{arg1} conflicts: local copies preserved. Resolve them in settings.}}",
+  "@syncConflicts": {
+    "placeholders": {
+      "arg1": {
+        "type": "int"
+      }
+    }
+  },
+  "waitForSync": "Wait for sync to finish.",
+  "legacyAccountDenied": "This account cannot import the previous library.",
+  "libraryAlreadyOwned": "This library already belongs to another account or server.",
+  "approachUnavailable": "Walking route unavailable. Connect to the server and Internet, then try again. No saved route passes near your position.",
+  "noNearbyPath": "No accessible path close enough to your position or the joining point.",
+  "routeTooLong": "Route too long",
+  "invalidGeometry": "Invalid geometry",
+  "invalidCoordinates": "Invalid coordinates",
+  "emptyRoute": "Empty route",
+  "invalidDirections": "Invalid directions",
+  "missingDirections": "Missing directions",
+  "towardsTrail": "Towards the trail · {arg1}",
+  "@towardsTrail": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "demo": "Demo",
+  "demoFlorence": "Demo · Florence",
+  "damagedGpx": "This GPX contains damaged text. Correct it in the original file before importing.",
+  "gpxSizeLimit": "Limit: 50 MB per GPX.",
+  "incompleteUtf16": "Incomplete UTF-16 file.",
+  "invalidUtf16": "Invalid UTF-16 text.",
+  "unsupportedGpxEncoding": "Unsupported GPX encoding: {arg1}. Export the file as UTF-8.",
+  "@unsupportedGpxEncoding": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "localCopy": "{arg1} · local copy",
+  "@localCopy": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "libraryClosed": "Library closed",
+  "downloadStalled": "Download stalled",
+  "invalidMapCatalog": "Invalid map catalog.",
+  "downloadRunning": "Download already in progress.",
+  "mapHttpsRequired": "Package rejected: HTTPS required, except HTTP from the same Dev LAN server.",
+  "incorrectPackageSize": "Incorrect package size.",
+  "packageIntegrityFailed": "Incomplete package or failed integrity check.",
+  "forbiddenPackagePath": "Package path not allowed.",
+  "unpackedPackageTooLarge": "Unpacked package too large.",
+  "waitForDownload": "Wait for the download to finish.",
+  "missingMapArchive": "Missing map style or archive.",
+  "invalidPath": "Invalid path.",
+  "damagedResource": "Missing or damaged resource.",
+  "invalidPmtiles": "Invalid PMTiles v3 archive.",
+  "truncatedPmtiles": "Truncated PMTiles archive.",
+  "unsupportedMapStyle": "Unsupported style version.",
+  "localPmtilesRequired": "The map must use only local PMTiles archives.",
+  "nonLocalGraphics": "Graphics resources are not local.",
+  "externalMapResource": "A map resource depends on the network or an external file.",
+  "unsupportedGlyphTemplate": "Unsupported glyph template.",
+  "missingFonts": "Missing local fonts.",
+  "incompleteGlyphs": "Incomplete glyph set.",
+  "undeclaredResource": "Undeclared local resource.",
+  "enableLocation": "Enable location on your phone.",
+  "locationPermissionRequired": "Location is required for tracking. Allow it in Android settings.",
+  "recordingNotificationTitle": "Gpix · walk in progress",
+  "recordingNotificationBody": "Your walk is being recorded. Open Gpix to pause or finish.",
+  "recordingChannel": "Walk recording",
+  "incompleteElevations": "Incomplete elevation response.",
+  "sessionChanged": "The session has changed.",
+  "serverUnavailable": "Server unavailable (HTTP {arg1}).",
+  "@serverUnavailable": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "signInRequired": "Sign in to continue.",
+  "sessionExpired": "Your session has expired. Please sign in again.",
+  "mapAddressRejected": "Map address rejected.",
+  "gpxTooLarge": "GPX too large (50 MB maximum).",
+  "xmlEntitiesForbidden": "XML entities are not allowed.",
+  "notGpx": "This file is not a GPX.",
+  "invalidGpxCoordinates": "Invalid GPX coordinates.",
+  "emptyGpx": "No trail or point of interest in this GPX.",
+  "invalidUsername": "3 to 32 letters, digits or underscores.",
+  "invalidEmail": "Enter a valid email address.",
+  "invalidPassword": "The password must contain 8 to 128 characters.",
+  "invalidMapArea": "Invalid map area",
+  "appTitle": "Gpix · On the trail",
+  "settings": "Settings",
+  "myTrails": "My trails",
+  "offline": "Offline",
+  "map": "Map",
+  "history": "History",
+  "sync": "Sync",
+  "delete": "Delete",
+  "view": "View",
+  "go": "Go",
+  "keep": "Keep",
+  "joyOfWalking": "THE JOY OF MOVING FORWARD",
+  "nextTrailStartsHere": "Your next trail\nstarts here.",
+  "libraryIntro": "Your trails, your places. Ready to go with you, even without a connection.",
+  "importGpx": "Import a GPX",
+  "tryDemo": "Try the demo · Florence",
+  "myLibrary": "My library",
+  "itemCount": "{arg1, plural, =0{0 items} =1{1 item} other{{arg1} items}}",
+  "@itemCount": {
+    "placeholders": {
+      "arg1": {
+        "type": "int"
+      }
+    }
+  },
+  "oneJourney": "A whole journey, one trail.",
+  "importIntro": "Import your Camino trail or a file of points of interest. No need to split it into stages.",
+  "pointCount": "{arg1, plural, =0{0 points of interest} =1{1 point of interest} other{{arg1} points of interest}}",
+  "@pointCount": {
+    "placeholders": {
+      "arg1": {
+        "type": "int"
+      }
+    }
+  },
+  "segmentCount": "{arg1} · {arg2, plural, =0{0 segments} =1{1 segment} other{{arg2} segments}}",
+  "@segmentCount": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "int"
+      }
+    }
+  },
+  "mapReady": "Map ready offline",
+  "mapNeedsPreparation": "Map needs preparation",
+  "savedPlaces": "Places saved on this phone",
+  "joinTrail": "Join the trail",
+  "days": "Days",
+  "deleteItemQuestion": "Delete this item?",
+  "deleteItemBody": "This deletion will also be synced with your server.",
+  "offlineHeadline": "Peace of mind.\nEven offline.",
+  "sharedMaps": "Maps are shared between your trails and stored on your phone.",
+  "automaticMapsInfo": "Visible areas load automatically online. Each GPX prepares its maps in the background. Offline, only downloaded areas remain visible.",
+  "resumePreparation": "Resume preparation",
+  "readyOffline": "Ready offline",
+  "preparingMaps": "Automatic preparation running or pending",
+  "loadCatalog": "Load my server's catalog",
+  "prepareTrails": "Prepare my trails · {arg1} MB",
+  "@prepareTrails": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "completeElevations": "Complete elevations for the open trail",
+  "onMyPhone": "On my phone",
+  "noInstalledMaps": "No map installed. Configure your server and its catalog in settings. GPX files remain viewable.",
+  "deleteMap": "Delete this map",
+  "availableRegions": "Available regions",
+  "coversOpenTrail": " · covers the open trail",
+  "download": "Download",
+  "removeMapQuestion": "Remove this map?",
+  "affectedTrails": "Affected trails: {arg1}. Their map may become unavailable offline.",
+  "@affectedTrails": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "none": "none",
+  "mapSizeVersion": "{arg1} MB · {arg2}",
+  "@mapSizeVersion": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "mapSizeCoverage": "{arg1} MB{arg2}",
+  "@mapSizeCoverage": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "libraryOpenFailed": "Cannot open your library. Your data is preserved.",
+  "libraryAdoptFailed": "Cannot attach the library. Existing files are preserved.",
+  "previousLibrary": "Your previous library",
+  "previousLibraryInfo": "Trails and maps from your previous installation are on this phone. Their original server cannot be confirmed.",
+  "adoptLibraryQuestion": "Attach them to {arg1} on this server?",
+  "@adoptLibraryQuestion": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "adoptLibraryInfo": "Importing allows these data and pending changes to sync with this account. With a separate library, the old files are preserved but neither displayed nor synced.",
+  "importExistingLibrary": "Import my existing library",
+  "useSeparateLibrary": "Use a separate library",
+  "signOut": "Sign out",
+  "openingLibrary": "Opening your space…",
+  "resetEmailSent": "If this address belongs to an account, an email will explain what to do. Copy its code below.",
+  "passwordSaved": "Password saved. Sign in with your new password.",
+  "loginHeading": "Your trail starts here.",
+  "registerHeading": "Your next adventure.",
+  "forgotHeading": "Recover your account.",
+  "resetHeading": "A fresh start.",
+  "signIn": "Sign in",
+  "createMyAccount": "Create my account",
+  "sendInstructions": "Send instructions",
+  "savePassword": "Save password",
+  "authIntro": "Your trails, your maps, your freedom. Sign in once, then head out even offline.",
+  "identifier": "Email or username",
+  "email": "Email address",
+  "username": "Username",
+  "resetCode": "Code or link received by email",
+  "resetCodeHint": "Copy the complete code or link from the email.",
+  "newPassword": "New password",
+  "password": "Password",
+  "confirmPassword": "Confirm password",
+  "passwordMismatch": "Passwords do not match.",
+  "forgotPassword": "Forgot password?",
+  "createAccount": "Create an account",
+  "backToLogin": "Back to sign in",
+  "haveResetCode": "I have a reset code",
+  "serverLabel": "Server · {arg1}",
+  "@serverLabel": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "configureServer": "Configure the address in the launch profile",
+  "myAccount": "My account",
+  "offlineSessionInfo": "Your session allows offline access to your library. Server revocation is checked when the connection returns.",
+  "currentPassword": "Current password",
+  "confirmNewPassword": "Confirm new password",
+  "passwordChanged": "Password changed.",
+  "changePassword": "Change password",
+  "apiConfigurationInfo": "Set the API address in the launch profile's local file, then restart F5.",
+  "resolveConflicts": "Resolve conflicts: keep both copies",
+  "signOutInfo": "Signing out locks this space on this phone. Your local trails are kept for your next sign-in.",
+  "requiredField": "This field is required.",
+  "showPassword": "Show password",
+  "hidePassword": "Hide password",
+  "estimatedSuffix": " · estimated",
+  "partialSuffix": " · partial",
+  "nearMe": "Around me",
+  "wholeTrail": "Whole trail",
+  "profileUnavailable": "Profile unavailable · tracking still works",
+  "distanceAlongTrail": "Distance along the trail",
+  "altitudeTitle": "Altitude{arg1}{arg2}",
+  "@altitudeTitle": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "finishWalkQuestion": "Finish this walk?",
+  "finishWalkInfo": "Your route and measurements will be saved in history and synced with your account.",
+  "continueAction": "Continue",
+  "saveWalk": "Save walk",
+  "viewOnMap": "View on map",
+  "importWatchData": "Add watch measurements",
+  "watchSettings": "Watch settings",
+  "deleteWalkQuestion": "Delete this walk?",
+  "deleteWalkInfo": "The deletion will be synced with your account.",
+  "deleteWalk": "Delete walk",
+  "myWalks": "My walks",
+  "walkHistoryInfo": "The paths you have actually walked.",
+  "recordingActive": "● Recording in progress",
+  "walkPaused": "Walk paused · ready to resume",
+  "pause": "Pause",
+  "resume": "Resume",
+  "finish": "Finish",
+  "liveStats": "My live data",
+  "recordFreeWalk": "Record a free walk",
+  "walkCountDistance": "{arg1, plural, =0{0 walks} =1{1 walk} other{{arg1} walks}} · {arg2}",
+  "@walkCountDistance": {
+    "placeholders": {
+      "arg1": {
+        "type": "int"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "viewAllWalkedPlaces": "View everywhere I have walked",
+  "allWalks": "All",
+  "withGpx": "With GPX",
+  "freeWalks": "Free walks",
+  "noWalks": "No walks here yet. Start a GPX with Go or record a free walk.",
+  "unreadableFilename": "Unreadable file name",
+  "unreadableFilenameInfo": "The phone provided a damaged name. Enter the trail name to preserve the correct characters.",
+  "trailName": "Trail name",
+  "enterName": "Enter a name.",
+  "replaceDamagedText": "Replace the damaged characters.",
+  "cancel": "Cancel",
+  "importAction": "Import",
+  "cannotOpenNavigation": "Cannot open the app or browser.",
+  "nearestJoinInfo": "Towards the GPX point closest to your position.",
+  "reverseSuffix": " · reverse direction",
+  "walkInGpix": "Walk with Gpix",
+  "onlineRouteInfo": "Map guidance · online calculation",
+  "walkInGoogleMaps": "Walk with Google Maps",
+  "driveInGoogleMaps": "Drive with Google Maps",
+  "routingPrivacy": "The routing service uses your position and the closest point. Gpix saves the calculated route so you can continue offline.",
+  "myMap": "My map",
+  "trailMapAvailable": "Trail map available offline",
+  "visibleMapsInfo": "Visible areas load automatically online.",
+  "offlineMapsInfo": "Offline, only downloaded areas are visible.",
+  "activeTrail": "Following: {arg1}",
+  "@activeTrail": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "compassInfo": "The arrow points towards the top of your phone. The compass button switches between north-up and heading-up.",
+  "discardChangesQuestion": "Leave this edit?",
+  "discardChangesInfo": "The current section is not saved. Previously saved days are preserved.",
+  "leave": "Leave",
+  "deleteDayQuestion": "Delete day {arg1}?",
+  "@deleteDayQuestion": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "deleteDayInfo": "The GPX and other sections are preserved.",
+  "trailsOnMap": "{arg1, plural, =0{0 trails on my map} =1{1 trail on my map} other{{arg1} trails on my map}}",
+  "@trailsOnMap": {
+    "placeholders": {
+      "arg1": {
+        "type": "int"
+      }
+    }
+  },
+  "walkInProgressData": "Walk in progress · data",
+  "walkPausedResume": "Walk paused · resume",
+  "walkedPlaces": "Places walked",
+  "offTrailDetails": "Off trail · details",
+  "dayNumber": "Day {arg1}",
+  "@dayNumber": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "editDayNumber": "Edit day {arg1}",
+  "@editDayNumber": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "tapStart": "Tap the start on the trail.",
+  "tapEnd": "Tap the end on the trail.",
+  "reviewSection": "Highlighted section: review and save.",
+  "startBoundary": "A · Start{arg1}",
+  "@startBoundary": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "endBoundary": "B · End{arg1}",
+  "@endBoundary": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "minimumSection": "{arg1}{arg2} · minimum 10 m",
+  "@minimumSection": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "saveDay": "Save this day",
+  "saveChanges": "Save changes",
+  "continueFromLastEnd": "Continue from the last endpoint",
+  "cancelEdit": "Cancel edit",
+  "myDays": "My days",
+  "noDays": "Your first section will appear here.",
+  "dayDistance": "Day {arg1} · {arg2}",
+  "@dayDistance": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "deleteDayNumber": "Delete day {arg1}",
+  "@deleteDayNumber": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "remaining": "remaining",
+  "distanceToTrail": "to the trail",
+  "toggleDetails": "Expand or collapse details",
+  "trailReached": "Trail reached",
+  "readyToFollow": "Ready to follow your GPX.",
+  "findingAccuratePosition": "Looking for an accurate GPS position…",
+  "routeEndGap": "End of the calculated path. Joining point {arg1} m away, marker R: check access on site.",
+  "@routeEndGap": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "leftApproach": "You have left the approach route. Recalculate for directions from here.",
+  "inMetres": "In {arg1} m",
+  "@inMetres": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "followFromHere": "Follow the GPX from here",
+  "exitApproach": "Exit approach guidance",
+  "recalculate": "Recalculate",
+  "otherNavigation": "Other navigation",
+  "cachedRouteInfo": "Saved route · online recalculation only",
+  "savedWalkingApproach": "Walking approach · route saved on this phone",
+  "fixMap": "Fix the map",
+  "pauseTracking": "Pause tracking",
+  "resumeApproach": "Resume towards the trail",
+  "followTrail": "Go · follow this trail",
+  "returnToTracking": "Return to tracking · {arg1}",
+  "@returnToTracking": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "findingPosition": "Finding your position…",
+  "poorGps": "Old position or low GPS accuracy",
+  "gpsAccuracy": "GPS accuracy ± {arg1} m",
+  "@gpsAccuracy": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "leavingTrail": "You are moving away from the trail",
+  "muteAlert": "Mute alert",
+  "reverseDirection": "Reverse direction · change",
+  "gpxDirection": "GPX direction · change",
+  "currentWalk": "My current walk",
+  "walkControls": "Pause, finish and history",
+  "planDays": "Plan my days",
+  "editDays": "{arg1, plural, =0{My days} =1{My day} other{My {arg1} days}} · edit",
+  "@editDays": {
+    "placeholders": {
+      "arg1": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineAvailability": "Offline availability",
+  "myFreeWalk": "My free walk",
+  "mapAroundYou": "Your map, around you",
+  "allTrailsInfo": "All your trails are visible. Tap a trail to select it.",
+  "accountServer": "Account and server",
+  "accountServerInfo": "Identity, password and sync",
+  "watchHealthData": "Watch and health data",
+  "healthBridge": "Amazfit / Zepp · Health Connect",
+  "myData": "My data",
+  "syncDataInfo": "Trails, days and walks are saved on this phone, then synced with your API. Sign in to the same account to find them on another phone. Maps must be downloaded again on that device.",
+  "syncNow": "Sync now",
+  "watchHealth": "Watch and health",
+  "yourWatchMeasurements": "Your watch, your measurements",
+  "compatibleWatches": "Amazfit Active Max and other compatible watches: measurements pass through Zepp and Health Connect. Other brands can use the same bridge.",
+  "checkingHealthConnect": "Checking Health Connect…",
+  "healthAuthorized": "Health Connect access authorized · check measurement availability in a walk",
+  "healthPermissionsMissing": "Missing or partial permissions",
+  "healthInstallRequired": "Health Connect must be installed or updated",
+  "healthUnavailable": "Health Connect unavailable on this device",
+  "healthSetupSteps": "1. Sync your watch in Zepp.\n\n2. Enable sharing with Health Connect in Zepp connections.\n\n3. Authorize Gpix below. In a walk, tap “Add watch measurements”.",
+  "openZepp": "Open Zepp",
+  "installHealthConnect": "Install Health Connect",
+  "authorizeMeasurements": "Authorize measurements",
+  "manageHealthPermissions": "Manage or revoke permissions",
+  "supportedMeasurements": "Supported measurements",
+  "supportedMeasurementsInfo": "Average and maximum heart rate, steps and active calories during your walk. Data depends on the model and what Zepp shares. This is not a live Bluetooth connection.",
+  "privacy": "Privacy",
+  "healthPrivacy": "Data is read only when you request it. Imported measurements are saved with your walk and synced with your personal API. Revoking permission prevents future reads; to erase imported measurements, delete the walk from history.",
+  "healthDevicePermissions": "Permissions apply to this phone. Grant them again on another device. Health Connect may restrict access to older periods.",
+  "chooseTrailPassage": "The trail passes here more than once. Which passage do you want?",
+  "atGpxKilometre": "At GPX kilometre {arg1}",
+  "@atGpxKilometre": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      }
+    }
+  },
+  "tapSelectedTrail": "Tap the selected trail. Zoom in to place the boundary precisely.",
+  "northUp": "Switch to north-up",
+  "headingUp": "Orient with the phone",
+  "recenter": "Recenter on my position",
+  "distanceWalked": "Distance walked",
+  "activeDuration": "Active duration",
+  "totalDuration": "Total duration",
+  "averageSpeed": "Average speed",
+  "averagePace": "Average pace",
+  "maxGpsSpeed": "Max. GPS speed",
+  "ascent": "Ascent",
+  "descent": "Descent",
+  "altitude": "Altitude",
+  "minMaxAltitude": "Min. / max. altitude",
+  "averageHeartRate": "Average heart rate",
+  "maxHeartRate": "Maximum heart rate",
+  "steps": "Steps",
+  "activeCalories": "Active calories",
+  "statsExplanation": "Active duration excludes manual pauses. Average pace and speed use this duration. Elevation changes are estimated from filtered GPS altitudes.",
+  "noImportedWatchData": "Watch: no measurements imported. Missing values are not estimated.",
+  "healthSources": "Health Connect · {arg1}\nSources: {arg2}",
+  "@healthSources": {
+    "placeholders": {
+      "arg1": {
+        "type": "Object"
+      },
+      "arg2": {
+        "type": "Object"
+      }
+    }
+  },
+  "language": "Language",
+  "systemLanguage": "Device language",
+  "unexpectedError": "This action could not be completed. Check your connection and try again.",
+  "networkError": "Connection unavailable. Your saved data remains on this phone.",
+  "invalidCredentials": "Incorrect username or password.",
+  "invalidSession": "Invalid session. Please sign in again.",
+  "accountAlreadyExists": "Username or email already in use.",
+  "rateLimited": "Too many attempts. Try again in 15 minutes.",
+  "resetUnavailable": "Email delivery unavailable. Try again later.",
+  "invalidResetCode": "Invalid or expired code. Request a new code.",
+  "incorrectCurrentPassword": "Incorrect current password.",
+  "invalidFields": "All fields must be text.",
+  "unknownOperation": "Unknown operation.",
+  "formTooLarge": "Form too large.",
+  "damagedText": "Text contains a lost character. Correct its name or reimport the original GPX.",
+  "invalidRouteCoordinates": "Invalid origin or destination coordinates.",
+  "waitBeforeRouting": "Wait two seconds before recalculating.",
+  "serviceUnavailable": "Service unavailable or resource not found",
+  "invalidRequest": "Invalid request. Check the entered data.",
+  "placesName": "{name} · places",
+  "@placesName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "englishLanguage": "English",
+  "frenchLanguage": "Français"
+}

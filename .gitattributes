@@ -1,0 +1,10 @@
+* text=auto eol=lf
+*.bat text eol=crlf
+*.dart text eol=lf
+*.arb text eol=lf
+*.md text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf
+*.gpx text eol=lf
+*.pmtiles binary
+*.png binary

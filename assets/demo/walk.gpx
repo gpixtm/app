@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Gpix synthetic demonstration" xmlns="http://www.topografix.com/GPX/1/1">
+  <wpt lat="43.7696" lon="11.2558"><name>Demo landmark</name><desc>Sample point for preview testing. Does not represent a real service.</desc></wpt>
+  <trk><name>Demo · Florence</name><desc>Synthetic trail and sample elevations for interface testing only. Do not follow on a real hike.</desc><trkseg>
+    <trkpt lat="43.765" lon="11.245"><ele>45</ele></trkpt>
+    <trkpt lat="43.767" lon="11.247"><ele>55</ele></trkpt>
+    <trkpt lat="43.768" lon="11.251"><ele>49</ele></trkpt>
+    <trkpt lat="43.7696" lon="11.2558"><ele>80</ele></trkpt>
+    <trkpt lat="43.772" lon="11.258"><ele>100</ele></trkpt>
+    <trkpt lat="43.774" lon="11.264"><ele>72</ele></trkpt>
+  </trkseg></trk>
+</gpx>

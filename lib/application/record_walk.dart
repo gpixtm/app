@@ -1,0 +1,123 @@
+import '../domain/app_message.dart';
+
+import 'dart:async';
+
+import '../domain/models.dart';
+import '../domain/ports.dart';
+import '../domain/walk_recording.dart';
+
+class RecordWalk {
+  RecordWalk(
+    this.store,
+    this.repository,
+    this.gps,
+    this.newId, {
+    this.freeWalkName,
+  });
+  final String Function()? freeWalkName;
+  final String Function() newId;
+  final RecordingStore store;
+  final TrailRepository repository;
+  final PositionSource gps;
+  final changes = StreamController<void>.broadcast();
+  final fixes = StreamController<Fix>.broadcast();
+  WalkRecording? current;
+  Object? error;
+  StreamSubscription<Fix>? _positions;
+  Timer? _checkpoint;
+  Future<void> _writes = Future.value();
+  bool _closed = false;
+  bool get active => current?.active == true;
+  void notify() {
+    if (!_closed) changes.add(null);
+  }
+
+  Future<void> initialize() async {
+    final saved = await store.read();
+    if (saved != null) {
+      // Finishing can be interrupted between the durable history write and clear.
+      if ((await repository.all()).any(
+        (t) => t.id == saved.id && t.walk?.ended != null,
+      )) {
+        await store.clear();
+      } else {
+        current = WalkRecording(saved);
+      }
+    }
+  }
+
+  Future<void> start({Trail? source}) async {
+    if (_closed || active) return;
+    await gps.requestAccess();
+    if (_closed) return;
+    final now = DateTime.now();
+    current ??= WalkRecording(
+      Trail(
+        id: newId(),
+        name: source?.name ?? freeWalkName?.call() ?? 'Walk',
+        segments: [],
+        pois: [],
+        walk: WalkDetails(started: now, seconds: 0, sourceTrailId: source?.id),
+      ),
+    );
+    current!.resume(now);
+    error = null;
+    await save();
+    _positions = gps.watch().listen(
+      (fix) {
+        if (_closed || !active) return;
+        if (current!.accept(fix, DateTime.now())) unawaited(save());
+        fixes.add(fix);
+        notify();
+      },
+      onError: (Object e) {
+        error = AppMessage.recordingSuspended(e);
+        unawaited(pause());
+      },
+    );
+    _checkpoint = Timer.periodic(const Duration(seconds: 15), (_) {
+      unawaited(save());
+      notify();
+    });
+    notify();
+  }
+
+  Future<void> save() {
+    if (current == null) return _writes;
+    final snapshot = current!.snapshot(DateTime.now());
+    _writes = _writes.then((_) => store.write(snapshot)).catchError((Object e) {
+      error = AppMessage.walkSaveFailed(e);
+      notify();
+    });
+    return _writes;
+  }
+
+  Future<void> pause() async {
+    current?.pause(DateTime.now());
+    _checkpoint?.cancel();
+    await _positions?.cancel();
+    _positions = null;
+    await save();
+    notify();
+  }
+
+  Future<Trail?> finish() async {
+    if (current == null) return null;
+    await pause();
+    final result = current!.snapshot(DateTime.now(), finished: true);
+    await repository.save(result);
+    await store.clear();
+    current = null;
+    error = null;
+    notify();
+    return result;
+  }
+
+  Future<void> close() async {
+    _closed = true;
+    await pause();
+    await _writes;
+    await changes.close();
+    await fixes.close();
+  }
+}

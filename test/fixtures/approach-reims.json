@@ -1,0 +1,34 @@
+{
+  "seconds": 350.803,
+  "shape": "ebf}|Age~tFmBmHiA_FU{@}@kCu@sBmA_D{CmK}B_IgC_JiAeEcL{b@yCoHeEmJa@{AGSy@yCoBmHsAwEiIy\\YcAgEqOoCgJUcAc@iBqBmH]kAKa@]mA{@}CcBj@}ADyBw@uAmAsAaDoDjDUTeB`BcAbAkIbIoDfDs@r@w@iCw@_AcDmMa@}AhM_M",
+  "steps": [
+    {
+      "instruction": "Marchez vers le nord-est sur Rue de Vesle.",
+      "index": 0
+    },
+    {
+      "instruction": "Continuez sur Rue Carnot.",
+      "index": 13
+    },
+    {
+      "instruction": "Tournez à gauche dans Place Royale.",
+      "index": 29
+    },
+    {
+      "instruction": "Tournez à gauche dans Rue Colbert.",
+      "index": 34
+    },
+    {
+      "instruction": "Tournez à droite dans l'allée.",
+      "index": 41
+    },
+    {
+      "instruction": "Tournez à droite dans Rue Bеrtin.",
+      "index": 45
+    },
+    {
+      "instruction": "Votre destination est sur la droite.",
+      "index": 46
+    }
+  ]
+}

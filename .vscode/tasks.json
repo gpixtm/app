@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Gpix: prepare local API if available",
+      "type": "process",
+      "command": "dart",
+      "args": [
+        "tool/start_dev_api.dart"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

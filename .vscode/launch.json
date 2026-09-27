@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Gpix · Local Dev (Docker)",
+      "type": "dart",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/lib/main.dart",
+      "flutterMode": "debug",
+      "toolArgs": [
+        "--flavor",
+        "dev",
+        "--dart-define-from-file=${workspaceFolder}/config/dev.local.json"
+      ],
+      "preLaunchTask": "Gpix: prepare local API if available"
+    },
+    {
+      "name": "Gpix · Prod",
+      "type": "dart",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/lib/main.dart",
+      "flutterMode": "debug",
+      "toolArgs": [
+        "--flavor",
+        "prod",
+        "--dart-define-from-file=${workspaceFolder}/config/prod.local.json"
+      ]
+    }
+  ]
+}
