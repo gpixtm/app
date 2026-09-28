@@ -96,7 +96,7 @@ class TrailReviewsSection extends StatelessWidget {
         if (shared?.author case final author?)
           Text(
             l10n.sharedBy(author),
-            style: const TextStyle(fontSize: 12, color: Color(0xff627068)),
+            style: const TextStyle(fontSize: 12, color: mutedInk),
           ),
         const SizedBox(height: 6),
         if (reviews == null)
@@ -197,10 +197,7 @@ class _ReviewTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   '$author · ${DateFormat.yMMMd(l10n.localeName).format(review.updatedAt.toLocal())}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xff627068),
-                  ),
+                  style: const TextStyle(fontSize: 12, color: mutedInk),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

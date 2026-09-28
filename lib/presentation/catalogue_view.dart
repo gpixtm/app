@@ -505,7 +505,7 @@ class _GroupPageState extends State<GroupPage> {
   }
 
   Widget body(BuildContext context, TrailGroup g) {
-    final muted = const TextStyle(fontSize: 12, color: Color(0xff627068));
+    final muted = const TextStyle(fontSize: 12, color: mutedInk);
     final description = g.summary.editorial == 'st-james'
         ? context.l10n.stJamesDescription
         : g.details.description(context.l10n.localeName, g.description);
@@ -747,7 +747,7 @@ class _GroupEditorDialogState extends State<GroupEditorDialog> {
             const SizedBox(height: 8),
             Text(
               context.l10n.groupsArePublic,
-              style: const TextStyle(fontSize: 12, color: Color(0xff627068)),
+              style: const TextStyle(fontSize: 12, color: mutedInk),
             ),
           ],
         ),

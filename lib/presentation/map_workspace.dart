@@ -153,14 +153,8 @@ class _MapWorkspaceState extends State<MapWorkspace> {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          value,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
-        ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12, color: Color(0xff627068)),
-        ),
+        Text(value, style: metricStyle.copyWith(fontSize: 24)),
+        Text(label, style: const TextStyle(fontSize: 12, color: mutedInk)),
       ],
     ),
   );
@@ -766,10 +760,7 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                         padding: const EdgeInsets.only(top: 6),
                         child: Text(
                           context.l10n.routingPrivacy,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Color(0xff627068),
-                          ),
+                          style: const TextStyle(fontSize: 12, color: mutedInk),
                         ),
                       ),
                   ],

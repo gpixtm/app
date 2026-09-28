@@ -17,6 +17,7 @@ import 'catalogue_view.dart';
 import 'map_workspace.dart';
 import 'history.dart';
 import 'settings.dart';
+import 'brand.dart';
 
 class GpixApp extends StatelessWidget {
   const GpixApp(this.controller, {this.mapBuilder, super.key});
@@ -160,19 +161,9 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     children: [
       Padding(
         padding: const EdgeInsets.fromLTRB(28, 20, 16, 16),
-        child: Row(
-          children: const [
-            Icon(Icons.terrain, color: forest, size: 30),
-            SizedBox(width: 8),
-            Text(
-              'gpix',
-              style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -1,
-              ),
-            ),
-          ],
+        child: const Align(
+          alignment: Alignment.centerLeft,
+          child: GpixLogo(width: 135),
         ),
       ),
       NavigationDrawerDestination(
@@ -362,7 +353,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
           ),
         Text(
           context.l10n.sharingNotice,
-          style: const TextStyle(fontSize: 12, color: Color(0xff627068)),
+          style: const TextStyle(fontSize: 12, color: mutedInk),
         ),
         const SizedBox(height: 12),
         // Points files are not shown with any trail until they are attached.

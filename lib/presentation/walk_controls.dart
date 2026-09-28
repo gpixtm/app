@@ -3,6 +3,7 @@ import 'localization.dart';
 import 'package:flutter/material.dart';
 
 import '../application/app_controller.dart';
+import 'design.dart';
 import 'finish_route_dialog.dart';
 
 /// Whether the recording in progress will become a route when finished.
@@ -93,7 +94,7 @@ class RecordingStatus extends StatelessWidget {
           active ? context.l10n.recordingActive : context.l10n.walkPaused,
           style: TextStyle(
             fontWeight: FontWeight.w700,
-            color: active ? const Color(0xffc62828) : const Color(0xff627068),
+            color: active ? const Color(0xffc62828) : mutedInk,
           ),
         ),
         if (error != null)

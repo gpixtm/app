@@ -83,10 +83,7 @@ class WalkStats extends StatelessWidget {
                         children: [
                           Text(
                             entry.value,
-                            style: const TextStyle(
-                              fontSize: 19,
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: metricStyle.copyWith(fontSize: 20),
                           ),
                           Text(entry.key, style: const TextStyle(fontSize: 11)),
                         ],

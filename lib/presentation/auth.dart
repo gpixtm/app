@@ -8,6 +8,7 @@ import '../application/auth_controller.dart';
 import '../application/app_controller.dart';
 import 'app.dart';
 import 'design.dart';
+import 'brand.dart';
 
 /// A fresh Navigator on every account transition removes every protected route.
 class AuthShell extends StatefulWidget {
@@ -353,19 +354,9 @@ class _AuthScreenState extends State<AuthScreen> {
                       children: [
                         const LanguageSelector(),
                         const SizedBox(height: 20),
-                        const Row(
-                          children: [
-                            Icon(Icons.terrain, color: forest, size: 40),
-                            SizedBox(width: 10),
-                            Text(
-                              'gpix',
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.w800,
-                                color: forest,
-                              ),
-                            ),
-                          ],
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: GpixLogo(),
                         ),
                         const SizedBox(height: 32),
                         Text(

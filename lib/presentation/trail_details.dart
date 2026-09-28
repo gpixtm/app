@@ -59,7 +59,7 @@ class _TrailDetailsSectionState extends State<TrailDetailsSection> {
         widget.trail.description;
     final fields = details?.fields ?? const {};
     final from = fields['from'], to = fields['to'];
-    final muted = const TextStyle(fontSize: 12, color: Color(0xff627068));
+    final muted = const TextStyle(fontSize: 12, color: mutedInk);
     return Padding(
       padding: const EdgeInsets.only(top: 12),
       child: Column(
