@@ -381,7 +381,7 @@ void main() {
       }, conflictAlgorithm: ConflictAlgorithm.replace);
       await v2.close();
       final upgraded = await openLocalDatabase(path);
-      expect(await upgraded.getVersion(), 4);
+      expect(await upgraded.getVersion(), 5);
       final restored = (await SqliteTrailRepository(upgraded).all()).single;
       expect(restored.name, 'Été à Chamonix 🏔️');
       expect(restored.publicId, isNull);
@@ -446,7 +446,7 @@ void main() {
       await SqliteTrailRepository(v3).keep(opened);
       await v3.close();
       final upgraded = await openLocalDatabase(path);
-      expect(await upgraded.getVersion(), 4);
+      expect(await upgraded.getVersion(), 5);
       final tables = await upgraded.rawQuery(
         "SELECT name FROM sqlite_master WHERE type='table'",
       );
@@ -1032,8 +1032,8 @@ void main() {
     );
 
     for (final (language, write, required) in [
-      ('en', 'Give my review', 'Walk the whole trail once'),
-      ('fr', 'Donner mon avis', 'Parcourez une fois tout le sentier'),
+      ('en', 'Give my review', 'in one go or over several walks'),
+      ('fr', 'Donner mon avis', 'en une ou plusieurs fois'),
     ]) {
       testWidgets('the panel shows reviews and who may write ($language)', (
         tester,

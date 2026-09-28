@@ -159,8 +159,27 @@ class _MapWorkspaceState extends State<MapWorkspace> {
     ),
   );
 
+  /// The end of the followed trail was reached; the panel opens once on it.
+  bool atTrailEnd = false;
+
+  void revealTrailEnd() {
+    final reached = app.atTrailEnd;
+    if (reached == atTrailEnd) return;
+    atTrailEnd = reached;
+    if (!reached) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !sheet.isAttached || sheet.size > .5) return;
+      sheet.animateTo(
+        .62,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    revealTrailEnd();
     final trail = app.focused;
     final s = app.selected?.id == trail?.id ? app.session : null;
     final p = s?.projection, fix = s?.fix;
@@ -627,6 +646,7 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                   // The walk being recorded is controlled here, alongside the
                   // trail, rather than from the history screen.
                   if (app.recorder?.current != null) ...[
+                    if (app.atTrailEnd) TrailEndCard(app),
                     RecordingStatus(app),
                     const SizedBox(height: 8),
                     WalkControls(app),

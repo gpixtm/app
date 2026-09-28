@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../application/app_controller.dart';
 import '../domain/catalogue.dart';
 import '../domain/models.dart';
+import '../domain/stages.dart';
 import 'catalogue_view.dart';
 import 'design.dart';
 import 'join_departure.dart' show openDirectionsLink;
@@ -94,6 +95,8 @@ class _TrailDetailsSectionState extends State<TrailDetailsSection> {
                 ],
               ),
             ),
+          if (widget.app.stagesOf(widget.trail) case final links?)
+            StageNavigation(widget.app, links),
           if (details?.ref != null || details?.marking != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 6),
@@ -184,6 +187,64 @@ class _TrailDetailsSectionState extends State<TrailDetailsSection> {
                   ),
               ],
             ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Jump to the stage before or after this one in its itinerary. The walk in
+/// progress goes on; only the trail shown changes.
+class StageNavigation extends StatelessWidget {
+  const StageNavigation(this.app, this.links, {super.key});
+  final AppController app;
+  final StageLinks links;
+  @override
+  Widget build(BuildContext context) {
+    Widget jump(TrailGroupMember? member, {required bool next}) {
+      final stage = member?.stage;
+      final label = Text(
+        stage == null
+            ? (next ? context.l10n.nextStage : context.l10n.previousStage)
+            : context.l10n.stageNumber(stage),
+      );
+      final onPressed = member == null || app.busy
+          ? null
+          : () => app.openStage(member);
+      return Semantics(
+        button: true,
+        label: next ? context.l10n.nextStage : context.l10n.previousStage,
+        excludeSemantics: true,
+        child: Tooltip(
+          message: next ? context.l10n.nextStage : context.l10n.previousStage,
+          child: next
+              ? OutlinedButton(
+                  onPressed: onPressed,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      label,
+                      const SizedBox(width: 4),
+                      const Icon(Icons.chevron_right, size: 20),
+                    ],
+                  ),
+                )
+              : OutlinedButton.icon(
+                  onPressed: onPressed,
+                  icon: const Icon(Icons.chevron_left, size: 20),
+                  label: label,
+                ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          if (links.previous != null) jump(links.previous, next: false),
+          const Spacer(),
+          if (links.next != null) jump(links.next, next: true),
         ],
       ),
     );

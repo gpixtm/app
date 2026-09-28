@@ -147,6 +147,8 @@ class AppMessage {
       AppMessage('addedToGroup', [arg1]);
   static AppMessage groupAvailableOffline(Object? arg1) =>
       AppMessage('groupAvailableOffline', [arg1]);
+  static AppMessage stageUnavailable(Object? arg1) =>
+      AppMessage('stageUnavailable', [arg1]);
 }
 
 /// Preserve the failure category while exposing a translatable payload.

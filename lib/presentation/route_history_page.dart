@@ -1,9 +1,12 @@
 import 'localization.dart';
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../application/app_controller.dart';
+import '../domain/models.dart';
 import '../domain/route_history.dart';
 import '../domain/trail_geometry.dart';
 import '../domain/walk_metrics.dart';
@@ -68,6 +71,19 @@ class _RouteHistoryPageState extends State<RouteHistoryPage> {
     app.viewHistory(walk: walk.walk);
     Navigator.of(context).pop();
     widget.openMap();
+  }
+
+  /// The route on the phone to walk on along, unless a walk is recording.
+  Trail? _continuable(RouteHistory g) => app.recorder?.current != null
+      ? null
+      : app.trails.where((t) => t.id == g.id && t.followable).firstOrNull;
+
+  /// Go on the next day from where the walker stands, in the direction of
+  /// the last walk on this route.
+  void continueRoute(RouteHistory g, Trail route) {
+    Navigator.of(context).pop();
+    widget.openMap();
+    unawaited(app.continueRoute(route, reversed: g.latest.reversed));
   }
 
   Future<void> deleteAll(RouteHistory g) async {
@@ -263,6 +279,18 @@ class _RouteHistoryPageState extends State<RouteHistoryPage> {
         icon: const Icon(Icons.map_outlined),
         label: Text(context.l10n.viewOnMap),
       ),
+      if (_continuable(g) case final route?) ...[
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          onPressed: app.busy ? null : () => continueRoute(g, route),
+          icon: const Icon(Icons.directions_walk),
+          label: Text(context.l10n.continueRoute),
+        ),
+        Text(
+          context.l10n.continueRouteInfo,
+          style: const TextStyle(fontSize: 12, color: mutedInk),
+        ),
+      ],
       const SizedBox(height: 16),
       WalkStats(current.walk),
       OutlinedButton.icon(

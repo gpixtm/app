@@ -166,6 +166,21 @@ class CollaborativeTrails {
     }
   }
 
+  /// An itinerary for walking its stages: read from the server and kept on
+  /// the phone, or this phone's last copy while offline.
+  Future<TrailGroup?> itinerary(String id) async {
+    try {
+      final group = await _catalogue.group(id);
+      await store.keepGroup(group);
+      return group;
+    } on RemoteFailure catch (e) {
+      if (e.status == 404) return null;
+      return store.group(id);
+    } catch (_) {
+      return store.group(id);
+    }
+  }
+
   Future<List<TrailGroupSummary>> myGroups() => _catalogue.myGroups();
 
   Future<TrailGroup> saveGroup(String id, GroupDraft draft) {

@@ -22,6 +22,7 @@ import '../domain/catalogue.dart';
 import '../domain/place_search.dart';
 import '../domain/point_attachment.dart';
 import '../domain/shared_trails.dart';
+import '../domain/stages.dart';
 import '../domain/trail_statistics.dart';
 import '../domain/walk_energy.dart';
 import '../domain/walk_recap.dart';
@@ -281,7 +282,11 @@ class AppController {
     _detailsFor = id;
     details = id == null ? null : _details[id];
     final catalogue = collaborative;
-    if (id == null || catalogue == null || details != null) return;
+    if (id == null || catalogue == null) return;
+    if (details != null) {
+      unawaited(_loadStages(trail!));
+      return;
+    }
     TrailDetails? result;
     try {
       result = (await catalogue.open(id)).details;
@@ -295,6 +300,60 @@ class AppController {
     if (_disposed || _detailsFor != id || result == null) return;
     _details[id] = details = result;
     notifyListeners();
+    unawaited(_loadStages(trail!));
+  }
+
+  /// Where trails are numbered stages of an itinerary, by shared identifier;
+  /// null once known not to be one.
+  final Map<String, StageLinks?> _stages = {};
+
+  /// The itinerary stages before and after [trail], when it is one of them.
+  StageLinks? stagesOf(Trail? trail) =>
+      trail == null ? null : _stages[trail.sharedId];
+
+  /// Find the stages around [trail] from its details and its itinerary, kept
+  /// on the phone so the next stage is known offline.
+  Future<StageLinks?> _loadStages(Trail trail) async {
+    final catalogue = collaborative;
+    final id = trail.sharedId;
+    if (catalogue == null || trail.walk != null) return null;
+    if (_stages.containsKey(id)) return _stages[id];
+    var details = _details[id];
+    if (details == null) {
+      try {
+        details = await catalogue.localDetails(id);
+      } catch (_) {
+        // The library closed meanwhile (account change).
+      }
+    }
+    if (details == null || _disposed) return null;
+    final itinerary = StageLinks.itinerary(details);
+    if (itinerary == null) {
+      _stages[id] = null;
+      return null;
+    }
+    final TrailGroup? group;
+    try {
+      group = await catalogue.itinerary(itinerary.id);
+    } catch (_) {
+      return null;
+    }
+    if (_disposed || group == null) return null;
+    final links = _stages[id] = StageLinks.of(group, id);
+    notifyListeners();
+    return links;
+  }
+
+  /// Open the stage [member] of an itinerary on the map, without interrupting
+  /// the walk in progress.
+  Future<void> openStage(TrailGroupMember member) async {
+    final id = member.trail?.id;
+    if (id == null) return;
+    await openShared(id);
+    if (!_disposed && focused?.sharedId != id && focused?.id != id) {
+      message = AppMessage.stageUnavailable(member.stage ?? 0);
+      notifyListeners();
+    }
   }
 
   /// Keep [trail] and its details on the phone, with its maps.
@@ -714,7 +773,7 @@ class AppController {
   }
 
   /// Walks recorded offline are pushed first: the API only accepts a review
-  /// once one synced walk covered the whole trail.
+  /// once the synced walks together covered the whole trail.
   Future<void> saveReview(int rating, String comment) =>
       _review((id) => collaborative!.review(id, rating, comment));
   Future<void> deleteReview() =>
@@ -830,6 +889,69 @@ class AppController {
       approachDestination != null &&
       approach!.arrived(session!, approachDestination!, DateTime.now());
 
+  /// The walker reached the end of the trail followed while recording.
+  bool get atTrailEnd {
+    final s = session;
+    return approach == null &&
+        s != null &&
+        recorder?.active == true &&
+        trailEndReached(s, DateTime.now());
+  }
+
+  /// The stage to propose once the followed stage is walked: the neighbour
+  /// with an end where the walker stands.
+  NextStage? get nextStage {
+    final point = session?.fix?.point;
+    return point == null ? null : stagesOf(selected)?.following(point);
+  }
+
+  /// Finish the walk of a stage, then start [next] from where it ends. Each
+  /// stage is its own walk, with its statistics.
+  Future<void> finishStage([NextStage? next]) async {
+    await finishWalk();
+    if (next == null || _disposed || recorder?.current != null) return;
+    showHistory = false;
+    final trail = await _openStage(next.member);
+    if (trail != null) await launch(trail, reverse: next.reverse);
+  }
+
+  Future<Trail?> _openStage(TrailGroupMember member) async {
+    await openStage(member);
+    final id = member.trail!.id;
+    final trail = focused;
+    return trail != null && (trail.sharedId == id || trail.id == id)
+        ? trail
+        : null;
+  }
+
+  /// Walk on along [route] after stopping, the next morning for instance:
+  /// from where the walker stands, in the direction [reversed] of the last
+  /// walk, or along the next stage once this one is behind them.
+  Future<void> continueRoute(Trail route, {required bool reversed}) async {
+    if (busy || _disposed || recorder?.current != null) return;
+    Fix? fix;
+    await run(() async {
+      fix = await _positionForApproach();
+      if (!_disposed) mapFix = fix;
+    });
+    final here = fix;
+    if (here == null || _disposed) return;
+    final plan = Continuation.of(
+      route,
+      here.point,
+      reversed: reversed,
+      links: await _loadStages(route),
+    );
+    showHistory = false;
+    var target = route;
+    if (plan.stage case final stage?) {
+      final trail = await _openStage(stage.member);
+      if (trail == null) return;
+      target = trail;
+    }
+    await launch(target, reverse: plan.reverse);
+  }
+
   Future<void> joinTrail(Trail target, {bool? reverse}) async {
     if (busy || approachSource == null) return;
     var ready = false;
@@ -870,7 +992,8 @@ class AppController {
 
   /// Start a trail from wherever the walker is: follow it directly when
   /// already on it, otherwise walk the internal approach to its nearest point.
-  Future<void> launch(Trail trail) async {
+  /// [reverse] walks it backwards; by default the chosen direction is kept.
+  Future<void> launch(Trail trail, {bool? reverse}) async {
     if (busy || !trail.followable || _disposed) return;
     // A catalogue trail being walked stays on the phone, maps included, so
     // guidance survives a lost connection or the app being closed.
@@ -886,9 +1009,11 @@ class AppController {
       trail = trails.firstWhere((t) => t.id == id, orElse: () => trail);
     }
     final backwards =
-        selected?.id == trail.id &&
-        (approach != null ? approachReverse : session?.reverse == true);
+        reverse ??
+        (selected?.id == trail.id &&
+            (approach != null ? approachReverse : session?.reverse == true));
     if (selected?.id != trail.id || session?.active == true) select(trail);
+    unawaited(_loadStages(trail));
     if (approachSource != null) {
       await joinTrail(trail, reverse: backwards);
       if (_disposed ||

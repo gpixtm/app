@@ -1715,11 +1715,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get reviewCompletionRequired =>
-      'Parcourez une fois tout le sentier avec l’enregistrement Gpix pour donner votre avis.';
+      'Parcourez tout le sentier avec l’enregistrement Gpix, en une ou plusieurs fois, pour donner votre avis.';
 
   @override
   String reviewProgress(int percent) {
-    return 'Votre meilleure marche enregistrée couvre $percent % de ce parcours.';
+    return 'Vos marches enregistrées couvrent ensemble $percent % de ce parcours.';
   }
 
   @override
@@ -1786,7 +1786,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get completionRequired =>
-      'Parcourez tout le sentier avant de donner votre avis.';
+      'Parcourez tout le sentier, en une ou plusieurs fois, avant de donner votre avis.';
 
   @override
   String get invalidRating => 'Choisissez une note de 1 à 5 étoiles.';
@@ -2607,4 +2607,39 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get walkBLetter => 'B';
+
+  @override
+  String stageUnavailable(int stage) {
+    return 'L’étape $stage n’est pas sur ce téléphone. Connectez-vous à Internet, ou rendez l’itinéraire disponible hors ligne avant de partir.';
+  }
+
+  @override
+  String get previousStage => 'Étape précédente';
+
+  @override
+  String get nextStage => 'Étape suivante';
+
+  @override
+  String get trailEndReached => 'Fin du parcours atteinte';
+
+  @override
+  String stageEndReached(int stage) {
+    return 'Fin de l’étape $stage atteinte';
+  }
+
+  @override
+  String get finishStageInfo =>
+      'Terminez pour enregistrer cette marche et ses statistiques.';
+
+  @override
+  String finishAndStartStage(int stage) {
+    return 'Terminer et lancer l’étape $stage';
+  }
+
+  @override
+  String get continueRoute => 'Continuer d’ici';
+
+  @override
+  String get continueRouteInfo =>
+      'Part de l’endroit où vous êtes, dans le sens de votre dernière marche. Au-delà de la fin d’une étape, l’étape suivante démarre.';
 }
