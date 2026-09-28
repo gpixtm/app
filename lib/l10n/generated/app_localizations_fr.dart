@@ -2408,4 +2408,199 @@ class AppLocalizationsFr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String routeHistoryCount(int routes, int walks, String distance) {
+    String _temp0 = intl.Intl.pluralLogic(
+      routes,
+      locale: localeName,
+      other: '$routes parcours',
+      one: '1 parcours',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      walks,
+      locale: localeName,
+      other: '$walks sorties',
+      one: '1 sortie',
+    );
+    return '$_temp0 · $_temp1 · $distance';
+  }
+
+  @override
+  String get searchRoutes => 'Rechercher un parcours';
+
+  @override
+  String get noMatchingRoutes =>
+      'Aucun parcours ne correspond à cette recherche.';
+
+  @override
+  String routeLastWalked(String date, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'parcouru $count fois',
+      one: 'parcouru 1 fois',
+    );
+    return '$date · $_temp0';
+  }
+
+  @override
+  String latestPerformance(String distance, String duration, String speed) {
+    return 'Dernière : $distance · $duration · $speed';
+  }
+
+  @override
+  String bestPerformance(String speed, String date) {
+    return 'Record : $speed le $date';
+  }
+
+  @override
+  String speedVsUsual(String difference, String usual) {
+    return '$difference par rapport à votre habitude de $usual';
+  }
+
+  @override
+  String partialWalk(int percent) {
+    return 'Partielle · $percent %';
+  }
+
+  @override
+  String get partialWalkInfo =>
+      'Les sorties couvrant moins de 90 % du parcours ne comptent ni dans les records ni dans la vitesse habituelle.';
+
+  @override
+  String get walkReversed => 'Sens inverse';
+
+  @override
+  String get walkInProgress => 'En cours';
+
+  @override
+  String get recordFastest => 'La plus rapide';
+
+  @override
+  String get recordLongest => 'La plus longue';
+
+  @override
+  String get recordHighest => 'Le plus de dénivelé';
+
+  @override
+  String get records => 'Records';
+
+  @override
+  String get walkTab => 'Sortie';
+
+  @override
+  String get compareTab => 'Comparer';
+
+  @override
+  String get progressTab => 'Progression';
+
+  @override
+  String get previousWalk => 'Sortie précédente';
+
+  @override
+  String get nextWalk => 'Sortie suivante';
+
+  @override
+  String routeSince(String date) {
+    return 'Depuis le $date';
+  }
+
+  @override
+  String get deleteAllWalks => 'Supprimer toutes les sorties';
+
+  @override
+  String deleteAllWalksQuestion(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Supprimer ces $count sorties ?',
+      one: 'Supprimer cette sortie ?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deleteAllWalksInfo =>
+      'Le parcours lui-même est conservé, tout comme les sentiers partagés. La suppression sera synchronisée avec votre compte.';
+
+  @override
+  String get walkA => 'Sortie A';
+
+  @override
+  String get walkB => 'Sortie B';
+
+  @override
+  String get difference => 'Écart';
+
+  @override
+  String get pickTwoWalks => 'Choisissez deux sorties différentes.';
+
+  @override
+  String get aheadBehindTitle => 'Avance ou retard le long du parcours';
+
+  @override
+  String get aheadBehindInfo =>
+      'Au-dessus de la ligne, la sortie A est en avance sur la sortie B ; en dessous, elle est en retard. Les pauses ne comptent pas.';
+
+  @override
+  String gapAhead(String distance, String time) {
+    return 'À $distance, A a $time d\'avance';
+  }
+
+  @override
+  String gapBehind(String distance, String time) {
+    return 'À $distance, A a $time de retard';
+  }
+
+  @override
+  String gapLevel(String distance) {
+    return 'À $distance, A et B sont à égalité';
+  }
+
+  @override
+  String get gapOppositeDirections =>
+      'Ces sorties ont été faites dans des sens opposés. Choisissez deux sorties dans le même sens pour suivre l\'écart.';
+
+  @override
+  String get gapUnavailable =>
+      'Ces sorties n\'ont pas assez de parcours en commun, avec leurs temps, pour suivre l\'écart.';
+
+  @override
+  String minutesSeconds(int minutes, int seconds) {
+    return '$minutes min $seconds s';
+  }
+
+  @override
+  String signedMinutes(String minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get speedProgressTitle => 'Vitesse moyenne, sortie après sortie';
+
+  @override
+  String get speedProgressInfo =>
+      'Sorties complètes uniquement. La ligne pointillée est votre vitesse habituelle sur ce parcours.';
+
+  @override
+  String speedOnDate(String date, String speed) {
+    return '$date · $speed';
+  }
+
+  @override
+  String get progressNeedsTwo =>
+      'Parcourez encore une fois ce parcours en entier pour voir votre progression.';
+
+  @override
+  String get totalActiveTime => 'Durée active totale';
+
+  @override
+  String get usualSpeed => 'Vitesse habituelle';
+
+  @override
+  String get walkALetter => 'A';
+
+  @override
+  String get walkBLetter => 'B';
 }

@@ -3745,6 +3745,276 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 place} other{{count} places}}'**
   String trailPlaceCount(int count);
+
+  /// No description provided for @routeHistoryCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{routes, plural, =1{1 route} other{{routes} routes}} · {walks, plural, =1{1 walk} other{{walks} walks}} · {distance}'**
+  String routeHistoryCount(int routes, int walks, String distance);
+
+  /// No description provided for @searchRoutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Search a route'**
+  String get searchRoutes;
+
+  /// No description provided for @noMatchingRoutes.
+  ///
+  /// In en, this message translates to:
+  /// **'No route matches this search.'**
+  String get noMatchingRoutes;
+
+  /// No description provided for @routeLastWalked.
+  ///
+  /// In en, this message translates to:
+  /// **'{date} · {count, plural, =1{walked once} other{walked {count} times}}'**
+  String routeLastWalked(String date, int count);
+
+  /// No description provided for @latestPerformance.
+  ///
+  /// In en, this message translates to:
+  /// **'Last: {distance} · {duration} · {speed}'**
+  String latestPerformance(String distance, String duration, String speed);
+
+  /// No description provided for @bestPerformance.
+  ///
+  /// In en, this message translates to:
+  /// **'Record: {speed} on {date}'**
+  String bestPerformance(String speed, String date);
+
+  /// No description provided for @speedVsUsual.
+  ///
+  /// In en, this message translates to:
+  /// **'{difference} vs your usual {usual}'**
+  String speedVsUsual(String difference, String usual);
+
+  /// No description provided for @partialWalk.
+  ///
+  /// In en, this message translates to:
+  /// **'Partial · {percent}%'**
+  String partialWalk(int percent);
+
+  /// No description provided for @partialWalkInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Walks covering less than 90% of the route are left out of records and of the usual speed.'**
+  String get partialWalkInfo;
+
+  /// No description provided for @walkReversed.
+  ///
+  /// In en, this message translates to:
+  /// **'Reverse direction'**
+  String get walkReversed;
+
+  /// No description provided for @walkInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get walkInProgress;
+
+  /// No description provided for @recordFastest.
+  ///
+  /// In en, this message translates to:
+  /// **'Fastest'**
+  String get recordFastest;
+
+  /// No description provided for @recordLongest.
+  ///
+  /// In en, this message translates to:
+  /// **'Longest'**
+  String get recordLongest;
+
+  /// No description provided for @recordHighest.
+  ///
+  /// In en, this message translates to:
+  /// **'Most climbing'**
+  String get recordHighest;
+
+  /// No description provided for @records.
+  ///
+  /// In en, this message translates to:
+  /// **'Records'**
+  String get records;
+
+  /// No description provided for @walkTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Walk'**
+  String get walkTab;
+
+  /// No description provided for @compareTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Compare'**
+  String get compareTab;
+
+  /// No description provided for @progressTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress'**
+  String get progressTab;
+
+  /// No description provided for @previousWalk.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous walk'**
+  String get previousWalk;
+
+  /// No description provided for @nextWalk.
+  ///
+  /// In en, this message translates to:
+  /// **'Next walk'**
+  String get nextWalk;
+
+  /// No description provided for @routeSince.
+  ///
+  /// In en, this message translates to:
+  /// **'Since {date}'**
+  String routeSince(String date);
+
+  /// No description provided for @deleteAllWalks.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all walks'**
+  String get deleteAllWalks;
+
+  /// No description provided for @deleteAllWalksQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Delete this walk?} other{Delete these {count} walks?}}'**
+  String deleteAllWalksQuestion(int count);
+
+  /// No description provided for @deleteAllWalksInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'The route itself is kept, and so are shared trails. The deletion will be synced with your account.'**
+  String get deleteAllWalksInfo;
+
+  /// No description provided for @walkA.
+  ///
+  /// In en, this message translates to:
+  /// **'Walk A'**
+  String get walkA;
+
+  /// No description provided for @walkB.
+  ///
+  /// In en, this message translates to:
+  /// **'Walk B'**
+  String get walkB;
+
+  /// No description provided for @difference.
+  ///
+  /// In en, this message translates to:
+  /// **'Difference'**
+  String get difference;
+
+  /// No description provided for @pickTwoWalks.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick two different walks.'**
+  String get pickTwoWalks;
+
+  /// No description provided for @aheadBehindTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ahead or behind along the route'**
+  String get aheadBehindTitle;
+
+  /// No description provided for @aheadBehindInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Above the line, walk A is ahead of walk B; below it, A is behind. Pauses are not counted.'**
+  String get aheadBehindInfo;
+
+  /// No description provided for @gapAhead.
+  ///
+  /// In en, this message translates to:
+  /// **'At {distance}, A is {time} ahead'**
+  String gapAhead(String distance, String time);
+
+  /// No description provided for @gapBehind.
+  ///
+  /// In en, this message translates to:
+  /// **'At {distance}, A is {time} behind'**
+  String gapBehind(String distance, String time);
+
+  /// No description provided for @gapLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'At {distance}, A and B are level'**
+  String gapLevel(String distance);
+
+  /// No description provided for @gapOppositeDirections.
+  ///
+  /// In en, this message translates to:
+  /// **'These walks went in opposite directions. Pick two walks in the same direction to follow the gap.'**
+  String get gapOppositeDirections;
+
+  /// No description provided for @gapUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'These walks do not share enough of the route, with times, to follow the gap.'**
+  String get gapUnavailable;
+
+  /// No description provided for @minutesSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min {seconds} s'**
+  String minutesSeconds(int minutes, int seconds);
+
+  /// No description provided for @signedMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String signedMinutes(String minutes);
+
+  /// No description provided for @speedProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Average speed, walk after walk'**
+  String get speedProgressTitle;
+
+  /// No description provided for @speedProgressInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete walks only. The dashed line is your usual speed on this route.'**
+  String get speedProgressInfo;
+
+  /// No description provided for @speedOnDate.
+  ///
+  /// In en, this message translates to:
+  /// **'{date} · {speed}'**
+  String speedOnDate(String date, String speed);
+
+  /// No description provided for @progressNeedsTwo.
+  ///
+  /// In en, this message translates to:
+  /// **'Walk this route completely once more to see your progress.'**
+  String get progressNeedsTwo;
+
+  /// No description provided for @totalActiveTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Total active time'**
+  String get totalActiveTime;
+
+  /// No description provided for @usualSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Usual speed'**
+  String get usualSpeed;
+
+  /// No description provided for @walkALetter.
+  ///
+  /// In en, this message translates to:
+  /// **'A'**
+  String get walkALetter;
+
+  /// No description provided for @walkBLetter.
+  ///
+  /// In en, this message translates to:
+  /// **'B'**
+  String get walkBLetter;
 }
 
 class _AppLocalizationsDelegate
