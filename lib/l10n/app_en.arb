@@ -968,5 +968,98 @@
   "recapItemRemaining": "Remaining distance",
   "recapItemArrival": "Estimated arrival time",
   "recapItemAscent": "Elevation gain",
-  "recapItemClock": "Current time"
+  "recapItemClock": "Current time",
+  "reviews": "Reviews",
+  "sharedBy": "Shared by {author}",
+  "@sharedBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "noReviewsYet": "No reviews yet",
+  "reviewCount": "{count, plural, =1{1 review} other{{count} reviews}}",
+  "@reviewCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "averageRating": "Rated {rating} out of 5",
+  "@averageRating": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "writeReview": "Give my review",
+  "editReview": "Edit my review",
+  "deleteMyReview": "Delete my review",
+  "deleteReviewQuestion": "Delete your review?",
+  "reviewCompletionRequired": "Walk the whole trail once with Gpix recording to give your review.",
+  "reviewProgress": "Your best recorded walk covers {percent}% of this trail.",
+  "@reviewProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewsOffline": "Reviews saved on this phone · connect to refresh",
+  "reviewDialogTitle": "Your review",
+  "reviewComment": "Comment (optional)",
+  "giveRating": "{rating} out of 5",
+  "@giveRating": {
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
+  },
+  "publish": "Publish",
+  "you": "You",
+  "formerWalker": "Former walker",
+  "removeSharedTrailBody": "It is removed from your trails on all your phones. The shared trail stays visible to other walkers.",
+  "sharingNotice": "Trails you add are shared with all Gpix walkers. Your walks, speeds and statistics stay private.",
+  "sharedTrailUnavailable": "Connect to the internet to download this trail.",
+  "reviewsUnavailable": "Reviews are unavailable offline.",
+  "invalidReview": "Choose 1 to 5 stars and at most 2,000 characters.",
+  "reviewSaved": "Review published",
+  "reviewDeleted": "Review deleted",
+  "trailsAlreadyShared": "{arg1, plural, =1{This trail already exists: the shared trail is reused} other{These {arg1} trails already exist: the shared trails are reused}}",
+  "@trailsAlreadyShared": {
+    "placeholders": {
+      "arg1": {
+        "type": "int"
+      }
+    }
+  },
+  "completionRequired": "Walk the whole trail before reviewing it.",
+  "invalidRating": "Choose a rating from 1 to 5 stars.",
+  "reviewTooLong": "Your comment is too long (2,000 characters maximum).",
+  "addPlaceHere": "Add a place here",
+  "newPlaceTitle": "New place",
+  "editPlaceTitle": "Edit the place",
+  "placeAtPosition": "It is placed at your current position and shared with every walker on this trail.",
+  "placeName": "Name (for example: Viewpoint)",
+  "save": "Save",
+  "edit": "Edit",
+  "placeAddedBy": "Added by {author}",
+  "@placeAddedBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "placePending": "Saved on this phone · shared once online",
+  "deletePlaceQuestion": "Delete this place?",
+  "invalidPlace": "Give the place a name (200 characters maximum).",
+  "placeTooFar": "Move within 100 m of the trail to add a place here.",
+  "placeNotYours": "Only its author can change this place.",
+  "placeSaved": "Place saved on the trail",
+  "placeDeleted": "Place deleted"
 }

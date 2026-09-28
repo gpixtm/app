@@ -317,6 +317,10 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
               child: Text(context.l10n.tryDemo),
             ),
           ),
+        Text(
+          context.l10n.sharingNotice,
+          style: const TextStyle(fontSize: 12, color: Color(0xff627068)),
+        ),
         const SizedBox(height: 12),
         if (app.trails.isEmpty)
           Padding(
@@ -432,7 +436,11 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       context: context,
       builder: (c) => AlertDialog(
         title: Text(context.l10n.deleteItemQuestion),
-        content: Text(context.l10n.deleteItemBody),
+        content: Text(
+          t.followable
+              ? context.l10n.removeSharedTrailBody
+              : context.l10n.deleteItemBody,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(c, false),

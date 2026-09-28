@@ -19,6 +19,11 @@ class Repository implements TrailRepository {
   Future<void> save(Trail t) async {
     list.add(t);
   }
+
+  @override
+  Future<void> keep(Trail t) async {
+    if (!list.any((known) => known.id == t.id)) list.add(t);
+  }
 }
 
 class Maps implements MapRepository {

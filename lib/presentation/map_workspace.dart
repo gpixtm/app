@@ -10,6 +10,8 @@ import '../domain/trail_geometry.dart';
 import 'guidance_text.dart';
 import 'place_search_bar.dart';
 import 'trail_map.dart';
+import 'trail_places.dart';
+import 'trail_reviews.dart';
 import 'walk_controls.dart';
 import 'walk_stats.dart';
 import 'join_departure.dart';
@@ -38,7 +40,7 @@ class _MapWorkspaceState extends State<MapWorkspace> {
   void openMenu() => Scaffold.of(context).openDrawer();
   void showTrail(Trail trail) {
     setState(() => cluster = null);
-    app.focus(trail);
+    app.open(trail);
   }
 
   @override
@@ -526,7 +528,24 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                         child: Icon(Icons.hiking, color: forest),
                       ),
                       title: Text(t.name),
-                      subtitle: Text(kilometers(TrailGeometry(t).total)),
+                      subtitle: Wrap(
+                        spacing: 10,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(
+                            kilometers(
+                              app.sharedFor(t)?.metres ??
+                                  TrailGeometry(t).total,
+                            ),
+                          ),
+                          if (app.sharedFor(t) case final shared?
+                              when shared.reviews > 0)
+                            RatingSummary(
+                              count: shared.reviews,
+                              average: shared.average,
+                            ),
+                        ],
+                      ),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => showTrail(t),
                     ),
@@ -721,6 +740,26 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                         ),
                       ),
                   ],
+                  // Where the walker stands: a viewpoint, a spring…
+                  if (trail.followable &&
+                      trail.walk == null &&
+                      approach == null &&
+                      app.collaborative != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: OutlinedButton.icon(
+                        onPressed: app.busy
+                            ? null
+                            : () => addPlaceHere(context, app, trail),
+                        icon: const Icon(Icons.add_location_alt_outlined),
+                        label: Text(context.l10n.addPlaceHere),
+                      ),
+                    ),
+                  if (trail.followable &&
+                      trail.walk == null &&
+                      s?.active != true &&
+                      approach == null)
+                    TrailReviewsSection(app, trail),
                   if (app.session?.active == true && s == null)
                     TextButton(
                       onPressed: () => app.focus(app.selected!),

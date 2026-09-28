@@ -7,6 +7,7 @@ import 'package:gpix/application/app_controller.dart';
 import 'package:gpix/application/library.dart';
 import 'package:gpix/application/record_walk.dart';
 import 'package:gpix/data/local_database.dart';
+import 'package:gpix/data/trail_identity_hash.dart';
 import 'package:gpix/data/recording_store.dart';
 import 'package:gpix/data/trail_codec.dart';
 import 'package:gpix/domain/app_message.dart';
@@ -190,6 +191,27 @@ void main() {
       expect(again.trail!.id, created.trail!.id);
       await service.finish();
       expect(await routes(), hasLength(1));
+      await service.close();
+    });
+
+    test('a new route takes the shared identifier of its line', () async {
+      final service = RecordWalk(
+        SqliteRecordingStore(db),
+        SqliteTrailRepository(db),
+        gps,
+        () => 'random',
+        identity: const HashedTrailIdentity(),
+      );
+      await service.initialize();
+      await service.start();
+      await walk(service, straight(14));
+      final created = await service.keepRoute(await routes());
+      const identity = HashedTrailIdentity();
+      expect(
+        created!.trail!.id,
+        identity.sharedId(identity.fingerprint(created.trail!.segments)!),
+      );
+      await service.finish(routeId: created.trail!.id);
       await service.close();
     });
 

@@ -42,7 +42,7 @@ class Server extends ServerConnection {
   bool offline = false;
   Object? sent;
   @override
-  Future<dynamic> request(String path, {Object? body}) async {
+  Future<dynamic> request(String path, {Object? body, String? method}) async {
     expect(path, '/api/approach');
     sent = body;
     if (offline) throw const SocketException('offline');

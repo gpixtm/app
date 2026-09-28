@@ -118,6 +118,17 @@ class AppMessage {
   static const libraryAdoptFailed = AppMessage('libraryAdoptFailed');
   static const resetEmailSent = AppMessage('resetEmailSent');
   static const passwordSaved = AppMessage('passwordSaved');
+  static const sharedTrailUnavailable = AppMessage('sharedTrailUnavailable');
+  static const reviewsUnavailable = AppMessage('reviewsUnavailable');
+  static const invalidReview = AppMessage('invalidReview');
+  static const reviewSaved = AppMessage('reviewSaved');
+  static const reviewDeleted = AppMessage('reviewDeleted');
+  static const invalidPlace = AppMessage('invalidPlace');
+  static const placeTooFar = AppMessage('placeTooFar');
+  static const placeSaved = AppMessage('placeSaved');
+  static const placeDeleted = AppMessage('placeDeleted');
+  static AppMessage trailsAlreadyShared(Object? arg1) =>
+      AppMessage('trailsAlreadyShared', [arg1]);
 }
 
 /// Preserve the failure category while exposing a translatable payload.

@@ -2677,6 +2677,270 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Current time'**
   String get recapItemClock;
+
+  /// No description provided for @reviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get reviews;
+
+  /// No description provided for @sharedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared by {author}'**
+  String sharedBy(String author);
+
+  /// No description provided for @noReviewsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No reviews yet'**
+  String get noReviewsYet;
+
+  /// No description provided for @reviewCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 review} other{{count} reviews}}'**
+  String reviewCount(int count);
+
+  /// No description provided for @averageRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rated {rating} out of 5'**
+  String averageRating(String rating);
+
+  /// No description provided for @writeReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Give my review'**
+  String get writeReview;
+
+  /// No description provided for @editReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit my review'**
+  String get editReview;
+
+  /// No description provided for @deleteMyReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete my review'**
+  String get deleteMyReview;
+
+  /// No description provided for @deleteReviewQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your review?'**
+  String get deleteReviewQuestion;
+
+  /// No description provided for @reviewCompletionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Walk the whole trail once with Gpix recording to give your review.'**
+  String get reviewCompletionRequired;
+
+  /// No description provided for @reviewProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Your best recorded walk covers {percent}% of this trail.'**
+  String reviewProgress(int percent);
+
+  /// No description provided for @reviewsOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews saved on this phone · connect to refresh'**
+  String get reviewsOffline;
+
+  /// No description provided for @reviewDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your review'**
+  String get reviewDialogTitle;
+
+  /// No description provided for @reviewComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment (optional)'**
+  String get reviewComment;
+
+  /// No description provided for @giveRating.
+  ///
+  /// In en, this message translates to:
+  /// **'{rating} out of 5'**
+  String giveRating(int rating);
+
+  /// No description provided for @publish.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish'**
+  String get publish;
+
+  /// No description provided for @you.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get you;
+
+  /// No description provided for @formerWalker.
+  ///
+  /// In en, this message translates to:
+  /// **'Former walker'**
+  String get formerWalker;
+
+  /// No description provided for @removeSharedTrailBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It is removed from your trails on all your phones. The shared trail stays visible to other walkers.'**
+  String get removeSharedTrailBody;
+
+  /// No description provided for @sharingNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Trails you add are shared with all Gpix walkers. Your walks, speeds and statistics stay private.'**
+  String get sharingNotice;
+
+  /// No description provided for @sharedTrailUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect to the internet to download this trail.'**
+  String get sharedTrailUnavailable;
+
+  /// No description provided for @reviewsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews are unavailable offline.'**
+  String get reviewsUnavailable;
+
+  /// No description provided for @invalidReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose 1 to 5 stars and at most 2,000 characters.'**
+  String get invalidReview;
+
+  /// No description provided for @reviewSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Review published'**
+  String get reviewSaved;
+
+  /// No description provided for @reviewDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Review deleted'**
+  String get reviewDeleted;
+
+  /// No description provided for @trailsAlreadyShared.
+  ///
+  /// In en, this message translates to:
+  /// **'{arg1, plural, =1{This trail already exists: the shared trail is reused} other{These {arg1} trails already exist: the shared trails are reused}}'**
+  String trailsAlreadyShared(int arg1);
+
+  /// No description provided for @completionRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Walk the whole trail before reviewing it.'**
+  String get completionRequired;
+
+  /// No description provided for @invalidRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a rating from 1 to 5 stars.'**
+  String get invalidRating;
+
+  /// No description provided for @reviewTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Your comment is too long (2,000 characters maximum).'**
+  String get reviewTooLong;
+
+  /// No description provided for @addPlaceHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a place here'**
+  String get addPlaceHere;
+
+  /// No description provided for @newPlaceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New place'**
+  String get newPlaceTitle;
+
+  /// No description provided for @editPlaceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit the place'**
+  String get editPlaceTitle;
+
+  /// No description provided for @placeAtPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'It is placed at your current position and shared with every walker on this trail.'**
+  String get placeAtPosition;
+
+  /// No description provided for @placeName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name (for example: Viewpoint)'**
+  String get placeName;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @placeAddedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Added by {author}'**
+  String placeAddedBy(String author);
+
+  /// No description provided for @placePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved on this phone · shared once online'**
+  String get placePending;
+
+  /// No description provided for @deletePlaceQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this place?'**
+  String get deletePlaceQuestion;
+
+  /// No description provided for @invalidPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Give the place a name (200 characters maximum).'**
+  String get invalidPlace;
+
+  /// No description provided for @placeTooFar.
+  ///
+  /// In en, this message translates to:
+  /// **'Move within 100 m of the trail to add a place here.'**
+  String get placeTooFar;
+
+  /// No description provided for @placeNotYours.
+  ///
+  /// In en, this message translates to:
+  /// **'Only its author can change this place.'**
+  String get placeNotYours;
+
+  /// No description provided for @placeSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Place saved on the trail'**
+  String get placeSaved;
+
+  /// No description provided for @placeDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Place deleted'**
+  String get placeDeleted;
 }
 
 class _AppLocalizationsDelegate

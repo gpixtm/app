@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:uuid/uuid.dart';
+import 'package:gpix/domain/app_message.dart';
 import 'package:gpix/domain/models.dart';
 import 'package:gpix/domain/day_plan.dart';
 import 'package:gpix/data/local_database.dart';
@@ -97,12 +98,15 @@ void main() {
         await ra.save(trail('A edit'));
         await rb.save(trail('B edit'));
         await sa.synchronize();
-        expect(await sb.synchronize(), contains('conflit'));
+        expect(
+          await sb.synchronize(),
+          isA<AppMessage>().having((m) => m.code, 'code', 'syncConflicts'),
+        );
         await sb.resolveConflicts();
         await sb.synchronize();
         final all = await rb.all();
         expect(all.any((t) => t.id == id && t.name == 'A edit'), true);
-        final copy = all.singleWhere((t) => t.name == 'B edit · copie locale');
+        final copy = all.singleWhere((t) => t.name == 'B edit · local copy');
         expect(copy.id, isNot(id));
         await rb.delete(copy.id);
         await rb.delete(id);

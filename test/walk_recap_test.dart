@@ -383,7 +383,7 @@ void main() {
       await SqliteTrailRepository(v1).save(finishedWalk(source: usualTrail));
       await v1.close();
       final upgraded = await openLocalDatabase(path);
-      expect(await upgraded.getVersion(), 2);
+      expect(await upgraded.getVersion(), 3);
       final trails = await SqliteTrailRepository(upgraded).all();
       expect(trails.single.walk!.sourceTrailId, usualTrail);
       expect(await SqliteSyncStore(upgraded).next(), isNotNull);
@@ -434,7 +434,11 @@ class _EmptySyncStore implements SyncStore {
   @override
   Future<SyncOperation?> next() async => null;
   @override
-  Future<void> acknowledge(SyncOperation op, int revision) async {}
+  Future<void> acknowledge(
+    SyncOperation op,
+    int revision, {
+    String? publicId,
+  }) async {}
   @override
   Future<void> conflict(SyncOperation op) async {}
   @override

@@ -3,6 +3,7 @@ import '../domain/app_message.dart';
 import 'dart:async';
 
 import 'announce_progress.dart';
+import 'collaborative_trails.dart';
 import 'guide_navigation.dart';
 import 'library.dart';
 import 'prepare_maps.dart';
@@ -16,6 +17,7 @@ import '../domain/day_plan.dart';
 import '../domain/health_data.dart';
 import '../domain/approach.dart';
 import '../domain/place_search.dart';
+import '../domain/shared_trails.dart';
 import '../domain/trail_statistics.dart';
 import '../domain/walk_recap.dart';
 import '../domain/walked_route.dart';
@@ -40,6 +42,138 @@ class AppController {
     this.recap,
     this.statistics,
     this.saveSpokenRecap,
+    this.collaborative,
+  });
+
+  /// Trails every walker shared; absent in tests and older setups.
+  final CollaborativeTrails? collaborative;
+
+  /// Offline catalogue of shared trails.
+  List<SharedTrail> shared = [];
+  Map<String, SharedTrail> _sharedById = {};
+
+  /// Every trail marked by a pin: the library, then shared trails not in it.
+  /// A shared trail appears as a light preview until opened.
+  List<Trail> pinned = [];
+  Set<String> _previews = {};
+  bool isPreview(Trail trail) => _previews.contains(trail.id);
+  SharedTrail? sharedFor(Trail trail) => _sharedById[trail.sharedId];
+
+  /// Show a pinned trail: a shared preview is downloaded once, then kept.
+  Future<void> open(Trail trail) async {
+    if (!isPreview(trail) || collaborative == null) {
+      focus(trail);
+      return;
+    }
+    await run(() async {
+      final full = await collaborative!.open(trail.id);
+      await reload();
+      if (_disposed) return;
+      focus(trails.firstWhere((t) => t.id == full.id, orElse: () => full));
+      unawaited(prepareTrailMaps([full]));
+    });
+  }
+
+  /// Places walkers added on shared trails, this phone's pending ones included.
+  List<TrailPlace> places = [];
+
+  /// Places of the trails on this phone, shown with their GPX points.
+  List<TrailPlace> get visiblePlaces {
+    final ids = {
+      for (final t in trails) ...[t.id, t.sharedId],
+    };
+    return [
+      for (final p in places)
+        if (ids.contains(p.trailId)) p,
+    ];
+  }
+
+  /// Add a place on [trail] where the walker stands: a fresh, precise fix
+  /// within [maximumPlaceDistance] of the line, between vertices included.
+  Future<void> addPlace(Trail trail, String name, String comment) =>
+      run(() async {
+        if (collaborative == null) return;
+        final fix = await _positionForApproach();
+        if (_disposed) return;
+        mapFix = fix;
+        final offTrail = TrailGeometry(trail).project(fix.point)?.offTrail;
+        if (offTrail == null || offTrail > maximumPlaceDistance) {
+          throw MessageFailure(AppMessage.placeTooFar);
+        }
+        await collaborative!.addPlace(trail, fix.point, name, comment);
+        places = await collaborative!.places();
+        message = AppMessage.placeSaved;
+        _scheduleSync();
+      });
+
+  Future<void> editPlace(TrailPlace place, String name, String comment) =>
+      run(() async {
+        await collaborative?.editPlace(place, name, comment);
+        places = await collaborative?.places() ?? const [];
+        message = AppMessage.placeSaved;
+        _scheduleSync();
+      });
+
+  Future<void> deletePlace(TrailPlace place) => run(() async {
+    await collaborative?.removePlace(place);
+    places = await collaborative?.places() ?? const [];
+    message = AppMessage.placeDeleted;
+    _scheduleSync();
+  });
+
+  /// Reviews of the focused trail, as last read.
+  TrailReviews? reviews;
+  bool reviewsLoading = false;
+  Object? reviewsError;
+  String? _reviewsFor;
+  Future<void> refreshReviews() async {
+    final trail = focused;
+    final id = trail == null || trail.walk != null || isPreview(trail)
+        ? null
+        : trail.sharedId;
+    _reviewsFor = id;
+    if (reviews?.trailId != id) reviews = null;
+    reviewsError = null;
+    if (id == null || collaborative == null) {
+      reviewsLoading = false;
+      notifyListeners();
+      return;
+    }
+    reviewsLoading = true;
+    notifyListeners();
+    try {
+      final result = await collaborative!.reviews(id);
+      if (_reviewsFor == id) reviews = result;
+    } catch (e) {
+      if (_reviewsFor == id) reviewsError = e;
+    } finally {
+      if (_reviewsFor == id) {
+        reviewsLoading = false;
+        notifyListeners();
+      }
+    }
+  }
+
+  /// Walks recorded offline are pushed first: the API only accepts a review
+  /// once one synced walk covered the whole trail.
+  Future<void> saveReview(int rating, String comment) =>
+      _review((id) => collaborative!.review(id, rating, comment));
+  Future<void> deleteReview() =>
+      _review((id) => collaborative!.removeReview(id), deleted: true);
+  Future<void> _review(
+    Future<TrailReviews> Function(String) change, {
+    bool deleted = false,
+  }) => run(() async {
+    final id = _reviewsFor;
+    if (id == null || collaborative == null) return;
+    try {
+      syncStatus = await sync.synchronize();
+    } catch (_) {
+      // Offline: the review request reports it.
+    }
+    final result = await change(id);
+    if (_reviewsFor == id) reviews = result;
+    message = deleted ? AppMessage.reviewDeleted : AppMessage.reviewSaved;
   });
   final AnnounceProgress? recap;
   final TrailStatisticsStore? statistics;
@@ -373,6 +507,7 @@ class AppController {
     focusRevision++;
     if (session?.active != true) select(trail);
     notifyListeners();
+    unawaited(refreshReviews());
   }
 
   void beginPlanning(Trail trail) {
@@ -579,6 +714,19 @@ class AppController {
     trails = all.where((t) => t.walk == null).toList();
     history = all.where((t) => t.walk != null).toList()
       ..sort((a, b) => b.walk!.started.compareTo(a.walk!.started));
+    shared = await collaborative?.catalogue() ?? const [];
+    places = await collaborative?.places() ?? const [];
+    if (_disposed) return;
+    _sharedById = {for (final s in shared) s.id: s};
+    final known = {
+      for (final t in trails) ...[t.id, ?t.publicId],
+    };
+    final previews = [
+      for (final s in shared)
+        if (!known.contains(s.id)) s.preview,
+    ];
+    _previews = {for (final t in previews) t.id};
+    pinned = [...trails, ...previews];
     if (focused != null) {
       focused = all.where((t) => t.id == focused!.id).firstOrNull;
     }
@@ -620,11 +768,14 @@ class AppController {
   }
 
   Future<void> import(String xml, String filename) => run(() async {
-    final added = await library.import(xml, filename);
+    final imported = await library.import(xml, filename);
+    final added = imported.trails;
     await reload();
     focus(added.first);
     unawaited(prepareTrailMaps(added));
-    message = AppMessage.itemsSaved(added.length);
+    message = imported.reused == added.length
+        ? AppMessage.trailsAlreadyShared(added.length)
+        : AppMessage.itemsSaved(added.length);
     _scheduleSync();
   });
   void select(Trail trail) {
@@ -637,7 +788,10 @@ class AppController {
     notifyListeners();
   }
 
-  List<Poi> get pois => trails.expand((t) => t.pois).toList();
+  List<Poi> get pois => [
+    ...trails.expand((t) => t.pois),
+    for (final p in visiblePlaces) p.poi,
+  ];
   Coverage get coverage => Coverage(localMaps.map((m) => m.region.bounds));
   bool covers(Trail trail) =>
       automaticMaps?.covers(trail) == true || coverage.covers(trail);

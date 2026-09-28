@@ -1643,4 +1643,171 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recapItemClock => 'Current time';
+
+  @override
+  String get reviews => 'Reviews';
+
+  @override
+  String sharedBy(String author) {
+    return 'Shared by $author';
+  }
+
+  @override
+  String get noReviewsYet => 'No reviews yet';
+
+  @override
+  String reviewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count reviews',
+      one: '1 review',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String averageRating(String rating) {
+    return 'Rated $rating out of 5';
+  }
+
+  @override
+  String get writeReview => 'Give my review';
+
+  @override
+  String get editReview => 'Edit my review';
+
+  @override
+  String get deleteMyReview => 'Delete my review';
+
+  @override
+  String get deleteReviewQuestion => 'Delete your review?';
+
+  @override
+  String get reviewCompletionRequired =>
+      'Walk the whole trail once with Gpix recording to give your review.';
+
+  @override
+  String reviewProgress(int percent) {
+    return 'Your best recorded walk covers $percent% of this trail.';
+  }
+
+  @override
+  String get reviewsOffline =>
+      'Reviews saved on this phone · connect to refresh';
+
+  @override
+  String get reviewDialogTitle => 'Your review';
+
+  @override
+  String get reviewComment => 'Comment (optional)';
+
+  @override
+  String giveRating(int rating) {
+    return '$rating out of 5';
+  }
+
+  @override
+  String get publish => 'Publish';
+
+  @override
+  String get you => 'You';
+
+  @override
+  String get formerWalker => 'Former walker';
+
+  @override
+  String get removeSharedTrailBody =>
+      'It is removed from your trails on all your phones. The shared trail stays visible to other walkers.';
+
+  @override
+  String get sharingNotice =>
+      'Trails you add are shared with all Gpix walkers. Your walks, speeds and statistics stay private.';
+
+  @override
+  String get sharedTrailUnavailable =>
+      'Connect to the internet to download this trail.';
+
+  @override
+  String get reviewsUnavailable => 'Reviews are unavailable offline.';
+
+  @override
+  String get invalidReview =>
+      'Choose 1 to 5 stars and at most 2,000 characters.';
+
+  @override
+  String get reviewSaved => 'Review published';
+
+  @override
+  String get reviewDeleted => 'Review deleted';
+
+  @override
+  String trailsAlreadyShared(int arg1) {
+    String _temp0 = intl.Intl.pluralLogic(
+      arg1,
+      locale: localeName,
+      other: 'These $arg1 trails already exist: the shared trails are reused',
+      one: 'This trail already exists: the shared trail is reused',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get completionRequired => 'Walk the whole trail before reviewing it.';
+
+  @override
+  String get invalidRating => 'Choose a rating from 1 to 5 stars.';
+
+  @override
+  String get reviewTooLong =>
+      'Your comment is too long (2,000 characters maximum).';
+
+  @override
+  String get addPlaceHere => 'Add a place here';
+
+  @override
+  String get newPlaceTitle => 'New place';
+
+  @override
+  String get editPlaceTitle => 'Edit the place';
+
+  @override
+  String get placeAtPosition =>
+      'It is placed at your current position and shared with every walker on this trail.';
+
+  @override
+  String get placeName => 'Name (for example: Viewpoint)';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String placeAddedBy(String author) {
+    return 'Added by $author';
+  }
+
+  @override
+  String get placePending => 'Saved on this phone · shared once online';
+
+  @override
+  String get deletePlaceQuestion => 'Delete this place?';
+
+  @override
+  String get invalidPlace => 'Give the place a name (200 characters maximum).';
+
+  @override
+  String get placeTooFar =>
+      'Move within 100 m of the trail to add a place here.';
+
+  @override
+  String get placeNotYours => 'Only its author can change this place.';
+
+  @override
+  String get placeSaved => 'Place saved on the trail';
+
+  @override
+  String get placeDeleted => 'Place deleted';
 }

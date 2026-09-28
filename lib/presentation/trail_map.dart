@@ -18,6 +18,7 @@ import '../application/app_controller.dart';
 import 'map_features.dart';
 import 'position_arrow.dart';
 import 'trail_pins.dart';
+import 'trail_places.dart';
 
 const dayColors = ['#c66a25', '#7956b2', '#087e8b', '#b03c68'];
 const navigationZoom = 16.0;
@@ -74,7 +75,7 @@ class _TrailMapState extends State<TrailMap> {
   Future<void> refreshAnchors() async {
     final c = controller;
     if (!loaded || c == null) return;
-    anchoredTrails = app.trails;
+    anchoredTrails = app.pinned;
     anchoredPins = showPins;
     anchoredFocus = app.focused?.id;
     if (!showPins) {
@@ -89,7 +90,7 @@ class _TrailMapState extends State<TrailMap> {
         region.northeast.latitude,
       );
       anchors = stickyAnchors(anchors, [
-        for (final trail in app.trails)
+        for (final trail in app.pinned)
           if (trail.id != app.focused?.id) trail,
       ], view);
     }
@@ -477,7 +478,7 @@ class _TrailMapState extends State<TrailMap> {
           placeRevision = app.placeRevision;
           if (app.placeTarget case final place?) await showPlace(place);
         }
-        if (!identical(anchoredTrails, app.trails) ||
+        if (!identical(anchoredTrails, app.pinned) ||
             anchoredPins != showPins ||
             anchoredFocus != app.focused?.id) {
           unawaited(refreshAnchors());
@@ -671,6 +672,13 @@ class _TrailMapState extends State<TrailMap> {
       }
       return;
     }
+    final nearPlaces = app.visiblePlaces
+        .where((place) => distance(p, place.point) <= tolerance)
+        .toList();
+    if (nearPlaces.isNotEmpty && mounted) {
+      await showTrailPlace(context, app, nearPlaces.first);
+      return;
+    }
     final nearPois = app.pois
         .where((poi) => distance(p, poi.point) <= tolerance)
         .toList();
@@ -799,7 +807,7 @@ class _TrailMapState extends State<TrailMap> {
                   pin,
                   onTap: () => widget.onPin != null
                       ? widget.onPin!(pin.trails)
-                      : app.focus(pin.trails.first),
+                      : app.open(pin.trails.first),
                 ),
               ),
             ),

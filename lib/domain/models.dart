@@ -27,6 +27,7 @@ class Trail {
     this.estimated = false,
     List<WalkingDay> days = const [],
     this.walk,
+    this.publicId,
   }) : segments = List.unmodifiable(segments.map(List<GeoPoint>.unmodifiable)),
        days = List.unmodifiable(days),
        pois = List.unmodifiable(pois);
@@ -41,6 +42,7 @@ class Trail {
     estimated: estimated,
     days: days,
     walk: value,
+    publicId: publicId,
   );
   Trail withDays(List<WalkingDay> value) => Trail(
     id: id,
@@ -51,7 +53,25 @@ class Trail {
     estimated: estimated,
     days: value,
     walk: walk,
+    publicId: publicId,
   );
+  Trail withPublicId(String? value) => Trail(
+    id: id,
+    name: name,
+    segments: segments,
+    pois: pois,
+    description: description,
+    estimated: estimated,
+    days: days,
+    walk: walk,
+    publicId: value,
+  );
+
+  /// Shared trail this library entry published or reused. It is kept beside
+  /// the synced payload, never inside it. A line added on a phone usually
+  /// already carries its shared identifier as [id].
+  final String? publicId;
+  String get sharedId => publicId ?? id;
   final String id, name, description;
   final List<List<GeoPoint>> segments;
   final List<Poi> pois;

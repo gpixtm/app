@@ -5,6 +5,7 @@ import 'dart:isolate';
 
 import '../domain/models.dart';
 import '../domain/ports.dart';
+import '../domain/trail_identity.dart';
 import '../domain/walk_recording.dart';
 import '../domain/walked_route.dart';
 
@@ -16,8 +17,12 @@ class RecordWalk {
     this.newId, {
     this.freeWalkName,
     this.routeName,
+    this.identity,
   });
   final String Function()? freeWalkName;
+
+  /// A route takes the shared identifier of its line when available.
+  final TrailIdentity? identity;
   final String Function(DateTime started)? routeName;
   final String Function() newId;
   final RecordingStore store;
@@ -115,7 +120,9 @@ class RecordWalk {
     }
     await pause();
     final walk = recording.snapshot(DateTime.now());
-    final id = newId();
+    // The route's line decides its shared identity, like an imported GPX.
+    final fingerprint = identity?.fingerprint(walk.segments);
+    final id = fingerprint == null ? newId() : identity!.sharedId(fingerprint);
     final name = routeName?.call(walk.walk!.started) ?? walk.name;
     final routes = known.where((t) => t.walk == null).toList();
     final result = await Isolate.run(

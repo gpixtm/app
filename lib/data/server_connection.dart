@@ -83,10 +83,18 @@ class ServerConnection implements AuthService {
     }
   }
 
-  Future<dynamic> _send(String path, {Object? body, String? access}) async {
+  Future<dynamic> _send(
+    String path, {
+    Object? body,
+    String? access,
+    String? method,
+  }) async {
     environment.requireEndpoint();
     final req =
-        http.Request(body == null ? 'GET' : 'POST', Uri.parse('$base$path'))
+        http.Request(
+            method ?? (body == null ? 'GET' : 'POST'),
+            Uri.parse('$base$path'),
+          )
           ..followRedirects = false
           ..headers['Content-Type'] = 'application/json; charset=utf-8';
     req.headers['Accept-Language'] = languageCode?.call() ?? 'en';
@@ -216,12 +224,19 @@ class ServerConnection implements AuthService {
   }
 
   ServerConnection bindAccount() => _AccountConnection(this, _generation);
-  Future<dynamic> request(String path, {Object? body}) async {
+
+  /// [method] overrides the default GET, or POST when a body is sent.
+  Future<dynamic> request(String path, {Object? body, String? method}) async {
     final generation = _generation;
     var access = await accessToken();
     _check(generation);
     try {
-      final result = await _send(path, body: body, access: access);
+      final result = await _send(
+        path,
+        body: body,
+        access: access,
+        method: method,
+      );
       _check(generation);
       return result;
     } on ApiFailure catch (e) {
@@ -232,7 +247,12 @@ class ServerConnection implements AuthService {
       access = await accessToken();
       _check(generation);
       try {
-        final result = await _send(path, body: body, access: access);
+        final result = await _send(
+          path,
+          body: body,
+          access: access,
+          method: method,
+        );
         _check(generation);
         return result;
       } on ApiFailure catch (retryError) {
@@ -324,7 +344,11 @@ class ApiSyncTransport implements SyncTransport {
         'payload': TrailCodec.encode(op.trail),
       },
     );
-    return SyncResult(r['revision'], r['conflict']);
+    return SyncResult(
+      r['revision'],
+      r['conflict'],
+      publicId: r['publicId'] as String?,
+    );
   }
 
   @override
@@ -337,6 +361,7 @@ class ApiSyncTransport implements SyncTransport {
               r['revision'],
               r['deleted'],
               TrailCodec.decode(r['payload']),
+              publicId: r['publicId'] as String?,
             ),
           )
           .toList();
@@ -376,9 +401,9 @@ class _AccountConnection extends ServerConnection {
   }
 
   @override
-  Future<dynamic> request(String path, {Object? body}) async {
+  Future<dynamic> request(String path, {Object? body, String? method}) async {
     check();
-    final r = await parent.request(path, body: body);
+    final r = await parent.request(path, body: body, method: method);
     check();
     return r;
   }

@@ -1,10 +1,16 @@
 import '../domain/app_message.dart';
 import '../domain/ports.dart';
+import '../domain/shared_trails.dart';
 import '../domain/sync.dart';
 import '../domain/trail_statistics.dart';
 
 class SynchronizeLibrary implements Synchronizer {
-  SynchronizeLibrary(this.store, this.transport, {this.statistics});
+  SynchronizeLibrary(
+    this.store,
+    this.transport, {
+    this.statistics,
+    this.shared,
+  });
   final SyncStore store;
   final SyncTransport transport;
 
@@ -22,6 +28,63 @@ class SynchronizeLibrary implements Synchronizer {
     }
   }
 
+  /// Offline catalogue of the trails every walker shared.
+  final ({SharedTrailTransport transport, SharedTrailStore store})? shared;
+
+  /// Pull catalogue changes since the last stored cursor, page by page. Each
+  /// page and its cursor are stored together, so an interruption resumes
+  /// without gaps. An older API without the catalogue leaves it empty.
+  Future<void> refreshShared() async {
+    final s = shared;
+    if (s == null) return;
+    try {
+      var since = await s.store.cursor();
+      while (true) {
+        final page = await s.transport.index(since);
+        await s.store.apply(page);
+        if (!page.more || page.next <= since) break;
+        since = page.next;
+      }
+    } catch (_) {
+      // Offline or older API: the cached catalogue stays in use.
+    }
+    try {
+      await _sendPlaces(s.transport, s.store);
+      var since = await s.store.placeCursor();
+      while (true) {
+        final page = await s.transport.places(since);
+        await s.store.applyPlaces(page);
+        if (!page.more || page.next <= since) break;
+        since = page.next;
+      }
+    } catch (_) {
+      // Places added offline stay queued until the next sync.
+    }
+  }
+
+  /// A place waits while its trail is not shared yet (404, for a trail added
+  /// offline); a refusal (too far, invalid, not the author) drops it.
+  Future<void> _sendPlaces(
+    SharedTrailTransport transport,
+    SharedTrailStore store,
+  ) async {
+    for (final pending in await store.pendingPlaces()) {
+      try {
+        final result = pending.delete
+            ? await transport.removePlace(pending.place)
+            : await transport.savePlace(pending.place);
+        await store.placeSent(pending, result);
+      } on RemoteFailure catch (e) {
+        if (e.status == 404 && !pending.delete) continue;
+        if (e.status == 403 || e.status == 404 || e.status == 422) {
+          await store.placeSent(pending, null);
+          continue;
+        }
+        rethrow;
+      }
+    }
+  }
+
   bool _running = false;
   @override
   Future<Object> synchronize() async {
@@ -35,11 +98,16 @@ class SynchronizeLibrary implements Synchronizer {
         if (result.conflict) {
           await store.conflict(op);
         } else {
-          await store.acknowledge(op, result.revision);
+          await store.acknowledge(
+            op,
+            result.revision,
+            publicId: result.publicId,
+          );
         }
       }
       await store.merge(await transport.pull());
       await _refreshStatistics();
+      await refreshShared();
       final conflicts = await store.conflictsCount();
       return conflicts == 0
           ? AppMessage.librarySynced

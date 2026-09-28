@@ -13,6 +13,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'application/library.dart';
+import 'application/collaborative_trails.dart';
+import 'data/shared_trail_api.dart';
+import 'data/trail_identity_hash.dart';
 import 'application/announce_progress.dart';
 import 'application/guide_navigation.dart';
 import 'domain/walk_recap.dart';
@@ -136,6 +139,8 @@ class _LibraryRuntime {
       await preferences.read('gpix.spokenRecap'),
     );
     final statistics = SqliteTrailStatisticsStore(db);
+    final sharedTrails = SqliteSharedTrailStore(db);
+    final sharedTransport = ApiSharedTrailTransport(scopedServer);
     final guidance = AndroidGuidance(
       sentences: (instruction) => describeGuidance(messages, instruction),
       recapSentences: (recap) => describeRecap(messages, recap),
@@ -145,6 +150,8 @@ class _LibraryRuntime {
       SqliteTrailRepository(db),
       XmlGpxDecoder(placesName: (name) => messages.placesName(name)),
       ApiElevationSource(scopedServer),
+      shared: sharedTrails,
+      identity: const HashedTrailIdentity(),
     );
     final placesClient = http.Client();
     final controller = AppController(
@@ -170,6 +177,7 @@ class _LibraryRuntime {
         const Uuid().v4,
         freeWalkName: () => messages.freeWalk,
         routeName: (started) => messages.walkedRouteName(started),
+        identity: const HashedTrailIdentity(),
       ),
       library: library,
       loadDemo: () => seedDemo(db, storage.mapsDirectory, library),
@@ -183,6 +191,7 @@ class _LibraryRuntime {
           transport: ApiStatisticsTransport(scopedServer),
           store: statistics,
         ),
+        shared: (transport: sharedTransport, store: sharedTrails),
       ),
       setAwake: (on) => WakelockPlus.toggle(enable: on),
       vibrate: HapticFeedback.heavyImpact,
@@ -198,6 +207,12 @@ class _LibraryRuntime {
       ),
       saveSpokenRecap: (items) =>
           preferences.write('gpix.spokenRecap', RecapItem.format(items)),
+      collaborative: CollaborativeTrails(
+        sharedTrails,
+        sharedTransport,
+        library.repository,
+        newId: const Uuid().v4,
+      ),
     );
     _close = () async {
       await controller.shutdown();

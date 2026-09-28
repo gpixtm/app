@@ -1666,4 +1666,175 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get recapItemClock => 'Heure actuelle';
+
+  @override
+  String get reviews => 'Avis';
+
+  @override
+  String sharedBy(String author) {
+    return 'Partagé par $author';
+  }
+
+  @override
+  String get noReviewsYet => 'Aucun avis pour le moment';
+
+  @override
+  String reviewCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count avis',
+      one: '1 avis',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String averageRating(String rating) {
+    return 'Noté $rating sur 5';
+  }
+
+  @override
+  String get writeReview => 'Donner mon avis';
+
+  @override
+  String get editReview => 'Modifier mon avis';
+
+  @override
+  String get deleteMyReview => 'Supprimer mon avis';
+
+  @override
+  String get deleteReviewQuestion => 'Supprimer votre avis ?';
+
+  @override
+  String get reviewCompletionRequired =>
+      'Parcourez une fois tout le sentier avec l’enregistrement Gpix pour donner votre avis.';
+
+  @override
+  String reviewProgress(int percent) {
+    return 'Votre meilleure marche enregistrée couvre $percent % de ce parcours.';
+  }
+
+  @override
+  String get reviewsOffline =>
+      'Avis enregistrés sur ce téléphone · connectez-vous pour actualiser';
+
+  @override
+  String get reviewDialogTitle => 'Votre avis';
+
+  @override
+  String get reviewComment => 'Commentaire (facultatif)';
+
+  @override
+  String giveRating(int rating) {
+    return '$rating sur 5';
+  }
+
+  @override
+  String get publish => 'Publier';
+
+  @override
+  String get you => 'Vous';
+
+  @override
+  String get formerWalker => 'Ancien marcheur';
+
+  @override
+  String get removeSharedTrailBody =>
+      'Il est retiré de vos parcours sur tous vos téléphones. Le parcours partagé reste visible pour les autres marcheurs.';
+
+  @override
+  String get sharingNotice =>
+      'Les parcours que vous ajoutez sont partagés avec tous les marcheurs Gpix. Vos marches, vitesses et statistiques restent privées.';
+
+  @override
+  String get sharedTrailUnavailable =>
+      'Connectez-vous à Internet pour télécharger ce parcours.';
+
+  @override
+  String get reviewsUnavailable =>
+      'Les avis ne sont pas disponibles hors connexion.';
+
+  @override
+  String get invalidReview =>
+      'Choisissez de 1 à 5 étoiles et 2 000 caractères au maximum.';
+
+  @override
+  String get reviewSaved => 'Avis publié';
+
+  @override
+  String get reviewDeleted => 'Avis supprimé';
+
+  @override
+  String trailsAlreadyShared(int arg1) {
+    String _temp0 = intl.Intl.pluralLogic(
+      arg1,
+      locale: localeName,
+      other:
+          'Ces $arg1 parcours existent déjà : les parcours partagés sont réutilisés',
+      one: 'Ce parcours existe déjà : le parcours partagé est réutilisé',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get completionRequired =>
+      'Parcourez tout le sentier avant de donner votre avis.';
+
+  @override
+  String get invalidRating => 'Choisissez une note de 1 à 5 étoiles.';
+
+  @override
+  String get reviewTooLong =>
+      'Votre commentaire est trop long (2 000 caractères maximum).';
+
+  @override
+  String get addPlaceHere => 'Ajouter un lieu ici';
+
+  @override
+  String get newPlaceTitle => 'Nouveau lieu';
+
+  @override
+  String get editPlaceTitle => 'Modifier le lieu';
+
+  @override
+  String get placeAtPosition =>
+      'Il est placé à votre position actuelle et partagé avec tous les marcheurs de ce parcours.';
+
+  @override
+  String get placeName => 'Nom (par exemple : Belle vue)';
+
+  @override
+  String get save => 'Enregistrer';
+
+  @override
+  String get edit => 'Modifier';
+
+  @override
+  String placeAddedBy(String author) {
+    return 'Ajouté par $author';
+  }
+
+  @override
+  String get placePending =>
+      'Enregistré sur ce téléphone · partagé dès la connexion';
+
+  @override
+  String get deletePlaceQuestion => 'Supprimer ce lieu ?';
+
+  @override
+  String get invalidPlace => 'Donnez un nom au lieu (200 caractères maximum).';
+
+  @override
+  String get placeTooFar =>
+      'Rapprochez-vous à moins de 100 m du parcours pour ajouter un lieu ici.';
+
+  @override
+  String get placeNotYours => 'Seul son auteur peut modifier ce lieu.';
+
+  @override
+  String get placeSaved => 'Lieu enregistré sur le parcours';
+
+  @override
+  String get placeDeleted => 'Lieu supprimé';
 }
