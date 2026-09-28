@@ -14,6 +14,11 @@ String decimal(num value, [int digits = 1]) =>
     NumberFormat(digits == 0 ? '0' : '0.${'0' * digits}').format(value);
 String kilometers(double metres) =>
     '${NumberFormat('0.0').format(metres / 1000)} km';
+
+/// A trail length short enough for a map label: "4.5 km", "12 km".
+String shortKilometers(double metres) => metres >= 10000
+    ? '${NumberFormat('0').format(metres / 1000)} km'
+    : kilometers(metres);
 ThemeData appTheme() => ThemeData(
   useMaterial3: true,
   scaffoldBackgroundColor: paper,

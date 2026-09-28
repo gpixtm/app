@@ -481,8 +481,8 @@
   "catalogueEmpty": "Aucun parcours dans le catalogue pour l’instant.",
   "retry": "Réessayer",
   "myGroups": "Mes groupes",
-  "ownTrailsLegend": "Mes parcours (sur ce téléphone)",
-  "catalogueTrailsLegend": "Parcours du catalogue",
+  "ownTrailsLegend": "Enregistrés",
+  "catalogueTrailsLegend": "Catalogue",
   "ownTrailLabel": "votre parcours",
   "catalogueTrailLabel": "parcours du catalogue",
   "itinerary": "Itinéraire",
@@ -550,5 +550,13 @@
   "invalidRecordingReference": "Le parcours suivi par cette marche n’a pas pu être enregistré avec elle.",
   "catalogueTrailKeptOffline": "Parcours du catalogue gardé hors ligne sur ce téléphone",
   "trailDistance": "distance",
-  "trailAscent": "dénivelé +"
+  "trailAscent": "dénivelé +",
+  "trailsInView": "{count, plural, =1{1 parcours dans cette zone} other{{count} parcours dans cette zone}}",
+  "noTrailsInView": "Aucun parcours dans cette zone",
+  "moveMapForTrails": "Déplacez la carte ou dézoomez pour trouver des parcours.",
+  "zoomInForMoreTrails": "Zoomez pour voir plus de parcours dans cette zone.",
+  "allTrailsInViewListed": "Tous les parcours de cette zone sont listés.",
+  "ascentShort": "{metres} m de D+",
+  "offlineTag": "Hors ligne",
+  "myTrailTag": "Mon parcours"
 }

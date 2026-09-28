@@ -9,6 +9,7 @@ import '../domain/shared_trails.dart';
 import 'design.dart';
 import 'join_departure.dart' show openDirectionsLink;
 import 'localization.dart';
+import 'pin_images.dart';
 import 'trail_details.dart';
 import 'trail_reviews.dart';
 
@@ -221,14 +222,10 @@ class TrailColourLegend extends StatelessWidget {
   const TrailColourLegend({super.key});
   @override
   Widget build(BuildContext context) {
-    Widget item(Color color, String label) => Row(
+    Widget item(bool catalogue, String label) => Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
+        TrailPinBadge(catalogue: catalogue, size: 20),
         const SizedBox(width: 6),
         Text(label, style: const TextStyle(fontSize: 12)),
       ],
@@ -237,8 +234,8 @@ class TrailColourLegend extends StatelessWidget {
       spacing: 16,
       runSpacing: 4,
       children: [
-        item(forest, context.l10n.ownTrailsLegend),
-        item(catalogueColor, context.l10n.catalogueTrailsLegend),
+        item(false, context.l10n.ownTrailsLegend),
+        item(true, context.l10n.catalogueTrailsLegend),
       ],
     );
   }
@@ -303,17 +300,7 @@ class CatalogueTrailTile extends StatelessWidget {
     );
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 4),
-      leading:
-          leading ??
-          CircleAvatar(
-            backgroundColor: own
-                ? const Color(0xffedf1e7)
-                : const Color(0xffefe8f6),
-            child: Icon(
-              own ? Icons.hiking : Icons.travel_explore,
-              color: own ? forest : catalogueColor,
-            ),
-          ),
+      leading: leading ?? TrailPinBadge(catalogue: !own),
       title: Text(trail.name),
       subtitle: Wrap(
         spacing: 10,

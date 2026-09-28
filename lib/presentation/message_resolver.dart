@@ -653,5 +653,13 @@ String resolveAppMessage(
   'catalogueTrailKeptOffline' => l10n.catalogueTrailKeptOffline,
   'trailDistance' => l10n.trailDistance,
   'trailAscent' => l10n.trailAscent,
+  'trailsInView' => l10n.trailsInView(message.arguments[0] as int),
+  'noTrailsInView' => l10n.noTrailsInView,
+  'moveMapForTrails' => l10n.moveMapForTrails,
+  'zoomInForMoreTrails' => l10n.zoomInForMoreTrails,
+  'allTrailsInViewListed' => l10n.allTrailsInViewListed,
+  'ascentShort' => l10n.ascentShort(message.arguments[0] as int),
+  'offlineTag' => l10n.offlineTag,
+  'myTrailTag' => l10n.myTrailTag,
   _ => l10n.unexpectedError,
 };

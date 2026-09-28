@@ -2987,13 +2987,13 @@ abstract class AppLocalizations {
   /// No description provided for @ownTrailsLegend.
   ///
   /// In en, this message translates to:
-  /// **'My trails (on this phone)'**
+  /// **'Saved'**
   String get ownTrailsLegend;
 
   /// No description provided for @catalogueTrailsLegend.
   ///
   /// In en, this message translates to:
-  /// **'Catalogue trails'**
+  /// **'Catalogue'**
   String get catalogueTrailsLegend;
 
   /// No description provided for @ownTrailLabel.
@@ -3403,6 +3403,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'ascent'**
   String get trailAscent;
+
+  /// No description provided for @trailsInView.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 trail in this area} other{{count} trails in this area}}'**
+  String trailsInView(int count);
+
+  /// No description provided for @noTrailsInView.
+  ///
+  /// In en, this message translates to:
+  /// **'No trails in this area'**
+  String get noTrailsInView;
+
+  /// No description provided for @moveMapForTrails.
+  ///
+  /// In en, this message translates to:
+  /// **'Move or zoom out the map to find trails.'**
+  String get moveMapForTrails;
+
+  /// No description provided for @zoomInForMoreTrails.
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom in to see more trails in this area.'**
+  String get zoomInForMoreTrails;
+
+  /// No description provided for @allTrailsInViewListed.
+  ///
+  /// In en, this message translates to:
+  /// **'Every trail in this area is listed.'**
+  String get allTrailsInViewListed;
+
+  /// No description provided for @ascentShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{metres} m ascent'**
+  String ascentShort(int metres);
+
+  /// No description provided for @offlineTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get offlineTag;
+
+  /// No description provided for @myTrailTag.
+  ///
+  /// In en, this message translates to:
+  /// **'My trail'**
+  String get myTrailTag;
 }
 
 class _AppLocalizationsDelegate

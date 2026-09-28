@@ -26,13 +26,14 @@ List<(Trail, GeoPoint)> stickyAnchors(
 const ownPinSource = 'own-pins';
 const cataloguePinSource = 'catalogue-pins';
 
-/// GeoJSON points of the anchors of one kind, identified by trail. The map
-/// clusters them itself: overlapping pins become one "N" bubble, split again
+/// GeoJSON points of the anchors of one kind, identified by trail and
+/// labelled with their length. The map clusters them itself: overlapping pins become one "N" bubble, split again
 /// while zooming in, without any work on the Flutter side while moving.
 Map<String, dynamic> pinFeatures(
   List<(Trail, GeoPoint)> anchors, {
   required bool catalogue,
   required bool Function(Trail) isCatalogue,
+  String Function(Trail)? label,
 }) => {
   'type': 'FeatureCollection',
   'features': [
@@ -41,7 +42,7 @@ Map<String, dynamic> pinFeatures(
         {
           'type': 'Feature',
           'id': trail.id,
-          'properties': {'trail': trail.id},
+          'properties': {'trail': trail.id, 'label': label?.call(trail) ?? ''},
           'geometry': {
             'type': 'Point',
             'coordinates': [point.lon, point.lat],
@@ -49,3 +50,11 @@ Map<String, dynamic> pinFeatures(
         },
   ],
 };
+
+/// Trails of the anchors, nearest to [centre] first, as the list under the
+/// map shows them.
+List<Trail> nearestFirst(List<(Trail, GeoPoint)> anchors, GeoPoint centre) {
+  final sorted = [...anchors]
+    ..sort((a, b) => distance(a.$2, centre).compareTo(distance(b.$2, centre)));
+  return [for (final (trail, _) in sorted) trail];
+}

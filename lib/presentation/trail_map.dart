@@ -1,5 +1,5 @@
 import 'localization.dart';
-import 'design.dart' show decimal, catalogueHex, ownTrailHex;
+import 'design.dart' show decimal, catalogueHex, ownTrailHex, shortKilometers;
 
 import 'dart:async';
 import 'dart:convert';
@@ -28,11 +28,15 @@ const referenceHex = '#8fa89c';
 const navigationZoom = 16.0;
 
 class TrailMap extends StatefulWidget {
-  const TrailMap(this.app, {this.onPin, super.key});
+  const TrailMap(this.app, {this.onPin, this.onVisibleTrails, super.key});
   final AppController app;
 
   /// A pin was touched: one trail, or several sharing the pin.
   final void Function(List<Trail>)? onPin;
+
+  /// The pinned trails now on screen, nearest to its centre first, each
+  /// time the camera stops or the pinned trails change.
+  final void Function(List<Trail>)? onVisibleTrails;
   @override
   State<TrailMap> createState() => _TrailMapState();
 }
@@ -91,6 +95,7 @@ class _TrailMapState extends State<TrailMap> {
     anchoredTrails = app.pinned;
     anchoredPins = showPins;
     anchoredFocus = app.focused?.id;
+    GeoPoint? centre;
     if (!showPins) {
       anchors = [];
     } else {
@@ -101,6 +106,10 @@ class _TrailMapState extends State<TrailMap> {
         region.southwest.latitude,
         region.northeast.longitude,
         region.northeast.latitude,
+      );
+      centre = GeoPoint(
+        (view.south + view.north) / 2,
+        (view.west + view.east) / 2,
       );
       anchors = stickyAnchors(anchors, [
         for (final trail in app.pinned)
@@ -114,7 +123,15 @@ class _TrailMapState extends State<TrailMap> {
           anchors,
           catalogue: catalogue,
           isCatalogue: (trail) => !app.stored(trail),
+          label: (trail) => shortKilometers(
+            app.sharedFor(trail)?.metres ?? TrailGeometry(trail).total,
+          ),
         ),
+      );
+    }
+    if (mounted) {
+      widget.onVisibleTrails?.call(
+        centre == null ? const [] : nearestFirst(anchors, centre),
       );
     }
   }
@@ -697,22 +714,38 @@ class _TrailMapState extends State<TrailMap> {
           clusterMaxZoom: 15,
         ),
       );
+      // A group reads as a group: a soft halo around a counted bubble whose
+      // size grows with the count, in the style of its trails' pins.
+      const radius = [
+        'step',
+        ['get', 'point_count'],
+        16,
+        10,
+        19,
+        50,
+        23,
+        200,
+        27,
+      ];
+      await c.addCircleLayer(
+        source,
+        '$prefix-pin-halos',
+        CircleLayerProperties(
+          circleColor: color,
+          circleOpacity: .2,
+          circleRadius: ['+', radius, 7],
+        ),
+        filter: ['has', 'point_count'],
+        enableInteraction: false,
+      );
+      final catalogue = source == cataloguePinSource;
       await c.addCircleLayer(
         source,
         '$prefix-pin-clusters',
         CircleLayerProperties(
-          circleColor: color,
-          circleOpacity: .92,
-          circleRadius: [
-            'step',
-            ['get', 'point_count'],
-            17,
-            10,
-            21,
-            100,
-            26,
-          ],
-          circleStrokeColor: '#ffffff',
+          circleColor: catalogue ? '#ffffff' : color,
+          circleRadius: radius,
+          circleStrokeColor: catalogue ? color : '#ffffff',
           circleStrokeWidth: 3,
         ),
         filter: ['has', 'point_count'],
@@ -721,11 +754,11 @@ class _TrailMapState extends State<TrailMap> {
       await c.addSymbolLayer(
         source,
         '$prefix-pin-counts',
-        const SymbolLayerProperties(
+        SymbolLayerProperties(
           textField: ['get', 'point_count_abbreviated'],
-          textFont: ['Noto Sans Bold'],
-          textSize: 13,
-          textColor: '#ffffff',
+          textFont: const ['Noto Sans Bold'],
+          textSize: 14,
+          textColor: catalogue ? color : '#ffffff',
           textAllowOverlap: true,
           textIgnorePlacement: true,
         ),
@@ -733,13 +766,11 @@ class _TrailMapState extends State<TrailMap> {
         enableInteraction: false,
       );
       try {
-        await c.addImage(
-          image,
-          await (source == cataloguePinSource ? cataloguePin : ownPin),
-        );
+        await c.addImage(image, await (catalogue ? cataloguePin : ownPin));
       } catch (e) {
         debugPrint('Pin image: $e');
       }
+      // Single pins always show; their length label shows where it fits.
       await c.addSymbolLayer(
         source,
         '$prefix-pin-points',
@@ -747,6 +778,15 @@ class _TrailMapState extends State<TrailMap> {
           iconImage: image,
           iconAllowOverlap: true,
           iconIgnorePlacement: true,
+          textField: ['get', 'label'],
+          textFont: const ['Noto Sans Bold'],
+          textSize: 11,
+          textAnchor: 'top',
+          textOffset: const [0, 1.45],
+          textColor: color,
+          textHaloColor: '#ffffff',
+          textHaloWidth: 1.6,
+          textOptional: true,
         ),
         filter: [
           '!',

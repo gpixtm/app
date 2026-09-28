@@ -11,7 +11,9 @@ import '../domain/walk_metrics.dart';
 import 'guidance_text.dart';
 import 'place_search_bar.dart';
 import 'trail_map.dart';
+import 'pin_images.dart';
 import 'trail_details.dart';
+import 'visible_trails_sheet.dart';
 import 'trail_places.dart';
 import 'trail_reviews.dart';
 import 'walk_controls.dart';
@@ -38,6 +40,9 @@ class _MapWorkspaceState extends State<MapWorkspace> {
 
   /// Trails sharing the pin the walker touched, listed in the bottom panel.
   List<Trail>? cluster;
+
+  /// Trails pinned on screen, nearest to its centre first.
+  List<Trail> inView = const [];
   AppController get app => widget.app;
   void openMenu() => Scaffold.of(context).openDrawer();
   void showTrail(Trail trail) {
@@ -195,6 +200,9 @@ class _MapWorkspaceState extends State<MapWorkspace> {
               onPin: (trails) => trails.length == 1
                   ? showTrail(trails.single)
                   : setState(() => cluster = trails),
+              onVisibleTrails: (trails) {
+                if (mounted) setState(() => inView = trails);
+              },
             ),
         if (!exploring)
           Positioned(
@@ -525,15 +533,7 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                   for (final t in cluster!)
                     ListTile(
                       contentPadding: EdgeInsets.zero,
-                      leading: CircleAvatar(
-                        backgroundColor: app.stored(t)
-                            ? const Color(0xffedf1e7)
-                            : const Color(0xffefe8f6),
-                        child: Icon(
-                          app.stored(t) ? Icons.hiking : Icons.travel_explore,
-                          color: app.stored(t) ? forest : catalogueColor,
-                        ),
-                      ),
+                      leading: TrailPinBadge(catalogue: !app.stored(t)),
                       title: Text(t.name),
                       subtitle: Wrap(
                         spacing: 10,
@@ -933,50 +933,13 @@ class _MapWorkspaceState extends State<MapWorkspace> {
               ),
             ),
           )
-        else if (app.trails.isEmpty)
-          Positioned(
-            left: 12,
-            right: 12,
-            bottom: 12,
-            child: Material(
-              color: Colors.white,
-              elevation: 8,
-              borderRadius: BorderRadius.circular(24),
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(context.l10n.mapAroundYou),
-                    const SizedBox(height: 8),
-                    FilledButton.icon(
-                      onPressed: app.busy ? null : widget.importTrails,
-                      icon: const Icon(Icons.add),
-                      label: Text(context.l10n.importGpx),
-                    ),
-                    if (app.recorder != null)
-                      TextButton.icon(
-                        onPressed: app.busy ? null : app.freeWalk,
-                        icon: const Icon(Icons.route),
-                        label: Text(context.l10n.startRoute),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          )
-        else if (app.recorder != null)
-          Positioned(
-            left: 12,
-            bottom: 16,
-            child: FloatingActionButton.extended(
-              heroTag: 'free-walk',
-              backgroundColor: Colors.white,
-              foregroundColor: forest,
-              onPressed: app.busy ? null : app.freeWalk,
-              icon: const Icon(Icons.route),
-              label: Text(context.l10n.startRoute),
-            ),
+        else
+          // Every trail pinned on screen, listed under the map.
+          VisibleTrailsSheet(
+            app,
+            inView,
+            onOpen: showTrail,
+            importTrails: widget.importTrails,
           ),
       ],
     );

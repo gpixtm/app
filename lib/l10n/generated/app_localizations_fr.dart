@@ -1862,10 +1862,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get myGroups => 'Mes groupes';
 
   @override
-  String get ownTrailsLegend => 'Mes parcours (sur ce téléphone)';
+  String get ownTrailsLegend => 'Enregistrés';
 
   @override
-  String get catalogueTrailsLegend => 'Parcours du catalogue';
+  String get catalogueTrailsLegend => 'Catalogue';
 
   @override
   String get ownTrailLabel => 'votre parcours';
@@ -2106,4 +2106,41 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get trailAscent => 'dénivelé +';
+
+  @override
+  String trailsInView(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count parcours dans cette zone',
+      one: '1 parcours dans cette zone',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get noTrailsInView => 'Aucun parcours dans cette zone';
+
+  @override
+  String get moveMapForTrails =>
+      'Déplacez la carte ou dézoomez pour trouver des parcours.';
+
+  @override
+  String get zoomInForMoreTrails =>
+      'Zoomez pour voir plus de parcours dans cette zone.';
+
+  @override
+  String get allTrailsInViewListed =>
+      'Tous les parcours de cette zone sont listés.';
+
+  @override
+  String ascentShort(int metres) {
+    return '$metres m de D+';
+  }
+
+  @override
+  String get offlineTag => 'Hors ligne';
+
+  @override
+  String get myTrailTag => 'Mon parcours';
 }

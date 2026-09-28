@@ -1069,8 +1069,8 @@
   "catalogueEmpty": "No trails in the catalogue yet.",
   "retry": "Retry",
   "myGroups": "My groups",
-  "ownTrailsLegend": "My trails (on this phone)",
-  "catalogueTrailsLegend": "Catalogue trails",
+  "ownTrailsLegend": "Saved",
+  "catalogueTrailsLegend": "Catalogue",
   "ownTrailLabel": "your trail",
   "catalogueTrailLabel": "catalogue trail",
   "itinerary": "Itinerary",
@@ -1190,5 +1190,27 @@
   "invalidRecordingReference": "The trail this walk followed could not be saved with it.",
   "catalogueTrailKeptOffline": "Catalogue trail kept offline on this phone",
   "trailDistance": "distance",
-  "trailAscent": "ascent"
+  "trailAscent": "ascent",
+  "trailsInView": "{count, plural, =1{1 trail in this area} other{{count} trails in this area}}",
+  "@trailsInView": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noTrailsInView": "No trails in this area",
+  "moveMapForTrails": "Move or zoom out the map to find trails.",
+  "zoomInForMoreTrails": "Zoom in to see more trails in this area.",
+  "allTrailsInViewListed": "Every trail in this area is listed.",
+  "ascentShort": "{metres} m ascent",
+  "@ascentShort": {
+    "placeholders": {
+      "metres": {
+        "type": "int"
+      }
+    }
+  },
+  "offlineTag": "Offline",
+  "myTrailTag": "My trail"
 }

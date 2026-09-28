@@ -1834,10 +1834,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get myGroups => 'My groups';
 
   @override
-  String get ownTrailsLegend => 'My trails (on this phone)';
+  String get ownTrailsLegend => 'Saved';
 
   @override
-  String get catalogueTrailsLegend => 'Catalogue trails';
+  String get catalogueTrailsLegend => 'Catalogue';
 
   @override
   String get ownTrailLabel => 'your trail';
@@ -2076,4 +2076,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trailAscent => 'ascent';
+
+  @override
+  String trailsInView(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count trails in this area',
+      one: '1 trail in this area',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get noTrailsInView => 'No trails in this area';
+
+  @override
+  String get moveMapForTrails => 'Move or zoom out the map to find trails.';
+
+  @override
+  String get zoomInForMoreTrails => 'Zoom in to see more trails in this area.';
+
+  @override
+  String get allTrailsInViewListed => 'Every trail in this area is listed.';
+
+  @override
+  String ascentShort(int metres) {
+    return '$metres m ascent';
+  }
+
+  @override
+  String get offlineTag => 'Offline';
+
+  @override
+  String get myTrailTag => 'My trail';
 }

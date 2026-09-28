@@ -11,6 +11,7 @@ import 'package:gpix/presentation/app.dart';
 import 'package:gpix/presentation/design.dart';
 import 'package:gpix/presentation/localization.dart';
 import 'package:gpix/presentation/trail_pins.dart';
+import 'package:gpix/presentation/visible_trails_sheet.dart';
 
 import 'lifecycle_test.dart' as fixtures;
 
@@ -82,11 +83,23 @@ void main() {
       anchors,
       catalogue: catalogue,
       isCatalogue: (t) => t.id == 'public',
+      label: (t) => t.id == 'own' ? '4.5 km' : '12 km',
     );
     final features = kind(false)['features'] as List;
-    expect(features.single['properties'], {'trail': 'own'});
+    expect(features.single['properties'], {'trail': 'own', 'label': '4.5 km'});
     expect(features.single['geometry']['coordinates'], [6, 45]);
     expect((kind(true)['features'] as List).single['id'], 'public');
+  });
+
+  test('the list starts with the trails nearest to the map centre', () {
+    final far = line('far', []), near = line('near', []);
+    final ordered = nearestFirst([
+      (far, const GeoPoint(46, 7)),
+      (near, const GeoPoint(45.01, 6.01)),
+    ], const GeoPoint(45, 6));
+    expect(ordered.map((t) => t.id), ['near', 'far']);
+    expect(shortKilometers(4520), '4.5 km');
+    expect(shortKilometers(12340), '12 km');
   });
 
   test('trail search ignores case and French accents', () {
@@ -191,6 +204,65 @@ void main() {
       expect(find.text(ascent), findsOneWidget);
       expect(find.text('80 m'), findsOneWidget, reason: 'only the climb');
       expect(find.text(language == 'fr' ? '2,0 km' : '2.0 km'), findsOneWidget);
+      await tester.pumpWidget(const SizedBox());
+      app.dispose();
+    });
+  }
+
+  for (final (language, title, end) in [
+    ('en', '45 trails in this area', 'Every trail in this area is listed.'),
+    (
+      'fr',
+      '45 parcours dans cette zone',
+      'Tous les parcours de cette zone sont listés.',
+    ),
+  ]) {
+    testWidgets('the list under the map pages through trails ($language)', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final app = fixtures.controller();
+      final trails = [
+        for (var i = 0; i < 45; i++)
+          line('t$i', [
+            [GeoPoint(45, 6 + i / 100), GeoPoint(45.01, 6 + i / 100)],
+          ]),
+      ];
+      final opened = <String>[];
+      await tester.pumpWidget(
+        LocalizedApp(
+          controller: LocaleController(initialLocale: Locale(language)),
+          homeBuilder: (_) => Scaffold(
+            body: Stack(
+              children: [
+                VisibleTrailsSheet(
+                  app,
+                  trails,
+                  onOpen: (t) => opened.add(t.id),
+                  importTrails: () {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text(title), findsOneWidget);
+      await tester.drag(find.text(title), const Offset(0, -600));
+      await tester.pumpAndSettle();
+      expect(find.byType(VisibleTrailTile), findsWidgets);
+      await tester.tap(find.byType(VisibleTrailTile).first);
+      expect(opened, ['t0']);
+      await tester.dragUntilVisible(
+        find.text(end),
+        find.byType(ListView),
+        const Offset(0, -500),
+      );
+      expect(find.text(end), findsOneWidget, reason: 'all 45 after paging');
+      expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());
       app.dispose();
     });
