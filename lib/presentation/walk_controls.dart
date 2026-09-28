@@ -64,3 +64,31 @@ class WalkControls extends StatelessWidget {
     );
   }
 }
+
+/// Whether the walk is being recorded or paused, and any recording error.
+class RecordingStatus extends StatelessWidget {
+  const RecordingStatus(this.app, {super.key});
+  final AppController app;
+  @override
+  Widget build(BuildContext context) {
+    final active = app.recorder?.active == true;
+    final error = app.recorder?.error;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          active ? context.l10n.recordingActive : context.l10n.walkPaused,
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: active ? const Color(0xffc62828) : const Color(0xff627068),
+          ),
+        ),
+        if (error != null)
+          Text(
+            context.message(error),
+            style: const TextStyle(color: Colors.deepOrange),
+          ),
+      ],
+    );
+  }
+}

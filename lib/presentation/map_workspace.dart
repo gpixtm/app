@@ -18,13 +18,12 @@ class MapWorkspace extends StatefulWidget {
   const MapWorkspace(
     this.app, {
     required this.openLibrary,
-    required this.openHistory,
     required this.importTrails,
     this.mapBuilder,
     super.key,
   });
   final AppController app;
-  final VoidCallback openLibrary, openHistory, importTrails;
+  final VoidCallback openLibrary, importTrails;
   final Widget Function(AppController)? mapBuilder;
   @override
   State<MapWorkspace> createState() => _MapWorkspaceState();
@@ -299,7 +298,7 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                       ? context.l10n.walkInProgressData
                       : context.l10n.walkPausedResume,
                 ),
-                onPressed: widget.openHistory,
+                onPressed: toggleSheet,
               ),
             ),
           ),
@@ -579,6 +578,14 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  // The walk being recorded is controlled here, alongside the
+                  // trail, rather than from the history screen.
+                  if (app.recorder?.current != null) ...[
+                    RecordingStatus(app),
+                    const SizedBox(height: 8),
+                    WalkControls(app),
+                    const SizedBox(height: 12),
+                  ],
                   if (approach != null) ...[
                     if (app.atConnection)
                       ListTile(
@@ -775,10 +782,6 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                       icon: const Icon(Icons.watch_outlined),
                       label: Text(context.l10n.importWatchData),
                     ),
-                    TextButton(
-                      onPressed: widget.openHistory,
-                      child: Text(context.l10n.walkControls),
-                    ),
                   ],
                   if (trail.walk != null) WalkStats(trail),
                   if (app.recorder != null &&
@@ -822,6 +825,8 @@ class _MapWorkspaceState extends State<MapWorkspace> {
           )
         else if (app.recorder?.current != null)
           DraggableScrollableSheet(
+            key: const ValueKey('recording'),
+            controller: sheet,
             initialChildSize: .22,
             minChildSize: .16,
             maxChildSize: .75,
@@ -837,12 +842,10 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                         : context.l10n.currentWalk,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
+                  RecordingStatus(app),
                   const SizedBox(height: 8),
                   WalkControls(app),
-                  TextButton(
-                    onPressed: widget.openHistory,
-                    child: Text(context.l10n.history),
-                  ),
+                  const SizedBox(height: 12),
                   WalkStats(app.recorder!.current!.snapshot(DateTime.now())),
                   OutlinedButton.icon(
                     onPressed: app.busy || app.health == null

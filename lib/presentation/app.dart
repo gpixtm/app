@@ -259,7 +259,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                       app,
                       mapBuilder: widget.mapBuilder,
                       openLibrary: () => open(Screen.trails),
-                      openHistory: () => open(Screen.history),
                       importTrails: import,
                     ),
                     libraryView(context),

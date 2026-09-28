@@ -16,6 +16,7 @@ import '../domain/heading.dart';
 import '../domain/trail_geometry.dart';
 import '../application/app_controller.dart';
 import 'map_features.dart';
+import 'position_arrow.dart';
 import 'trail_pins.dart';
 
 const dayColors = ['#c66a25', '#7956b2', '#087e8b', '#b03c68'];
@@ -57,6 +58,9 @@ class _TrailMapState extends State<TrailMap> {
   bool? renderedPlanning;
   List<Map<String, dynamic>> markers = [];
   List<({math.Point point, String label, String color})> markerViews = [];
+  late final Future<Uint8List> arrow = positionArrowPng(
+    MediaQuery.devicePixelRatioOf(context),
+  );
 
   /// Centre of each unselected trail's visible portion. Trails are only drawn
   /// once selected; until then a pin is their only mark on the map.
@@ -422,10 +426,21 @@ class _TrailMapState extends State<TrailMap> {
         }
         final fix = app.currentFix;
         final reliable = fix?.reliable(DateTime.now()) ?? false;
+        // With a fresh compass heading the arrow replaces the dot, so the
+        // position is drawn once and the direction is unambiguous.
+        final heading =
+            fix != null &&
+                reliable &&
+                navigating &&
+                pointer.value != null &&
+                headingTime != null &&
+                DateTime.now().difference(headingTime!).inSeconds < 3
+            ? pointer.value
+            : null;
         await c.setGeoJsonSource(
           'position',
           collection([
-            if (fix != null)
+            if (fix != null && heading == null)
               feature(
                 'Point',
                 [fix.point.lon, fix.point.lat],
@@ -433,60 +448,17 @@ class _TrailMapState extends State<TrailMap> {
               ),
           ]),
         );
-        final cone = <Map<String, dynamic>>[];
-        if (fix != null &&
-            reliable &&
-            navigating &&
-            pointer.value != null &&
-            headingTime != null &&
-            DateTime.now().difference(headingTime!).inSeconds < 3) {
-          final scale =
-              156543.03392 *
-              math.cos(fix.point.lat * math.pi / 180) /
-              math.pow(2, c.cameraPosition?.zoom ?? 16);
-          List<double> at(double angle, double pixels) {
-            final r = angle * math.pi / 180;
-            final metres = pixels * scale;
-            return [
-              fix.point.lon +
-                  math.sin(r) *
-                      metres /
-                      (111320 * math.cos(fix.point.lat * math.pi / 180)),
-              fix.point.lat + math.cos(r) * metres / 111320,
-            ];
-          }
-
-          final origin = [fix.point.lon, fix.point.lat];
-          cone.add(
-            feature(
-              'Polygon',
-              [
-                [
-                  origin,
-                  for (var a = -25; a <= 25; a += 5) at(pointer.value! + a, 48),
-                  origin,
-                ],
-              ],
-              {'color': '#93b8ff'},
-            ),
-          );
-          cone.add(
-            feature(
-              'Polygon',
-              [
-                [
-                  at(pointer.value!, 23),
-                  at(pointer.value! + 125, 10),
-                  origin,
-                  at(pointer.value! - 125, 10),
-                  at(pointer.value!, 23),
-                ],
-              ],
-              {'color': '#2563eb'},
-            ),
-          );
-        }
-        await c.setGeoJsonSource('heading', collection(cone));
+        await c.setGeoJsonSource(
+          'heading',
+          collection([
+            if (fix != null && heading != null)
+              feature(
+                'Point',
+                [fix.point.lon, fix.point.lat],
+                {'bearing': heading},
+              ),
+          ]),
+        );
         final active = navigating;
         final starting =
             active &&
@@ -614,12 +586,6 @@ class _TrailMapState extends State<TrailMap> {
       ),
       enableInteraction: false,
     );
-    await c.addFillLayer(
-      'heading',
-      'heading-cone',
-      const FillLayerProperties(fillColor: ['get', 'color'], fillOpacity: .75),
-      enableInteraction: false,
-    );
     await c.addCircleLayer(
       'position',
       'position-dot',
@@ -628,6 +594,25 @@ class _TrailMapState extends State<TrailMap> {
         circleColor: ['get', 'color'],
         circleStrokeColor: '#ffffff',
         circleStrokeWidth: 2,
+      ),
+      enableInteraction: false,
+    );
+    try {
+      await c.addImage(positionArrowImage, await arrow);
+    } catch (e) {
+      // Without the image the dot still shows the position.
+      debugPrint('Position arrow: $e');
+    }
+    await c.addSymbolLayer(
+      'heading',
+      'heading-arrow',
+      const SymbolLayerProperties(
+        iconImage: positionArrowImage,
+        iconRotate: ['get', 'bearing'],
+        iconRotationAlignment: 'map',
+        iconPitchAlignment: 'map',
+        iconAllowOverlap: true,
+        iconIgnorePlacement: true,
       ),
       enableInteraction: false,
     );

@@ -27,7 +27,6 @@ class HistoryView extends StatefulWidget {
 class _HistoryViewState extends State<HistoryView> {
   int filter = 0;
   AppController get app => widget.app;
-  Future<void> finish() => confirmFinishWalk(context, app);
 
   void details(Trail walk) {
     showModalBottomSheet<void>(
@@ -138,76 +137,19 @@ class _HistoryViewState extends State<HistoryView> {
       children: [
         Text(context.l10n.walkHistoryInfo),
         const SizedBox(height: 18),
+        // Recording is controlled from the map's bottom panel; history only
+        // points back to it.
         if (ongoing != null)
           Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    ongoing.active
-                        ? context.l10n.recordingActive
-                        : context.l10n.walkPaused,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      color: forest,
-                    ),
-                  ),
-                  Text(ongoing.saved.name),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      FilledButton.icon(
-                        onPressed: app.busy
-                            ? null
-                            : ongoing.active
-                            ? app.pauseWalk
-                            : app.freeWalk,
-                        icon: Icon(
-                          ongoing.active ? Icons.pause : Icons.play_arrow,
-                        ),
-                        label: Text(
-                          ongoing.active
-                              ? context.l10n.pause
-                              : context.l10n.resume,
-                        ),
-                      ),
-                      OutlinedButton(
-                        onPressed: app.busy ? null : finish,
-                        child: Text(context.l10n.finish),
-                      ),
-                      TextButton(
-                        onPressed: widget.openMap,
-                        child: Text(context.l10n.map),
-                      ),
-                    ],
-                  ),
-                  if (app.recorder?.error != null)
-                    Text(
-                      context.message(app.recorder!.error!),
-                      style: const TextStyle(color: Colors.deepOrange),
-                    ),
-                  ExpansionTile(
-                    tilePadding: EdgeInsets.zero,
-                    title: Text(context.l10n.liveStats),
-                    children: [WalkStats(ongoing.snapshot(DateTime.now()))],
-                  ),
-                ],
+            child: ListTile(
+              title: RecordingStatus(app),
+              subtitle: Text(ongoing.saved.name),
+              trailing: FilledButton.tonalIcon(
+                onPressed: widget.openMap,
+                icon: const Icon(Icons.map_outlined),
+                label: Text(context.l10n.map),
               ),
             ),
-          )
-        else
-          FilledButton.icon(
-            onPressed: app.busy || app.recorder == null
-                ? null
-                : () async {
-                    await app.freeWalk();
-                    if (app.recorder?.active == true) widget.openMap();
-                  },
-            icon: const Icon(Icons.route),
-            label: Text(context.l10n.startRoute),
           ),
         const SizedBox(height: 12),
         Text(
