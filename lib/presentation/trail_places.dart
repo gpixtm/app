@@ -137,7 +137,7 @@ Future<void> showTrailPlace(
           const SizedBox(height: 8),
           Text(
             '${l10n.placeAddedBy(author)} · ${DateFormat.yMMMd(l10n.localeName).format(place.updatedAt.toLocal())}',
-            style: const TextStyle(fontSize: 12, color: Color(0xff627068)),
+            style: const TextStyle(fontSize: 12, color: mutedInk),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 4),

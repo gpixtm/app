@@ -171,7 +171,7 @@ class _VisibleTrailsSheetState extends State<VisibleTrailsSheet> {
   );
 
   Widget footer(BuildContext context) {
-    final muted = const TextStyle(fontSize: 12, color: Color(0xff627068));
+    final muted = const TextStyle(fontSize: 12, color: mutedInk);
     if (widget.trails.isEmpty) {
       return Padding(
         padding: const EdgeInsets.fromLTRB(18, 12, 18, 0),
