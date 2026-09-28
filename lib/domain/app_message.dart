@@ -48,6 +48,8 @@ class AppMessage {
   static const legacyAccountDenied = AppMessage('legacyAccountDenied');
   static const libraryAlreadyOwned = AppMessage('libraryAlreadyOwned');
   static const approachUnavailable = AppMessage('approachUnavailable');
+  static const placeSearchUnavailable = AppMessage('placeSearchUnavailable');
+  static const approachFallback = AppMessage('approachFallback');
   static const noNearbyPath = AppMessage('noNearbyPath');
   static const routeTooLong = AppMessage('routeTooLong');
   static const invalidGeometry = AppMessage('invalidGeometry');

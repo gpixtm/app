@@ -11,17 +11,22 @@ import 'package:flutter_compass/flutter_compass.dart';
 import 'package:maplibre_gl/maplibre_gl.dart';
 
 import '../domain/models.dart';
+import '../domain/place_search.dart';
 import '../domain/heading.dart';
 import '../domain/trail_geometry.dart';
 import '../application/app_controller.dart';
 import 'map_features.dart';
+import 'trail_pins.dart';
 
 const dayColors = ['#c66a25', '#7956b2', '#087e8b', '#b03c68'];
 const navigationZoom = 16.0;
 
 class TrailMap extends StatefulWidget {
-  const TrailMap(this.app, {super.key});
+  const TrailMap(this.app, {this.onPin, super.key});
   final AppController app;
+
+  /// A pin was touched: one trail, or several sharing the pin.
+  final void Function(List<Trail>)? onPin;
   @override
   State<TrailMap> createState() => _TrailMapState();
 }
@@ -39,6 +44,7 @@ class _TrailMapState extends State<TrailMap> {
   DateTime lastCamera = DateTime(2000), lastRender = DateTime(2000);
   DateTime? headingTime;
   int focusRevision = 0;
+  late int placeRevision = app.placeRevision;
   Object? renderedTrails;
   String? renderedSelection;
   Object? renderedDays;
@@ -51,7 +57,41 @@ class _TrailMapState extends State<TrailMap> {
   bool? renderedPlanning;
   List<Map<String, dynamic>> markers = [];
   List<({math.Point point, String label, String color})> markerViews = [];
+
+  /// Centre of each unselected trail's visible portion. Trails are only drawn
+  /// once selected; until then a pin is their only mark on the map.
+  List<(Trail, GeoPoint)> anchors = [];
+  List<TrailPin> pins = [];
+  Object? anchoredTrails;
+  bool? anchoredPins;
+  String? anchoredFocus;
+  bool get showPins => !app.planning && app.session?.active != true;
   bool projecting = false, projectAgain = false;
+  Future<void> refreshAnchors() async {
+    final c = controller;
+    if (!loaded || c == null) return;
+    anchoredTrails = app.trails;
+    anchoredPins = showPins;
+    anchoredFocus = app.focused?.id;
+    if (!showPins) {
+      anchors = [];
+    } else {
+      final region = await c.getVisibleRegion();
+      if (!mounted) return;
+      final view = Bounds(
+        region.southwest.longitude,
+        region.southwest.latitude,
+        region.northeast.longitude,
+        region.northeast.latitude,
+      );
+      anchors = stickyAnchors(anchors, [
+        for (final trail in app.trails)
+          if (trail.id != app.focused?.id) trail,
+      ], view);
+    }
+    await projectMarkers();
+  }
+
   Future<void> projectMarkers() async {
     if (!loaded || !mounted) return;
     projectAgain = true;
@@ -61,27 +101,42 @@ class _TrailMapState extends State<TrailMap> {
       while (projectAgain && loaded && mounted) {
         projectAgain = false;
         final snapshot = markers;
-        final locations = await controller!.toScreenLocationBatch(
-          snapshot.map((m) {
+        final anchored = anchors;
+        final locations = await controller!.toScreenLocationBatch([
+          ...snapshot.map((m) {
             final coordinates = m['geometry']['coordinates'] as List;
             return LatLng(coordinates[1] as double, coordinates[0] as double);
           }),
-        );
+          for (final (_, p) in anchored) LatLng(p.lat, p.lon),
+        ]);
         if (!mounted) return;
-        if (!identical(snapshot, markers)) {
+        if (!identical(snapshot, markers) || !identical(anchored, anchors)) {
           projectAgain = true;
           continue;
         }
-        setState(
-          () => markerViews = [
-            for (var i = 0; i < locations.length; i++)
+        final ratio = defaultTargetPlatform == TargetPlatform.android
+            ? MediaQuery.devicePixelRatioOf(context)
+            : 1.0;
+        setState(() {
+          markerViews = [
+            for (var i = 0; i < snapshot.length; i++)
               (
                 point: locations[i],
                 label: snapshot[i]['properties']['label'] as String,
                 color: snapshot[i]['properties']['color'] as String,
               ),
-          ],
-        );
+          ];
+          pins = clusterPins([
+            for (var i = 0; i < anchored.length; i++)
+              (
+                anchored[i].$1,
+                Offset(
+                  locations[snapshot.length + i].x / ratio,
+                  locations[snapshot.length + i].y / ratio,
+                ),
+              ),
+          ]);
+        });
       }
     } catch (_) {
       /* The map can be disposed during a projection. */
@@ -200,6 +255,33 @@ class _TrailMapState extends State<TrailMap> {
     );
   }
 
+  Future<void> showPlace(Place place) async {
+    follow = false;
+    final e = place.extent;
+    // Buildings and addresses have tiny extents: show their surroundings.
+    if (e != null && (e.east - e.west > .01 || e.north - e.south > .01)) {
+      await controller?.animateCamera(
+        CameraUpdate.newLatLngBounds(
+          LatLngBounds(
+            southwest: LatLng(e.south, e.west),
+            northeast: LatLng(e.north, e.east),
+          ),
+          left: 30,
+          top: 110,
+          right: 70,
+          bottom: 60,
+        ),
+      );
+    } else {
+      await controller?.animateCamera(
+        CameraUpdate.newLatLngZoom(
+          LatLng(place.point.lat, place.point.lon),
+          14,
+        ),
+      );
+    }
+  }
+
   Future<void> update() async {
     if (!loaded || !mounted) return;
     pending = true;
@@ -239,7 +321,6 @@ class _TrailMapState extends State<TrailMap> {
         final selected = app.focused?.id;
         if (!identical(renderedTrails, app.trails) ||
             renderedSelection != selected) {
-          await c.setGeoJsonSource('trails', libraryFeatures(app.trails));
           await c.setGeoJsonSource(
             'selected',
             collection(lines(app.focused?.segments ?? [])),
@@ -420,6 +501,15 @@ class _TrailMapState extends State<TrailMap> {
           follow = true;
           resetNavigationZoom = true;
         }
+        if (placeRevision != app.placeRevision) {
+          placeRevision = app.placeRevision;
+          if (app.placeTarget case final place?) await showPlace(place);
+        }
+        if (!identical(anchoredTrails, app.trails) ||
+            anchoredPins != showPins ||
+            anchoredFocus != app.focused?.id) {
+          unawaited(refreshAnchors());
+        }
         wasActive = active;
         followedSession = app.session?.active == true ? app.session : null;
         updateCamera();
@@ -434,13 +524,13 @@ class _TrailMapState extends State<TrailMap> {
   Future<void> styleLoaded() async {
     loaded = false;
     renderedTrails = renderedDays = null;
+    anchoredTrails = anchoredPins = anchoredFocus = null;
     renderedHistory = null;
     renderedApproach = null;
     renderedShowHistory = null;
     renderedSamples = -1;
     final c = controller!;
     for (final id in [
-      'trails',
       'selected',
       'days',
       'ends',
@@ -454,22 +544,11 @@ class _TrailMapState extends State<TrailMap> {
       await c.addGeoJsonSource(id, collection([]));
     }
     await c.addLineLayer(
-      'trails',
-      'trail-halo',
+      'selected',
+      'selected-halo',
       const LineLayerProperties(
         lineColor: '#ffffff',
-        lineWidth: 7,
-        lineJoin: 'round',
-        lineCap: 'round',
-      ),
-      enableInteraction: false,
-    );
-    await c.addLineLayer(
-      'trails',
-      'trail-lines',
-      const LineLayerProperties(
-        lineColor: '#54846d',
-        lineWidth: 3,
+        lineWidth: 9,
         lineJoin: 'round',
         lineCap: 'round',
       ),
@@ -625,16 +704,6 @@ class _TrailMapState extends State<TrailMap> {
       );
       return;
     }
-    Trail? closest;
-    var gap = tolerance;
-    for (final trail in app.trails) {
-      final hit = TrailGeometry(trail).project(p);
-      if (hit != null && hit.offTrail < gap) {
-        closest = trail;
-        gap = hit.offTrail;
-      }
-    }
-    if (closest != null) app.focus(closest);
   }
 
   @override
@@ -673,7 +742,7 @@ class _TrailMapState extends State<TrailMap> {
             onCameraMove: (_) => unawaited(projectMarkers()),
             trackCameraPosition: true,
             onCameraIdle: () async {
-              unawaited(projectMarkers());
+              unawaited(refreshAnchors());
               final c = controller;
               if (c == null || !mounted) return;
               final bounds = await c.getVisibleRegion();
@@ -734,6 +803,21 @@ class _TrailMapState extends State<TrailMap> {
               ),
             ),
           ),
+        if (showPins)
+          for (final pin in pins)
+            Positioned(
+              left: pin.position.dx,
+              top: pin.position.dy,
+              child: FractionalTranslation(
+                translation: const Offset(-.5, -.5),
+                child: TrailPinView(
+                  pin,
+                  onTap: () => widget.onPin != null
+                      ? widget.onPin!(pin.trails)
+                      : app.focus(pin.trails.first),
+                ),
+              ),
+            ),
         Positioned(
           right: 12,
           top: 12,

@@ -13,11 +13,6 @@ class SettingsView extends StatelessWidget {
   Widget build(BuildContext context) => ListView(
     padding: const EdgeInsets.all(22),
     children: [
-      Text(
-        context.l10n.settings,
-        style: Theme.of(context).textTheme.headlineLarge,
-      ),
-      const SizedBox(height: 20),
       const LanguageSelector(),
       const SizedBox(height: 20),
       if (app.guide != null)

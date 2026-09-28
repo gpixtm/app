@@ -2,7 +2,13 @@
 
 ## Central map and walking UX
 
-The home screen is the central map. All imported GPX tracks are overlaid without opening a file. My trails provides view/recenter, day planning and Go. Map, My trails, History, Offline and Settings retain distinct roles. A focused/browsed trail is separate from the actively followed trail.
+The home screen is the central map. Imported trails are not drawn until selected: each one with a visible portion is marked by a pin. The selected trail alone is drawn and stays drawn while panning or zooming, until another trail is selected or it is closed. User-facing text calls them **trails** (“parcours”), never “GPX”; the file format is only mentioned where a file is picked or rejected. A focused/browsed trail is separate from the actively followed trail.
+
+There is no bottom navigation bar. A menu button at the top left opens a drawer to My trails, History, Offline and Settings; each page has a back action to the map, and Android back returns to the map. My trails is a secondary, searchable list (case- and accent-insensitive) that keeps view, day planning, start and deletion.
+
+Trails are discovered on the map, as in AllTrails. A pin marks each unselected trail with a visible portion (also while another trail is selected, so the walker can switch; pins are hidden during day planning and active tracking), at the middle of its longest visible portion on the shared distance axis (not its start); segment gaps never join portions. Pins overlapping on screen merge into an “N trails” pin whose trails are listed in the bottom panel. A pin stays where it is while it remains on screen, even when the map moves; only a trail whose pin left the view (or that enters it) gets a new pin when the camera stops. Touching a pin selects its trail (hidden lines are not touch targets): the map fits the whole trail and enters itinerary mode.
+
+Exploration mode shows a place search field (town, address, place) that moves the map. It uses OpenStreetMap geocoding through a Photon server behind the `PlaceSearch` port: the public server is free but fair-use, a self-hosted Photon can replace it through configuration, and search requires a connection. Itinerary mode hides the search field and shows the existing bottom panel with the trail statistics, a single start action and an explicit Google Maps action; the top card closes the trail unless it is being actively followed.
 
 Starting or recentering navigation uses walking proximity (currently zoom 16), even for a 100 km trail. Apply it at the first valid GPS fix if none is available yet. Manual panning suspends camera following until recentering; ordinary following preserves user zoom. The intent is nearby paths, roughly kilometre scale, rather than a rigid one-kilometre radius on every screen.
 
@@ -28,13 +34,15 @@ Persist `RecordWalk` checkpoints locally. Filter inaccurate fixes and jumps; pau
 
 ## Joining a GPX
 
+There is no separate “join the trail” action. Starting a trail follows it directly when the walker is already on it (within 25 m with a precise fix); otherwise it computes and starts the internal walking approach. If the approach cannot be calculated (offline without a saved route), the trail itself is followed and the distance to it stays visible, with an explicit notice.
+
 The latest request is to join the nearest point on an actual GPX segment, including between vertices, not the file's start. Following direction does not change this joining point. Use a fresh reliable GPS fix and recompute the nearest point on manual recalculation.
 
 The internal pedestrian approach uses the API's Valhalla adapter. Keep its blue route separate from the original green GPX and place the R marker at the real joining point. Validate arrival through GPS/proximity/progression before offering to follow the GPX from there, preserving reverse direction. If routing ends short of the target, display the final unguided gap rather than inventing a traversable connection.
 
 Initial calculation and recalculation require a connection. A saved approach is usable offline within its existing validity criteria. Cache instructions by language so a request for English cannot silently reuse French directions. Avoid routing on every location update; respect provider limits. Public routing is for low-volume use and a dedicated provider can be configured for scale. Turn-by-turn voice guidance applies to the approach route geometry as to any followed route (see below); perpetual automatic rerouting is not currently promised.
 
-Google Maps is an explicit walking/driving fallback and receives the same nearest joining point. Show routing privacy information. Historical names referring to “departure” do not override the nearest-point behavior.
+Google Maps is an explicit fallback (driving, transit or walking, chosen in Google Maps) offered by the trail panel and receives the same nearest joining point. Show routing privacy information. Historical names referring to “departure” do not override the nearest-point behavior.
 
 ## Turn-by-turn guidance
 

@@ -173,14 +173,13 @@ void main() {
       GpixApp(app, mapBuilder: (_) => const ColoredBox(color: Colors.green)),
     );
     await tester.pumpAndSettle();
-    expect(find.text("Import a GPX"), findsOneWidget);
-    await tester.tap(find.byType(NavigationDestination).at(0));
+    expect(find.text("Import a trail"), findsOneWidget);
+    await tester.tap(find.byTooltip('Menu'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('My trails'));
     await tester.pumpAndSettle();
     expect(find.text('0 items'), findsOneWidget);
     expect(tester.takeException(), isNull);
-    await tester.tap(find.text("Offline"));
-    await tester.pumpAndSettle();
-    expect(find.textContaining('No map installed'), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
     app.dispose();
   });

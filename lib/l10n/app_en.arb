@@ -1,8 +1,8 @@
 {
   "@@locale": "en",
   "routingAttribution": "Valhalla · © OpenStreetMap",
-  "noJoinSegment": "This GPX has no segment to join.",
-  "alreadyNearTrail": "You are already near the trail. Use Go to follow it from here.",
+  "noJoinSegment": "This trail has no segment to join.",
+  "alreadyNearTrail": "You are already on the trail: tracking starts here.",
   "cachedApproach": "Using a saved route · recalculation unavailable offline",
   "gpsUnavailable": "Cannot find an accurate GPS position. Try again outdoors.",
   "noWatchData": "No measurements shared for this period. Sync your watch in Zepp, then try again.",
@@ -11,7 +11,7 @@
   "changesSavedPending": "Changes saved here · sync pending",
   "localMaps": "Local maps",
   "mapsStorageUnavailable": "Maps not prepared: check available storage.",
-  "demoNotice": "Demo: sample GPX and elevations, real map of Florence.",
+  "demoNotice": "Demo: sample trails and elevations, real map of Florence.",
   "syncPending": "Sync pending",
   "itemsSaved": "{arg1, plural, =0{No items saved on this phone} =1{One item saved on this phone} other{{arg1} items saved on this phone}}",
   "@itemsSaved": {
@@ -138,11 +138,11 @@
   },
   "demo": "Demo",
   "demoFlorence": "Demo · Florence",
-  "damagedGpx": "This GPX contains damaged text. Correct it in the original file before importing.",
-  "gpxSizeLimit": "Limit: 50 MB per GPX.",
+  "damagedGpx": "This trail file contains damaged text. Correct it in the original file before importing.",
+  "gpxSizeLimit": "Limit: 50 MB per trail file.",
   "incompleteUtf16": "Incomplete UTF-16 file.",
   "invalidUtf16": "Invalid UTF-16 text.",
-  "unsupportedGpxEncoding": "Unsupported GPX encoding: {arg1}. Export the file as UTF-8.",
+  "unsupportedGpxEncoding": "Unsupported file encoding: {arg1}. Export the file as UTF-8.",
   "@unsupportedGpxEncoding": {
     "placeholders": {
       "arg1": {
@@ -199,11 +199,11 @@
   "signInRequired": "Sign in to continue.",
   "sessionExpired": "Your session has expired. Please sign in again.",
   "mapAddressRejected": "Map address rejected.",
-  "gpxTooLarge": "GPX too large (50 MB maximum).",
+  "gpxTooLarge": "Trail file too large (50 MB maximum).",
   "xmlEntitiesForbidden": "XML entities are not allowed.",
-  "notGpx": "This file is not a GPX.",
-  "invalidGpxCoordinates": "Invalid GPX coordinates.",
-  "emptyGpx": "No trail or point of interest in this GPX.",
+  "notGpx": "This file is not a trail file (.gpx).",
+  "invalidGpxCoordinates": "Invalid trail coordinates.",
+  "emptyGpx": "No trail or point of interest in this file.",
   "invalidUsername": "3 to 32 letters, digits or underscores.",
   "invalidEmail": "Enter a valid email address.",
   "invalidPassword": "The password must contain 8 to 128 characters.",
@@ -217,14 +217,10 @@
   "sync": "Sync",
   "delete": "Delete",
   "view": "View",
-  "go": "Go",
+  "go": "Start",
   "keep": "Keep",
-  "joyOfWalking": "THE JOY OF MOVING FORWARD",
-  "nextTrailStartsHere": "Your next trail\nstarts here.",
-  "libraryIntro": "Your trails, your places. Ready to go with you, even without a connection.",
-  "importGpx": "Import a GPX",
+  "importGpx": "Import a trail",
   "tryDemo": "Try the demo · Florence",
-  "myLibrary": "My library",
   "itemCount": "{arg1, plural, =0{0 items} =1{1 item} other{{arg1} items}}",
   "@itemCount": {
     "placeholders": {
@@ -233,8 +229,7 @@
       }
     }
   },
-  "oneJourney": "A whole journey, one trail.",
-  "importIntro": "Import your Camino trail or a file of points of interest. No need to split it into stages.",
+  "importIntro": "Import a trail (.gpx file): a Camino, a hike or a list of places. No need to split it into stages.",
   "pointCount": "{arg1, plural, =0{0 points of interest} =1{1 point of interest} other{{arg1} points of interest}}",
   "@pointCount": {
     "placeholders": {
@@ -257,13 +252,11 @@
   "mapReady": "Map ready offline",
   "mapNeedsPreparation": "Map needs preparation",
   "savedPlaces": "Places saved on this phone",
-  "joinTrail": "Join the trail",
   "days": "Days",
   "deleteItemQuestion": "Delete this item?",
   "deleteItemBody": "This deletion will also be synced with your server.",
-  "offlineHeadline": "Peace of mind.\nEven offline.",
   "sharedMaps": "Maps are shared between your trails and stored on your phone.",
-  "automaticMapsInfo": "Visible areas load automatically online. Each GPX prepares its maps in the background. Offline, only downloaded areas remain visible.",
+  "automaticMapsInfo": "Visible areas load automatically online. Each trail prepares its maps in the background. Offline, only downloaded areas remain visible.",
   "resumePreparation": "Resume preparation",
   "readyOffline": "Ready offline",
   "preparingMaps": "Automatic preparation running or pending",
@@ -278,7 +271,7 @@
   },
   "completeElevations": "Complete elevations for the open trail",
   "onMyPhone": "On my phone",
-  "noInstalledMaps": "No map installed. Configure your server and its catalog in settings. GPX files remain viewable.",
+  "noInstalledMaps": "No map installed. Configure your server and its catalog in settings. Trails remain viewable.",
   "deleteMap": "Delete this map",
   "availableRegions": "Available regions",
   "coversOpenTrail": " · covers the open trail",
@@ -404,7 +397,6 @@
   "deleteWalkQuestion": "Delete this walk?",
   "deleteWalkInfo": "The deletion will be synced with your account.",
   "deleteWalk": "Delete walk",
-  "myWalks": "My walks",
   "walkHistoryInfo": "The paths you have actually walked.",
   "recordingActive": "● Recording in progress",
   "walkPaused": "Walk paused · ready to resume",
@@ -426,9 +418,9 @@
   },
   "viewAllWalkedPlaces": "View everywhere I have walked",
   "allWalks": "All",
-  "withGpx": "With GPX",
+  "withGpx": "On a trail",
   "freeWalks": "Free walks",
-  "noWalks": "No walks here yet. Start a GPX with Go or record a free walk.",
+  "noWalks": "No walks here yet. Start a trail or record a free walk.",
   "unreadableFilename": "Unreadable file name",
   "unreadableFilenameInfo": "The phone provided a damaged name. Enter the trail name to preserve the correct characters.",
   "trailName": "Trail name",
@@ -437,12 +429,7 @@
   "cancel": "Cancel",
   "importAction": "Import",
   "cannotOpenNavigation": "Cannot open the app or browser.",
-  "nearestJoinInfo": "Towards the GPX point closest to your position.",
   "reverseSuffix": " · reverse direction",
-  "walkInGpix": "Walk with Gpix",
-  "onlineRouteInfo": "Map guidance · online calculation",
-  "walkInGoogleMaps": "Walk with Google Maps",
-  "driveInGoogleMaps": "Drive with Google Maps",
   "routingPrivacy": "The routing service uses your position and the closest point. Gpix saves the calculated route so you can continue offline.",
   "myMap": "My map",
   "trailMapAvailable": "Trail map available offline",
@@ -468,15 +455,7 @@
       }
     }
   },
-  "deleteDayInfo": "The GPX and other sections are preserved.",
-  "trailsOnMap": "{arg1, plural, =0{0 trails on my map} =1{1 trail on my map} other{{arg1} trails on my map}}",
-  "@trailsOnMap": {
-    "placeholders": {
-      "arg1": {
-        "type": "int"
-      }
-    }
-  },
+  "deleteDayInfo": "The trail and other sections are preserved.",
   "walkInProgressData": "Walk in progress · data",
   "walkPausedResume": "Walk paused · resume",
   "walkedPlaces": "Places walked",
@@ -556,7 +535,7 @@
   "distanceToTrail": "to the trail",
   "toggleDetails": "Expand or collapse details",
   "trailReached": "Trail reached",
-  "readyToFollow": "Ready to follow your GPX.",
+  "readyToFollow": "Ready to follow your trail.",
   "findingAccuratePosition": "Looking for an accurate GPS position…",
   "routeEndGap": "End of the calculated path. Joining point {arg1} m away, marker R: check access on site.",
   "@routeEndGap": {
@@ -575,16 +554,15 @@
       }
     }
   },
-  "followFromHere": "Follow the GPX from here",
+  "followFromHere": "Follow the trail from here",
   "exitApproach": "Exit approach guidance",
   "recalculate": "Recalculate",
-  "otherNavigation": "Other navigation",
   "cachedRouteInfo": "Saved route · online recalculation only",
   "savedWalkingApproach": "Walking approach · route saved on this phone",
   "fixMap": "Fix the map",
   "pauseTracking": "Pause tracking",
   "resumeApproach": "Resume towards the trail",
-  "followTrail": "Go · follow this trail",
+  "followTrail": "Start the trail",
   "returnToTracking": "Return to tracking · {arg1}",
   "@returnToTracking": {
     "placeholders": {
@@ -606,7 +584,7 @@
   "leavingTrail": "You are moving away from the trail",
   "muteAlert": "Mute alert",
   "reverseDirection": "Reverse direction · change",
-  "gpxDirection": "GPX direction · change",
+  "gpxDirection": "Original direction · change",
   "currentWalk": "My current walk",
   "walkControls": "Pause, finish and history",
   "planDays": "Plan my days",
@@ -621,7 +599,6 @@
   "offlineAvailability": "Offline availability",
   "myFreeWalk": "My free walk",
   "mapAroundYou": "Your map, around you",
-  "allTrailsInfo": "All your trails are visible. Tap a trail to select it.",
   "accountServer": "Account and server",
   "accountServerInfo": "Identity, password and sync",
   "watchHealthData": "Watch and health data",
@@ -648,7 +625,7 @@
   "healthPrivacy": "Data is read only when you request it. Imported measurements are saved with your walk and synced with your personal API. Revoking permission prevents future reads; to erase imported measurements, delete the walk from history.",
   "healthDevicePermissions": "Permissions apply to this phone. Grant them again on another device. Health Connect may restrict access to older periods.",
   "chooseTrailPassage": "The trail passes here more than once. Which passage do you want?",
-  "atGpxKilometre": "At GPX kilometre {arg1}",
+  "atGpxKilometre": "At trail kilometre {arg1}",
   "@atGpxKilometre": {
     "placeholders": {
       "arg1": {
@@ -701,7 +678,7 @@
   "invalidFields": "All fields must be text.",
   "unknownOperation": "Unknown operation.",
   "formTooLarge": "Form too large.",
-  "damagedText": "Text contains a lost character. Correct its name or reimport the original GPX.",
+  "damagedText": "Text contains a lost character. Correct its name or reimport the original file.",
   "invalidRouteCoordinates": "Invalid origin or destination coordinates.",
   "waitBeforeRouting": "Wait two seconds before recalculating.",
   "serviceUnavailable": "Service unavailable or resource not found",
@@ -787,5 +764,48 @@
   "nextDirection": "Next direction",
   "voiceGuidance": "Voice guidance",
   "voiceGuidanceInfo": "Speaks each direction change about 100 m ahead during navigation, even with the screen off. While Gpix is in the background, a notification also shows the direction.",
-  "voiceGuidanceNotSaved": "Voice guidance preference not saved on this phone."
+  "voiceGuidanceNotSaved": "Voice guidance preference not saved on this phone.",
+  "menu": "Menu",
+  "backToMap": "Back to the map",
+  "searchPlaces": "Search a town, an address…",
+  "clearSearch": "Clear search",
+  "noPlaceFound": "No place found.",
+  "placeSearchUnavailable": "Place search needs a connection. Try again once online.",
+  "trailCount": "{count, plural, =1{1 trail} other{{count} trails}}",
+  "@trailCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trailsHere": "{count, plural, =1{1 trail here} other{{count} trails here}}",
+  "@trailsHere": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "showTrail": "Show {name}",
+  "@showTrail": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "closeTrail": "Close the trail",
+  "close": "Close",
+  "openInGoogleMaps": "Get there with Google Maps",
+  "searchTrails": "Search my trails",
+  "noTrailMatch": "No trail matches “{query}”.",
+  "@noTrailMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "approachFallback": "Route to the trail unavailable offline: the trail itself is followed and your distance to it stays visible."
 }

@@ -6,7 +6,9 @@ import '../application/app_controller.dart';
 import '../domain/models.dart';
 import 'design.dart';
 import 'elevation_chart.dart';
+import '../domain/trail_geometry.dart';
 import 'guidance_text.dart';
+import 'place_search_bar.dart';
 import 'trail_map.dart';
 import 'walk_stats.dart';
 import 'join_departure.dart';
@@ -16,11 +18,12 @@ class MapWorkspace extends StatefulWidget {
     this.app, {
     required this.openLibrary,
     required this.openHistory,
+    required this.importTrails,
     this.mapBuilder,
     super.key,
   });
   final AppController app;
-  final VoidCallback openLibrary, openHistory;
+  final VoidCallback openLibrary, openHistory, importTrails;
   final Widget Function(AppController)? mapBuilder;
   @override
   State<MapWorkspace> createState() => _MapWorkspaceState();
@@ -28,7 +31,16 @@ class MapWorkspace extends StatefulWidget {
 
 class _MapWorkspaceState extends State<MapWorkspace> {
   final sheet = DraggableScrollableController();
+
+  /// Trails sharing the pin the walker touched, listed in the bottom panel.
+  List<Trail>? cluster;
   AppController get app => widget.app;
+  void openMenu() => Scaffold.of(context).openDrawer();
+  void showTrail(Trail trail) {
+    setState(() => cluster = null);
+    app.focus(trail);
+  }
+
   @override
   void dispose() {
     sheet.dispose();
@@ -152,94 +164,120 @@ class _MapWorkspaceState extends State<MapWorkspace> {
     final direction = approach?.next(p?.along ?? 0);
     final upcoming = app.approach == null ? app.upcomingManeuver : null;
     final turn = upcoming != null && upcoming.metres <= 500 ? upcoming : null;
+    final exploring = trail == null && !app.planning;
+    // The followed trail stays on screen until tracking is paused.
+    final closable =
+        trail != null &&
+        !app.planning &&
+        !(app.session?.active == true && app.selected?.id == trail.id);
+    final leading = closable
+        ? IconButton(
+            tooltip: context.l10n.closeTrail,
+            onPressed: app.closeTrail,
+            icon: const Icon(Icons.arrow_back),
+          )
+        : IconButton(
+            tooltip: context.l10n.menu,
+            onPressed: openMenu,
+            icon: const Icon(Icons.menu),
+          );
     return Stack(
+      fit: StackFit.expand,
       children: [
         widget.mapBuilder?.call(app) ??
-            TrailMap(app, key: ValueKey(app.mapVersion)),
-        Positioned(
-          top: 12,
-          left: 12,
-          right: 76,
-          child: Material(
-            color: Colors.white,
-            elevation: 2,
-            borderRadius: BorderRadius.circular(24),
-            child: InkWell(
+            TrailMap(
+              app,
+              key: ValueKey(app.mapVersion),
+              onPin: (trails) => trails.length == 1
+                  ? showTrail(trails.single)
+                  : setState(() => cluster = trails),
+            ),
+        if (!exploring)
+          Positioned(
+            top: 12,
+            left: 12,
+            right: 76,
+            child: Material(
+              color: Colors.white,
+              elevation: 2,
               borderRadius: BorderRadius.circular(24),
-              onTap: details,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
-                child: turn != null
-                    ? Semantics(
-                        label: context.l10n.nextDirection,
-                        child: Row(
-                          children: [
-                            Icon(
-                              guidanceIcon(turn.kind),
-                              color: forest,
-                              size: 32,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    guidanceTitle(context.l10n, turn.kind),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(24),
+                onTap: details,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 4, 14, 4),
+                  child: turn != null
+                      ? Semantics(
+                          label: context.l10n.nextDirection,
+                          child: Row(
+                            children: [
+                              leading,
+                              Icon(
+                                guidanceIcon(turn.kind),
+                                color: forest,
+                                size: 32,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      guidanceTitle(context.l10n, turn.kind),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    context.l10n.inMetres(turn.metres.round()),
-                                  ),
-                                ],
+                                    Text(
+                                      context.l10n.inMetres(
+                                        turn.metres.round(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(Icons.info_outline, size: 18),
+                            ],
+                          ),
+                        )
+                      : Row(
+                          children: [
+                            leading,
+                            Icon(
+                              trail != null &&
+                                      app.covers(app.approach?.trail ?? trail)
+                                  ? Icons.offline_pin
+                                  : Icons.map_outlined,
+                              color: forest,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                (app.approach != null
+                                        ? context.l10n.towardsTrail(
+                                            app.selected?.name ?? '',
+                                          )
+                                        : trail?.name) ??
+                                    context.l10n.myMap,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 4),
                             const Icon(Icons.info_outline, size: 18),
                           ],
                         ),
-                      )
-                    : Row(
-                        children: [
-                          Icon(
-                            trail != null &&
-                                    app.covers(app.approach?.trail ?? trail)
-                                ? Icons.offline_pin
-                                : Icons.map_outlined,
-                            color: forest,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              (app.approach != null
-                                      ? context.l10n.towardsTrail(
-                                          app.selected?.name ?? '',
-                                        )
-                                      : trail?.name) ??
-                                  context.l10n.trailsOnMap(app.trails.length),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          const Icon(Icons.info_outline, size: 18),
-                        ],
-                      ),
+                ),
               ),
             ),
           ),
-        ),
         if (app.recorder?.current != null)
           Positioned(
             top: 70,
@@ -289,6 +327,13 @@ class _MapWorkspaceState extends State<MapWorkspace> {
               label: Text(context.l10n.offTrailDetails),
               onPressed: toggleSheet,
             ),
+          ),
+        if (exploring)
+          Positioned(
+            top: 12,
+            left: 12,
+            right: 76,
+            child: PlaceSearchBar(app, openMenu: openMenu),
           ),
         if (app.planning)
           DraggableScrollableSheet(
@@ -446,6 +491,49 @@ class _MapWorkspaceState extends State<MapWorkspace> {
               ),
             ),
           )
+        else if (cluster != null)
+          DraggableScrollableSheet(
+            key: const ValueKey('cluster'),
+            initialChildSize: .36,
+            minChildSize: .2,
+            maxChildSize: .72,
+            builder: (context, scroll) => panel(
+              ListView(
+                controller: scroll,
+                padding: const EdgeInsets.fromLTRB(18, 0, 18, 24),
+                children: [
+                  handle(),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          context.l10n.trailsHere(cluster!.length),
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: context.l10n.close,
+                        onPressed: () => setState(() => cluster = null),
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
+                  ),
+                  for (final t in cluster!)
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const CircleAvatar(
+                        backgroundColor: Color(0xffedf1e7),
+                        child: Icon(Icons.hiking, color: forest),
+                      ),
+                      title: Text(t.name),
+                      subtitle: Text(kilometers(TrailGeometry(t).total)),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => showTrail(t),
+                    ),
+                ],
+              ),
+            ),
+          )
         else if (trail != null)
           DraggableScrollableSheet(
             key: const ValueKey('navigation'),
@@ -545,12 +633,6 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                           onPressed: app.busy ? null : app.cancelApproach,
                           child: Text(context.l10n.exitApproach),
                         ),
-                        TextButton(
-                          onPressed: app.busy
-                              ? null
-                              : () => showJoinTrail(context, app, trail),
-                          child: Text(context.l10n.otherNavigation),
-                        ),
                       ],
                     ),
                     Text(
@@ -589,11 +671,12 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                           : () async {
                               if (s?.active == true) {
                                 app.stop();
-                              } else {
-                                if (app.selected?.id != trail.id) {
-                                  app.select(trail);
-                                }
+                              } else if (approach != null) {
                                 await app.start();
+                              } else {
+                                // Joins the trail by an internal walking
+                                // route first when the walker is elsewhere.
+                                await app.launch(trail);
                               }
                             },
                       icon: Icon(
@@ -609,14 +692,27 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                     ),
                   if (trail.followable &&
                       trail.walk == null &&
-                      approach == null)
+                      !(s?.active == true && approach == null)) ...[
+                    const SizedBox(height: 6),
                     OutlinedButton.icon(
                       onPressed: app.busy
                           ? null
-                          : () => showJoinTrail(context, app, trail),
-                      icon: const Icon(Icons.directions_walk),
-                      label: Text(context.l10n.joinTrail),
+                          : () => openInGoogleMaps(context, app, trail),
+                      icon: const Icon(Icons.directions_car_outlined),
+                      label: Text(context.l10n.openInGoogleMaps),
                     ),
+                    if (s?.active != true)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          context.l10n.routingPrivacy,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xff627068),
+                          ),
+                        ),
+                      ),
+                  ],
                   if (app.session?.active == true && s == null)
                     TextButton(
                       onPressed: () => app.focus(app.selected!),
@@ -742,41 +838,49 @@ class _MapWorkspaceState extends State<MapWorkspace> {
               ),
             ),
           )
-        else
+        else if (app.trails.isEmpty)
           Positioned(
             left: 12,
             right: 12,
             bottom: 12,
-            child: panel(
-              Padding(
+            child: Material(
+              color: Colors.white,
+              elevation: 8,
+              borderRadius: BorderRadius.circular(24),
+              child: Padding(
                 padding: const EdgeInsets.all(14),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      app.trails.isEmpty
-                          ? context.l10n.mapAroundYou
-                          : context.l10n.allTrailsInfo,
-                    ),
+                    Text(context.l10n.mapAroundYou),
                     const SizedBox(height: 8),
+                    FilledButton.icon(
+                      onPressed: app.busy ? null : widget.importTrails,
+                      icon: const Icon(Icons.add),
+                      label: Text(context.l10n.importGpx),
+                    ),
                     if (app.recorder != null)
                       TextButton.icon(
                         onPressed: app.busy ? null : app.freeWalk,
                         icon: const Icon(Icons.hiking),
                         label: Text(context.l10n.recordFreeWalk),
                       ),
-                    FilledButton.icon(
-                      onPressed: widget.openLibrary,
-                      icon: const Icon(Icons.route),
-                      label: Text(
-                        app.trails.isEmpty
-                            ? context.l10n.importGpx
-                            : context.l10n.myTrails,
-                      ),
-                    ),
                   ],
                 ),
               ),
+            ),
+          )
+        else if (app.recorder != null)
+          Positioned(
+            left: 12,
+            bottom: 16,
+            child: FloatingActionButton.extended(
+              heroTag: 'free-walk',
+              backgroundColor: Colors.white,
+              foregroundColor: forest,
+              onPressed: app.busy ? null : app.freeWalk,
+              icon: const Icon(Icons.hiking),
+              label: Text(context.l10n.recordFreeWalk),
             ),
           ),
       ],

@@ -159,7 +159,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Réglages'), findsOneWidget);
+      expect(find.text('Mes données'), findsOneWidget);
       expect(
         find.text('2 éléments enregistrés sur ce téléphone'),
         findsOneWidget,
@@ -170,7 +170,7 @@ void main() {
       await tester.tap(find.text('English').last);
       await tester.pumpAndSettle();
 
-      expect(find.text('Settings'), findsOneWidget);
+      expect(find.text('My data'), findsOneWidget);
       expect(find.text('2 items saved on this phone'), findsOneWidget);
       expect((app.syncStatus as AppMessage).arguments, [2]);
       await tester.pumpWidget(const SizedBox());

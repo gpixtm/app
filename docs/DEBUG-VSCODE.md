@@ -19,7 +19,7 @@ Check the active SDK with `puro flutter --version`. If `flutter` on `PATH` point
 
 To move to a newer stable release, check the latest tag on [flutter/flutter](https://github.com/flutter/flutter/tags), then run `puro upgrade gpix <version>`. Update the version in this section and in `AGENTS.md`, adjust `environment.sdk` in `pubspec.yaml` if the Dart version changes, then run the full validation below and a native build.
 
-Copy `config/dev.example.json` and `config/prod.example.json` to the corresponding ignored `*.local.json` files. Set `API_URL` to your private LAN HTTP origin for Dev and an HTTPS origin for Prod. Optional Dev-only `AUTH_PREFILL_IDENTIFIER` / `AUTH_PREFILL_PASSWORD` can be placed in the ignored Dev JSON; never commit them. Prod has no prefill values.
+Copy `config/dev.example.json` and `config/prod.example.json` to the corresponding ignored `*.local.json` files. Set `API_URL` to your private LAN HTTP origin for Dev and an HTTPS origin for Prod. Optional Dev-only `AUTH_PREFILL_IDENTIFIER` / `AUTH_PREFILL_PASSWORD` can be placed in the ignored Dev JSON; never commit them. Prod has no prefill values. Optional `PLACE_SEARCH_URL` points map place search at another Photon server (for example a self-hosted one); it defaults to the public `https://photon.komoot.io`, which is free but fair-use only.
 
 The two launch profiles use `lib/main.dart` and the matching `dev`/`prod` flavor. Both are debug builds: Prod is a server selection, not a release signature. Changing compile-time values requires stopping and restarting F5.
 

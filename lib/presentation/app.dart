@@ -15,7 +15,6 @@ import '../application/auth_controller.dart';
 import 'map_workspace.dart';
 import 'history.dart';
 import 'settings.dart';
-import 'join_departure.dart';
 
 class GpixApp extends StatelessWidget {
   const GpixApp(this.controller, {this.mapBuilder, super.key});
@@ -37,9 +36,19 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
+/// The map is the home screen; the menu opens every other page over it.
+enum Screen { map, trails, history, offline, settings }
+
 class _HomeState extends State<Home> with WidgetsBindingObserver {
-  int tab = 1;
+  Screen page = Screen.map;
+  String trailQuery = '';
   AppController get app => widget.app;
+  void open(Screen value) => setState(() => page = value);
+  void showOnMap(Trail trail) {
+    app.focus(trail);
+    open(Screen.map);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -86,7 +95,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     }
   }
 
-  void settings() => setState(() => tab = 4);
+  void settings() => open(Screen.settings);
   Future<void> accountSettings() async {
     final auth = widget.auth;
     if (auth == null) return;
@@ -105,326 +114,319 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     );
   }
 
-  @override
-  Widget build(BuildContext context) => StreamBuilder<void>(
-    stream: app.changes.stream,
-    builder: (context, _) => Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            if (app.connectionDetails?.call().problem case final String problem)
-              Material(
-                color: const Color(0xffffedcd),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          problem,
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: settings,
-                        child: Text(context.l10n.settings),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            if (app.busy)
-              LinearProgressIndicator(value: app.progress, minHeight: 3),
-            if (app.message != null)
-              Material(
-                color: const Color(0xffe6ecdf),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 6, 4, 6),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(context.message(app.message!), maxLines: 4),
-                      ),
-                      IconButton(
-                        onPressed: () => setState(() => app.message = null),
-                        icon: const Icon(Icons.close),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            Expanded(
-              child: IndexedStack(
-                index: tab,
-                children: [
-                  libraryView(context),
-                  MapWorkspace(
-                    app,
-                    mapBuilder: widget.mapBuilder,
-                    openLibrary: () => setState(() => tab = 0),
-                    openHistory: () => setState(() => tab = 2),
-                  ),
-                  HistoryView(
-                    app,
-                    openMap: () => setState(() => tab = 1),
-                    openSettings: settings,
-                  ),
-                  offlineView(context),
-                  SettingsView(app, account: accountSettings),
-                ],
+  String title(BuildContext context) => switch (page) {
+    Screen.map => context.l10n.map,
+    Screen.trails => context.l10n.myTrails,
+    Screen.history => context.l10n.history,
+    Screen.offline => context.l10n.offline,
+    Screen.settings => context.l10n.settings,
+  };
+
+  Widget menu(BuildContext context) => NavigationDrawer(
+    selectedIndex: page.index,
+    onDestinationSelected: (index) {
+      Navigator.of(context).pop();
+      open(Screen.values[index]);
+    },
+    children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(28, 20, 16, 16),
+        child: Row(
+          children: const [
+            Icon(Icons.terrain, color: forest, size: 30),
+            SizedBox(width: 8),
+            Text(
+              'gpix',
+              style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -1,
               ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: tab,
-        onDestinationSelected: (v) => setState(() => tab = v),
-        destinations: [
-          NavigationDestination(
-            icon: Icon(Icons.route_outlined),
-            selectedIcon: Icon(Icons.route),
-            label: context.l10n.myTrails,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.explore_outlined),
-            selectedIcon: Icon(Icons.explore),
-            label: context.l10n.map,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.history),
-            label: context.l10n.history,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.download_for_offline_outlined),
-            selectedIcon: Icon(Icons.download_for_offline),
-            label: context.l10n.offline,
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            label: context.l10n.settings,
-          ),
-        ],
+      NavigationDrawerDestination(
+        icon: const Icon(Icons.map_outlined),
+        selectedIcon: const Icon(Icons.map),
+        label: Text(context.l10n.map),
       ),
-    ),
+      NavigationDrawerDestination(
+        icon: const Icon(Icons.route_outlined),
+        selectedIcon: const Icon(Icons.route),
+        label: Text(context.l10n.myTrails),
+      ),
+      NavigationDrawerDestination(
+        icon: const Icon(Icons.history),
+        label: Text(context.l10n.history),
+      ),
+      NavigationDrawerDestination(
+        icon: const Icon(Icons.download_for_offline_outlined),
+        selectedIcon: const Icon(Icons.download_for_offline),
+        label: Text(context.l10n.offline),
+      ),
+      NavigationDrawerDestination(
+        icon: const Icon(Icons.settings_outlined),
+        selectedIcon: const Icon(Icons.settings),
+        label: Text(context.l10n.settings),
+      ),
+    ],
   );
-  Widget libraryView(BuildContext context) => ListView(
-    padding: const EdgeInsets.fromLTRB(22, 16, 22, 24),
-    children: [
-      Row(
-        children: [
-          const Icon(Icons.terrain, color: forest, size: 30),
-          const SizedBox(width: 8),
-          const Text(
-            'gpix',
-            style: TextStyle(
-              fontSize: 25,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -1,
-            ),
-          ),
-          const Spacer(),
-          IconButton(
-            tooltip: context.l10n.sync,
-            onPressed: app.busy ? null : app.synchronize,
-            icon: const Icon(Icons.sync),
-          ),
-          IconButton(
-            tooltip: context.l10n.settings,
-            onPressed: settings,
-            icon: const Icon(Icons.tune),
-          ),
-        ],
-      ),
-      const SizedBox(height: 28),
-      Text(
-        context.l10n.joyOfWalking,
-        style: TextStyle(
-          color: forest,
-          fontSize: 11,
-          letterSpacing: 2,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-      const SizedBox(height: 10),
-      Text(
-        context.l10n.nextTrailStartsHere,
-        style: Theme.of(context).textTheme.headlineLarge,
-      ),
-      const SizedBox(height: 14),
-      Text(
-        context.l10n.libraryIntro,
-        style: TextStyle(fontSize: 16, color: Color(0xff627068), height: 1.5),
-      ),
-      const SizedBox(height: 24),
-      FilledButton.icon(
-        onPressed: app.busy ? null : import,
-        icon: const Icon(Icons.add),
-        label: Text(context.l10n.importGpx),
-      ),
-      if (app.trails.isEmpty && app.loadDemo != null)
-        TextButton(
-          onPressed: app.busy ? null : app.demonstrate,
-          child: Text(context.l10n.tryDemo),
-        ),
-      const SizedBox(height: 32),
-      Row(
-        children: [
-          Expanded(
-            child: Text(
-              context.l10n.myLibrary,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Text(context.l10n.itemCount(app.trails.length)),
-        ],
-      ),
-      const SizedBox(height: 14),
-      if (app.trails.isEmpty)
-        Container(
-          padding: const EdgeInsets.all(28),
-          decoration: BoxDecoration(
-            color: const Color(0xffe9eee2),
-            borderRadius: BorderRadius.circular(24),
-          ),
+
+  @override
+  Widget build(BuildContext context) => StreamBuilder<void>(
+    stream: app.changes.stream,
+    builder: (context, _) => PopScope(
+      // System back returns from any page to the map.
+      canPop: page == Screen.map,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) open(Screen.map);
+      },
+      child: Scaffold(
+        drawer: menu(context),
+        appBar: page == Screen.map
+            ? null
+            : AppBar(
+                leading: IconButton(
+                  tooltip: context.l10n.backToMap,
+                  onPressed: () => open(Screen.map),
+                  icon: const Icon(Icons.arrow_back),
+                ),
+                title: Text(title(context)),
+                actions: [
+                  if (page == Screen.trails)
+                    IconButton(
+                      tooltip: context.l10n.sync,
+                      onPressed: app.busy ? null : app.synchronize,
+                      icon: const Icon(Icons.sync),
+                    ),
+                ],
+              ),
+        body: SafeArea(
           child: Column(
             children: [
-              Icon(Icons.hiking, size: 60, color: forest),
-              SizedBox(height: 18),
-              Text(
-                context.l10n.oneJourney,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-              ),
-              SizedBox(height: 10),
-              Text(
-                context.l10n.importIntro,
-                textAlign: TextAlign.center,
-                style: TextStyle(height: 1.5),
+              if (app.connectionDetails?.call().problem
+                  case final String problem)
+                Material(
+                  color: const Color(0xffffedcd),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            problem,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: settings,
+                          child: Text(context.l10n.settings),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              if (app.busy)
+                LinearProgressIndicator(value: app.progress, minHeight: 3),
+              if (app.message != null)
+                Material(
+                  color: const Color(0xffe6ecdf),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 6, 4, 6),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            context.message(app.message!),
+                            maxLines: 4,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => setState(() => app.message = null),
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              Expanded(
+                // Keep the map alive underneath the other pages.
+                child: IndexedStack(
+                  index: page.index,
+                  children: [
+                    MapWorkspace(
+                      app,
+                      mapBuilder: widget.mapBuilder,
+                      openLibrary: () => open(Screen.trails),
+                      openHistory: () => open(Screen.history),
+                      importTrails: import,
+                    ),
+                    libraryView(context),
+                    HistoryView(
+                      app,
+                      openMap: () => open(Screen.map),
+                      openSettings: settings,
+                    ),
+                    offlineView(context),
+                    SettingsView(app, account: accountSettings),
+                  ],
+                ),
               ),
             ],
           ),
         ),
+      ),
+    ),
+  );
+
+  Widget libraryView(BuildContext context) {
+    final query = foldForSearch(trailQuery.trim());
+    final shown = [
       for (final trail in app.trails)
-        Card(
-          margin: const EdgeInsets.only(bottom: 14),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(24),
-            onTap: () {
-              app.focus(trail);
-              setState(() => tab = 1);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(18),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xffedf1e7),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Icon(
-                          trail.followable ? Icons.route : Icons.place_outlined,
-                          color: forest,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          trail.name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      PopupMenuButton<String>(
-                        onSelected: (_) => confirmDelete(trail),
-                        itemBuilder: (_) => [
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Text(context.l10n.delete),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    trail.followable
-                        ? context.l10n.segmentCount(
-                            kilometers(TrailGeometry(trail).total),
-                            trail.segments.length,
-                          )
-                        : context.l10n.pointCount(trail.pois.length),
-                  ),
-                  const SizedBox(height: 12),
-                  StatusPill(
-                    trail.followable
-                        ? (app.covers(trail)
-                              ? context.l10n.mapReady
-                              : context.l10n.mapNeedsPreparation)
-                        : context.l10n.savedPlaces,
-                    good: !trail.followable || app.covers(trail),
-                  ),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 8,
-                    children: [
-                      TextButton.icon(
-                        onPressed: () {
-                          app.focus(trail);
-                          setState(() => tab = 1);
-                        },
-                        icon: const Icon(Icons.center_focus_strong),
-                        label: Text(context.l10n.view),
-                      ),
-                      if (trail.followable) ...[
-                        TextButton.icon(
-                          onPressed: app.busy
-                              ? null
-                              : () async {
-                                  setState(() => tab = 1);
-                                  app.focus(trail);
-                                  await showJoinTrail(context, app, trail);
-                                },
-                          icon: const Icon(Icons.directions_walk),
-                          label: Text(context.l10n.joinTrail),
-                        ),
-                        TextButton.icon(
-                          onPressed: app.busy
-                              ? null
-                              : () {
-                                  app.beginPlanning(trail);
-                                  setState(() => tab = 1);
-                                },
-                          icon: const Icon(Icons.edit_road),
-                          label: Text(context.l10n.days),
-                        ),
-                        FilledButton.icon(
-                          onPressed: app.busy
-                              ? null
-                              : () async {
-                                  app.select(trail);
-                                  setState(() => tab = 1);
-                                  await app.start();
-                                },
-                          icon: const Icon(Icons.play_arrow),
-                          label: Text(context.l10n.go),
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
-              ),
-            ),
+        if (query.isEmpty || foldForSearch(trail.name).contains(query)) trail,
+    ];
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      children: [
+        TextField(
+          onChanged: (value) => setState(() => trailQuery = value),
+          textInputAction: TextInputAction.search,
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.search),
+            hintText: context.l10n.searchTrails,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(24)),
+            isDense: true,
           ),
         ),
-    ],
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(child: Text(context.l10n.itemCount(app.trails.length))),
+            FilledButton.tonalIcon(
+              onPressed: app.busy ? null : import,
+              icon: const Icon(Icons.add),
+              label: Text(context.l10n.importGpx),
+            ),
+          ],
+        ),
+        if (app.trails.isEmpty && app.loadDemo != null)
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: app.busy ? null : app.demonstrate,
+              child: Text(context.l10n.tryDemo),
+            ),
+          ),
+        const SizedBox(height: 12),
+        if (app.trails.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Text(context.l10n.importIntro, textAlign: TextAlign.center),
+          )
+        else if (shown.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Text(
+              context.l10n.noTrailMatch(trailQuery.trim()),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        for (final trail in shown) trailCard(context, trail),
+      ],
+    );
+  }
+
+  Widget trailCard(BuildContext context, Trail trail) => Card(
+    margin: const EdgeInsets.only(bottom: 10),
+    child: InkWell(
+      borderRadius: BorderRadius.circular(24),
+      onTap: () => showOnMap(trail),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 4, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  trail.followable ? Icons.route : Icons.place_outlined,
+                  color: forest,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    trail.name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                PopupMenuButton<String>(
+                  onSelected: (_) => confirmDelete(trail),
+                  itemBuilder: (_) => [
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Text(context.l10n.delete),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Text(
+              trail.followable
+                  ? context.l10n.segmentCount(
+                      kilometers(TrailGeometry(trail).total),
+                      trail.segments.length,
+                    )
+                  : context.l10n.pointCount(trail.pois.length),
+            ),
+            const SizedBox(height: 8),
+            StatusPill(
+              trail.followable
+                  ? (app.covers(trail)
+                        ? context.l10n.mapReady
+                        : context.l10n.mapNeedsPreparation)
+                  : context.l10n.savedPlaces,
+              good: !trail.followable || app.covers(trail),
+            ),
+            Wrap(
+              spacing: 4,
+              children: [
+                TextButton.icon(
+                  onPressed: () => showOnMap(trail),
+                  icon: const Icon(Icons.center_focus_strong),
+                  label: Text(context.l10n.view),
+                ),
+                if (trail.followable) ...[
+                  TextButton.icon(
+                    onPressed: app.busy
+                        ? null
+                        : () {
+                            app.beginPlanning(trail);
+                            open(Screen.map);
+                          },
+                    icon: const Icon(Icons.edit_road),
+                    label: Text(context.l10n.days),
+                  ),
+                  TextButton.icon(
+                    onPressed: app.busy
+                        ? null
+                        : () async {
+                            showOnMap(trail);
+                            await app.launch(trail);
+                          },
+                    icon: const Icon(Icons.play_arrow),
+                    label: Text(context.l10n.go),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
   );
   Future<void> confirmDelete(Trail t) async {
     final yes = await showDialog<bool>(
@@ -450,12 +452,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   Widget offlineView(BuildContext context) => ListView(
     padding: const EdgeInsets.all(22),
     children: [
-      const SizedBox(height: 16),
-      Text(
-        context.l10n.offlineHeadline,
-        style: Theme.of(context).textTheme.headlineLarge,
-      ),
-      const SizedBox(height: 14),
       Text(
         context.l10n.sharedMaps,
         style: TextStyle(fontSize: 16, height: 1.5),

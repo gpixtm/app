@@ -16,9 +16,10 @@ class ProfilePoint {
 }
 
 class _Edge {
-  const _Edge(this.a, this.b, this.start, this.length);
+  const _Edge(this.a, this.b, this.start, this.length, this.segment);
   final GeoPoint a, b;
   final double start, length;
+  final int segment;
 }
 
 /// One distance axis shared by tracking and elevation. Segment gaps add no distance.
@@ -30,7 +31,7 @@ class TrailGeometry {
         if (i > 0) {
           final length = distance(segment[i - 1], segment[i]);
           if (length > 0) {
-            _edges.add(_Edge(segment[i - 1], segment[i], total, length));
+            _edges.add(_Edge(segment[i - 1], segment[i], total, length, s));
           }
           total += length;
         }
@@ -90,6 +91,69 @@ class TrailGeometry {
       }
     }
     return _edges.lastOrNull?.b;
+  }
+
+  /// Middle of the longest portion inside [view], on the shared distance axis.
+  /// Separate GPX segments never merge into one visible portion.
+  GeoPoint? visibleCentre(Bounds view) {
+    double? runStart, runEnd, bestStart, bestEnd;
+    int? runSegment;
+    void close() {
+      if (runStart != null &&
+          (bestStart == null || runEnd! - runStart! > bestEnd! - bestStart!)) {
+        bestStart = runStart;
+        bestEnd = runEnd;
+      }
+      runStart = null;
+    }
+
+    for (final e in _edges) {
+      final clip = _clip(e, view);
+      if (clip == null) {
+        close();
+        continue;
+      }
+      final from = e.start + e.length * clip.$1;
+      final to = e.start + e.length * clip.$2;
+      if (runStart != null &&
+          runSegment == e.segment &&
+          (from - runEnd!).abs() < 1e-6) {
+        runEnd = to;
+      } else {
+        close();
+        runStart = from;
+        runEnd = to;
+        runSegment = e.segment;
+      }
+    }
+    close();
+    return bestStart == null ? null : pointAt((bestStart! + bestEnd!) / 2);
+  }
+
+  /// Liang–Barsky clipping of an edge in longitude/latitude space.
+  static (double, double)? _clip(_Edge e, Bounds b) {
+    var t0 = 0.0, t1 = 1.0;
+    final dx = e.b.lon - e.a.lon, dy = e.b.lat - e.a.lat;
+    for (final (p, q) in [
+      (-dx, e.a.lon - b.west),
+      (dx, b.east - e.a.lon),
+      (-dy, e.a.lat - b.south),
+      (dy, b.north - e.a.lat),
+    ]) {
+      if (p == 0) {
+        if (q < 0) return null;
+        continue;
+      }
+      final r = q / p;
+      if (p < 0) {
+        if (r > t1) return null;
+        if (r > t0) t0 = r;
+      } else {
+        if (r < t0) return null;
+        if (r < t1) t1 = r;
+      }
+    }
+    return (t0, t1);
   }
 
   Projection? project(

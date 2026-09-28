@@ -36,7 +36,7 @@ These instructions apply to this standalone Flutter repository (`gpixtm/app`). T
 
 Read [product decisions](docs/PRODUCT.md) for map UX, navigation, day planning, recording, history and watch integration. In particular:
 
-- Open on one central map with **all imported GPX trails already visible**. Browsing another trail must not interrupt the active walk.
+- Open on one central map where **every imported trail with a visible portion is marked by a pin**; a trail's line is drawn only once it is selected, and stays drawn while the map moves until another trail is selected or it is closed (decision of 28 September 2026). Browsing another trail must not interrupt the active walk.
 - Starting navigation and recentering use a local walking zoom, currently 16, irrespective of total route length. Never fit a 100 km trail as the default navigation view.
 - Join the **nearest point on a GPX segment**, including between vertices, rather than the file's start or nearest vertex. Keep internal walking guidance and an explicit Google Maps fallback.
 - Download visible map areas automatically online and prepare the GPX corridor at import. Offline, display only actually downloaded areas and report partial preparation honestly.

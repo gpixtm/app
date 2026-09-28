@@ -25,16 +25,12 @@ Trail route(String id) => Trail(
 );
 
 void main() {
-  test(
-    'central map includes every imported GPX and preserves segment gaps',
-    () {
-      final features =
-          libraryFeatures([route('a'), route('b')])['features'] as List;
-      expect(features, hasLength(4));
-      expect((features[0]['geometry']['coordinates'] as List).last, [0.01, 0]);
-      expect((features[1]['geometry']['coordinates'] as List).first, [1, 1]);
-    },
-  );
+  test('selected trail lines preserve segment gaps', () {
+    final features = lines(route('a').segments).toList();
+    expect(features, hasLength(2));
+    expect((features[0]['geometry']['coordinates'] as List).last, [0.01, 0]);
+    expect((features[1]['geometry']['coordinates'] as List).first, [1, 1]);
+  });
   test('day clipping follows the GPX, interpolates boundaries and supports reverse without bridging gaps', () {
     final g = TrailGeometry(route('r'));
     final portion = g.portion(500, 1500);

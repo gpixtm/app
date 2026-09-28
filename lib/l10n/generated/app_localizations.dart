@@ -107,13 +107,13 @@ abstract class AppLocalizations {
   /// No description provided for @noJoinSegment.
   ///
   /// In en, this message translates to:
-  /// **'This GPX has no segment to join.'**
+  /// **'This trail has no segment to join.'**
   String get noJoinSegment;
 
   /// No description provided for @alreadyNearTrail.
   ///
   /// In en, this message translates to:
-  /// **'You are already near the trail. Use Go to follow it from here.'**
+  /// **'You are already on the trail: tracking starts here.'**
   String get alreadyNearTrail;
 
   /// No description provided for @cachedApproach.
@@ -167,7 +167,7 @@ abstract class AppLocalizations {
   /// No description provided for @demoNotice.
   ///
   /// In en, this message translates to:
-  /// **'Demo: sample GPX and elevations, real map of Florence.'**
+  /// **'Demo: sample trails and elevations, real map of Florence.'**
   String get demoNotice;
 
   /// No description provided for @syncPending.
@@ -377,13 +377,13 @@ abstract class AppLocalizations {
   /// No description provided for @damagedGpx.
   ///
   /// In en, this message translates to:
-  /// **'This GPX contains damaged text. Correct it in the original file before importing.'**
+  /// **'This trail file contains damaged text. Correct it in the original file before importing.'**
   String get damagedGpx;
 
   /// No description provided for @gpxSizeLimit.
   ///
   /// In en, this message translates to:
-  /// **'Limit: 50 MB per GPX.'**
+  /// **'Limit: 50 MB per trail file.'**
   String get gpxSizeLimit;
 
   /// No description provided for @incompleteUtf16.
@@ -401,7 +401,7 @@ abstract class AppLocalizations {
   /// No description provided for @unsupportedGpxEncoding.
   ///
   /// In en, this message translates to:
-  /// **'Unsupported GPX encoding: {arg1}. Export the file as UTF-8.'**
+  /// **'Unsupported file encoding: {arg1}. Export the file as UTF-8.'**
   String unsupportedGpxEncoding(Object arg1);
 
   /// No description provided for @localCopy.
@@ -617,7 +617,7 @@ abstract class AppLocalizations {
   /// No description provided for @gpxTooLarge.
   ///
   /// In en, this message translates to:
-  /// **'GPX too large (50 MB maximum).'**
+  /// **'Trail file too large (50 MB maximum).'**
   String get gpxTooLarge;
 
   /// No description provided for @xmlEntitiesForbidden.
@@ -629,19 +629,19 @@ abstract class AppLocalizations {
   /// No description provided for @notGpx.
   ///
   /// In en, this message translates to:
-  /// **'This file is not a GPX.'**
+  /// **'This file is not a trail file (.gpx).'**
   String get notGpx;
 
   /// No description provided for @invalidGpxCoordinates.
   ///
   /// In en, this message translates to:
-  /// **'Invalid GPX coordinates.'**
+  /// **'Invalid trail coordinates.'**
   String get invalidGpxCoordinates;
 
   /// No description provided for @emptyGpx.
   ///
   /// In en, this message translates to:
-  /// **'No trail or point of interest in this GPX.'**
+  /// **'No trail or point of interest in this file.'**
   String get emptyGpx;
 
   /// No description provided for @invalidUsername.
@@ -725,7 +725,7 @@ abstract class AppLocalizations {
   /// No description provided for @go.
   ///
   /// In en, this message translates to:
-  /// **'Go'**
+  /// **'Start'**
   String get go;
 
   /// No description provided for @keep.
@@ -734,28 +734,10 @@ abstract class AppLocalizations {
   /// **'Keep'**
   String get keep;
 
-  /// No description provided for @joyOfWalking.
-  ///
-  /// In en, this message translates to:
-  /// **'THE JOY OF MOVING FORWARD'**
-  String get joyOfWalking;
-
-  /// No description provided for @nextTrailStartsHere.
-  ///
-  /// In en, this message translates to:
-  /// **'Your next trail\nstarts here.'**
-  String get nextTrailStartsHere;
-
-  /// No description provided for @libraryIntro.
-  ///
-  /// In en, this message translates to:
-  /// **'Your trails, your places. Ready to go with you, even without a connection.'**
-  String get libraryIntro;
-
   /// No description provided for @importGpx.
   ///
   /// In en, this message translates to:
-  /// **'Import a GPX'**
+  /// **'Import a trail'**
   String get importGpx;
 
   /// No description provided for @tryDemo.
@@ -764,28 +746,16 @@ abstract class AppLocalizations {
   /// **'Try the demo · Florence'**
   String get tryDemo;
 
-  /// No description provided for @myLibrary.
-  ///
-  /// In en, this message translates to:
-  /// **'My library'**
-  String get myLibrary;
-
   /// No description provided for @itemCount.
   ///
   /// In en, this message translates to:
   /// **'{arg1, plural, =0{0 items} =1{1 item} other{{arg1} items}}'**
   String itemCount(int arg1);
 
-  /// No description provided for @oneJourney.
-  ///
-  /// In en, this message translates to:
-  /// **'A whole journey, one trail.'**
-  String get oneJourney;
-
   /// No description provided for @importIntro.
   ///
   /// In en, this message translates to:
-  /// **'Import your Camino trail or a file of points of interest. No need to split it into stages.'**
+  /// **'Import a trail (.gpx file): a Camino, a hike or a list of places. No need to split it into stages.'**
   String get importIntro;
 
   /// No description provided for @pointCount.
@@ -818,12 +788,6 @@ abstract class AppLocalizations {
   /// **'Places saved on this phone'**
   String get savedPlaces;
 
-  /// No description provided for @joinTrail.
-  ///
-  /// In en, this message translates to:
-  /// **'Join the trail'**
-  String get joinTrail;
-
   /// No description provided for @days.
   ///
   /// In en, this message translates to:
@@ -842,12 +806,6 @@ abstract class AppLocalizations {
   /// **'This deletion will also be synced with your server.'**
   String get deleteItemBody;
 
-  /// No description provided for @offlineHeadline.
-  ///
-  /// In en, this message translates to:
-  /// **'Peace of mind.\nEven offline.'**
-  String get offlineHeadline;
-
   /// No description provided for @sharedMaps.
   ///
   /// In en, this message translates to:
@@ -857,7 +815,7 @@ abstract class AppLocalizations {
   /// No description provided for @automaticMapsInfo.
   ///
   /// In en, this message translates to:
-  /// **'Visible areas load automatically online. Each GPX prepares its maps in the background. Offline, only downloaded areas remain visible.'**
+  /// **'Visible areas load automatically online. Each trail prepares its maps in the background. Offline, only downloaded areas remain visible.'**
   String get automaticMapsInfo;
 
   /// No description provided for @resumePreparation.
@@ -905,7 +863,7 @@ abstract class AppLocalizations {
   /// No description provided for @noInstalledMaps.
   ///
   /// In en, this message translates to:
-  /// **'No map installed. Configure your server and its catalog in settings. GPX files remain viewable.'**
+  /// **'No map installed. Configure your server and its catalog in settings. Trails remain viewable.'**
   String get noInstalledMaps;
 
   /// No description provided for @deleteMap.
@@ -1352,12 +1310,6 @@ abstract class AppLocalizations {
   /// **'Delete walk'**
   String get deleteWalk;
 
-  /// No description provided for @myWalks.
-  ///
-  /// In en, this message translates to:
-  /// **'My walks'**
-  String get myWalks;
-
   /// No description provided for @walkHistoryInfo.
   ///
   /// In en, this message translates to:
@@ -1427,7 +1379,7 @@ abstract class AppLocalizations {
   /// No description provided for @withGpx.
   ///
   /// In en, this message translates to:
-  /// **'With GPX'**
+  /// **'On a trail'**
   String get withGpx;
 
   /// No description provided for @freeWalks.
@@ -1439,7 +1391,7 @@ abstract class AppLocalizations {
   /// No description provided for @noWalks.
   ///
   /// In en, this message translates to:
-  /// **'No walks here yet. Start a GPX with Go or record a free walk.'**
+  /// **'No walks here yet. Start a trail or record a free walk.'**
   String get noWalks;
 
   /// No description provided for @unreadableFilename.
@@ -1490,41 +1442,11 @@ abstract class AppLocalizations {
   /// **'Cannot open the app or browser.'**
   String get cannotOpenNavigation;
 
-  /// No description provided for @nearestJoinInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Towards the GPX point closest to your position.'**
-  String get nearestJoinInfo;
-
   /// No description provided for @reverseSuffix.
   ///
   /// In en, this message translates to:
   /// **' · reverse direction'**
   String get reverseSuffix;
-
-  /// No description provided for @walkInGpix.
-  ///
-  /// In en, this message translates to:
-  /// **'Walk with Gpix'**
-  String get walkInGpix;
-
-  /// No description provided for @onlineRouteInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Map guidance · online calculation'**
-  String get onlineRouteInfo;
-
-  /// No description provided for @walkInGoogleMaps.
-  ///
-  /// In en, this message translates to:
-  /// **'Walk with Google Maps'**
-  String get walkInGoogleMaps;
-
-  /// No description provided for @driveInGoogleMaps.
-  ///
-  /// In en, this message translates to:
-  /// **'Drive with Google Maps'**
-  String get driveInGoogleMaps;
 
   /// No description provided for @routingPrivacy.
   ///
@@ -1595,14 +1517,8 @@ abstract class AppLocalizations {
   /// No description provided for @deleteDayInfo.
   ///
   /// In en, this message translates to:
-  /// **'The GPX and other sections are preserved.'**
+  /// **'The trail and other sections are preserved.'**
   String get deleteDayInfo;
-
-  /// No description provided for @trailsOnMap.
-  ///
-  /// In en, this message translates to:
-  /// **'{arg1, plural, =0{0 trails on my map} =1{1 trail on my map} other{{arg1} trails on my map}}'**
-  String trailsOnMap(int arg1);
 
   /// No description provided for @walkInProgressData.
   ///
@@ -1751,7 +1667,7 @@ abstract class AppLocalizations {
   /// No description provided for @readyToFollow.
   ///
   /// In en, this message translates to:
-  /// **'Ready to follow your GPX.'**
+  /// **'Ready to follow your trail.'**
   String get readyToFollow;
 
   /// No description provided for @findingAccuratePosition.
@@ -1781,7 +1697,7 @@ abstract class AppLocalizations {
   /// No description provided for @followFromHere.
   ///
   /// In en, this message translates to:
-  /// **'Follow the GPX from here'**
+  /// **'Follow the trail from here'**
   String get followFromHere;
 
   /// No description provided for @exitApproach.
@@ -1795,12 +1711,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Recalculate'**
   String get recalculate;
-
-  /// No description provided for @otherNavigation.
-  ///
-  /// In en, this message translates to:
-  /// **'Other navigation'**
-  String get otherNavigation;
 
   /// No description provided for @cachedRouteInfo.
   ///
@@ -1835,7 +1745,7 @@ abstract class AppLocalizations {
   /// No description provided for @followTrail.
   ///
   /// In en, this message translates to:
-  /// **'Go · follow this trail'**
+  /// **'Start the trail'**
   String get followTrail;
 
   /// No description provided for @returnToTracking.
@@ -1883,7 +1793,7 @@ abstract class AppLocalizations {
   /// No description provided for @gpxDirection.
   ///
   /// In en, this message translates to:
-  /// **'GPX direction · change'**
+  /// **'Original direction · change'**
   String get gpxDirection;
 
   /// No description provided for @currentWalk.
@@ -1927,12 +1837,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your map, around you'**
   String get mapAroundYou;
-
-  /// No description provided for @allTrailsInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'All your trails are visible. Tap a trail to select it.'**
-  String get allTrailsInfo;
 
   /// No description provided for @accountServer.
   ///
@@ -2093,7 +1997,7 @@ abstract class AppLocalizations {
   /// No description provided for @atGpxKilometre.
   ///
   /// In en, this message translates to:
-  /// **'At GPX kilometre {arg1}'**
+  /// **'At trail kilometre {arg1}'**
   String atGpxKilometre(Object arg1);
 
   /// No description provided for @tapSelectedTrail.
@@ -2309,7 +2213,7 @@ abstract class AppLocalizations {
   /// No description provided for @damagedText.
   ///
   /// In en, this message translates to:
-  /// **'Text contains a lost character. Correct its name or reimport the original GPX.'**
+  /// **'Text contains a lost character. Correct its name or reimport the original file.'**
   String get damagedText;
 
   /// No description provided for @invalidRouteCoordinates.
@@ -2491,6 +2395,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Voice guidance preference not saved on this phone.'**
   String get voiceGuidanceNotSaved;
+
+  /// No description provided for @menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu'**
+  String get menu;
+
+  /// No description provided for @backToMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to the map'**
+  String get backToMap;
+
+  /// No description provided for @searchPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Search a town, an address…'**
+  String get searchPlaces;
+
+  /// No description provided for @clearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get clearSearch;
+
+  /// No description provided for @noPlaceFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No place found.'**
+  String get noPlaceFound;
+
+  /// No description provided for @placeSearchUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Place search needs a connection. Try again once online.'**
+  String get placeSearchUnavailable;
+
+  /// No description provided for @trailCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 trail} other{{count} trails}}'**
+  String trailCount(int count);
+
+  /// No description provided for @trailsHere.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 trail here} other{{count} trails here}}'**
+  String trailsHere(int count);
+
+  /// No description provided for @showTrail.
+  ///
+  /// In en, this message translates to:
+  /// **'Show {name}'**
+  String showTrail(String name);
+
+  /// No description provided for @closeTrail.
+  ///
+  /// In en, this message translates to:
+  /// **'Close the trail'**
+  String get closeTrail;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @openInGoogleMaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Get there with Google Maps'**
+  String get openInGoogleMaps;
+
+  /// No description provided for @searchTrails.
+  ///
+  /// In en, this message translates to:
+  /// **'Search my trails'**
+  String get searchTrails;
+
+  /// No description provided for @noTrailMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No trail matches “{query}”.'**
+  String noTrailMatch(String query);
+
+  /// No description provided for @approachFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Route to the trail unavailable offline: the trail itself is followed and your distance to it stays visible.'**
+  String get approachFallback;
 }
 
 class _AppLocalizationsDelegate

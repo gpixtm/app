@@ -154,10 +154,6 @@ class _HistoryViewState extends State<HistoryView> {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        Text(
-          context.l10n.myWalks,
-          style: Theme.of(context).textTheme.headlineLarge,
-        ),
         Text(context.l10n.walkHistoryInfo),
         const SizedBox(height: 18),
         if (ongoing != null)

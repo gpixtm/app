@@ -1,6 +1,7 @@
 import 'data/health_connect.dart';
 import 'data/approach_source.dart';
 import 'data/android_guidance.dart';
+import 'data/photon_place_search.dart';
 
 import 'package:uuid/uuid.dart';
 import 'package:flutter/foundation.dart';
@@ -131,7 +132,13 @@ class _LibraryRuntime {
       XmlGpxDecoder(placesName: (name) => messages.placesName(name)),
       ApiElevationSource(scopedServer),
     );
+    final placesClient = http.Client();
     final controller = AppController(
+      placeSearch: PhotonPlaceSearch(
+        placesClient,
+        base: const String.fromEnvironment('PLACE_SEARCH_URL'),
+        languageCode: () => locale.languageCode,
+      ),
       approachSource: ApiApproachSource(
         scopedServer,
         db,
@@ -173,6 +180,7 @@ class _LibraryRuntime {
     );
     _close = () async {
       await controller.shutdown();
+      placesClient.close();
       await db.close();
     };
     try {

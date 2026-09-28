@@ -1,9 +1,6 @@
-import 'package:gpix/presentation/localization.dart';
-
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -16,7 +13,7 @@ import 'package:gpix/data/trail_codec.dart';
 import 'package:gpix/domain/approach.dart';
 import 'package:gpix/domain/models.dart';
 import 'package:gpix/domain/trail_geometry.dart';
-import 'package:gpix/presentation/join_departure.dart';
+import 'package:gpix/domain/app_message.dart';
 
 import 'auth_session_test.dart' show MemoryCredentials, environment;
 import 'lifecycle_test.dart' as fixtures;
@@ -54,7 +51,7 @@ class Server extends ServerConnection {
 }
 
 class Source implements ApproachSource {
-  bool fail = false;
+  bool fail = false, unavailable = false;
   GeoPoint? destination;
   @override
   Future<ApproachRoute> calculate(
@@ -64,6 +61,7 @@ class Source implements ApproachSource {
   ) async {
     this.destination = destination;
     if (fail) throw StateError('offline');
+    if (unavailable) throw MessageFailure(AppMessage.approachUnavailable);
     return decodeApproach(response(), target);
   }
 }
@@ -265,29 +263,66 @@ void main() {
     expect(app.session!.active, true);
     expect(app.selected!.id, target().id);
   });
-  testWidgets(
-    'join sheet offers internal walking and external fallback without starting until choice',
-    (tester) async {
-      final app = appWith(Source());
+  group('launch', () {
+    Trail far() => Trail(
+      id: 'far',
+      name: 'Far',
+      segments: [
+        [const GeoPoint(0, 0), const GeoPoint(0, 1)],
+      ],
+      pois: [],
+    );
+    test('far from the trail walks the internal approach first', () async {
+      final source = Source();
+      final app = appWith(source);
       addTearDown(app.dispose);
-      await tester.pumpWidget(
-        LocalizedApp(
-          homeBuilder: (context) => Builder(
-            builder: (context) => Scaffold(
-              body: TextButton(
-                onPressed: () => showJoinTrail(context, app, target()),
-                child: const Text('Join'),
-              ),
-            ),
-          ),
-        ),
-      );
-      await tester.tap(find.text('Join'));
-      await tester.pumpAndSettle();
-      expect(find.text("Walk with Gpix"), findsOneWidget);
-      expect(find.text("Drive with Google Maps"), findsOneWidget);
+      app.mapFix = Fix(const GeoPoint(.01, .5), 5, DateTime.now());
+      await app.launch(far());
+      expect(source.destination!.lon, closeTo(.5, .000001));
+      expect(app.approach, isNotNull);
+      expect(app.session!.active, true);
+      expect(app.selected!.id, 'far');
+    });
+    test('already on the trail follows it directly', () async {
+      final source = Source();
+      final app = appWith(source);
+      addTearDown(app.dispose);
+      app.mapFix = Fix(const GeoPoint(.00005, .5), 5, DateTime.now());
+      await app.launch(far());
+      expect(source.destination, isNull);
       expect(app.approach, isNull);
-      expect(tester.takeException(), isNull);
-    },
-  );
+      expect(app.session!.active, true);
+      expect(app.message, AppMessage.alreadyNearTrail);
+    });
+    test(
+      'offline without a saved route follows the trail and says so',
+      () async {
+        final source = Source()..unavailable = true;
+        final app = appWith(source);
+        addTearDown(app.dispose);
+        app.mapFix = Fix(const GeoPoint(.01, .5), 5, DateTime.now());
+        await app.launch(far());
+        expect(app.approach, isNull);
+        expect(app.session!.active, true);
+        expect(app.selected!.id, 'far');
+        expect(app.message, AppMessage.approachFallback);
+      },
+    );
+    test(
+      'closing the itinerary returns to exploration unless tracking',
+      () async {
+        final app = appWith(Source());
+        addTearDown(app.dispose);
+        app.mapFix = Fix(const GeoPoint(.00005, .5), 5, DateTime.now());
+        await app.launch(far());
+        app.closeTrail();
+        expect(app.focused!.id, 'far');
+        app.stop();
+        app.closeTrail();
+        expect(app.focused, isNull);
+        expect(app.selected, isNull);
+        expect(app.session, isNull);
+      },
+    );
+  });
 }

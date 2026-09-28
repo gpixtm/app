@@ -29,6 +29,3 @@ Iterable<Map<String, dynamic>> lines(
     }
   }
 }
-
-Map<String, dynamic> libraryFeatures(List<Trail> trails) =>
-    collection([for (final trail in trails) ...lines(trail.segments)]);

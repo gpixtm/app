@@ -14,6 +14,7 @@ import '../domain/connection_settings.dart';
 import '../domain/day_plan.dart';
 import '../domain/health_data.dart';
 import '../domain/approach.dart';
+import '../domain/place_search.dart';
 
 class AppController {
   AppController({
@@ -31,7 +32,21 @@ class AppController {
     this.approachSource,
     this.guide,
     this.saveVoiceGuidance,
+    this.placeSearch,
   });
+  final PlaceSearch? placeSearch;
+
+  /// Last searched place the map should move to.
+  Place? placeTarget;
+  int placeRevision = 0;
+  Future<List<Place>> searchPlaces(String query) async =>
+      await placeSearch?.search(query, near: currentFix?.point) ?? const [];
+  void showPlace(Place place) {
+    placeTarget = place;
+    placeRevision++;
+    notifyListeners();
+  }
+
   final GuideNavigation? guide;
   final Future<void> Function(bool)? saveVoiceGuidance;
   bool get voiceGuidance => guide?.voice ?? false;
@@ -102,6 +117,7 @@ class AppController {
         select(target);
         session?.reverse = backwards;
         message = AppMessage.alreadyNearTrail;
+        ready = true;
         return;
       }
       final route = await approachSource!.calculate(fix.point, target, end);
@@ -117,7 +133,59 @@ class AppController {
       unawaited(prepareTrailMaps([route.trail]));
       ready = true;
     });
-    if (ready && !_disposed) await start();
+    if (ready && !_disposed) await _startKeepingNotice();
+  }
+
+  /// Start a trail from wherever the walker is: follow it directly when
+  /// already on it, otherwise walk the internal approach to its nearest point.
+  Future<void> launch(Trail trail) async {
+    if (busy || !trail.followable || _disposed) return;
+    final backwards =
+        selected?.id == trail.id &&
+        (approach != null ? approachReverse : session?.reverse == true);
+    if (selected?.id != trail.id || session?.active == true) select(trail);
+    if (approachSource != null) {
+      await joinTrail(trail, reverse: backwards);
+      if (_disposed ||
+          session?.active == true ||
+          selected?.id != trail.id ||
+          approach != null) {
+        return;
+      }
+    }
+    // Offline without a saved approach, or no fix yet: follow the trail
+    // itself; the remaining distance to it stays visible.
+    if (message case MessageFailure(
+      detail: AppMessage(code: 'approachUnavailable'),
+    )) {
+      message = AppMessage.approachFallback;
+    }
+    session?.reverse = backwards;
+    await _startKeepingNotice();
+  }
+
+  Future<void> _startKeepingNotice() async {
+    final notice = message;
+    await start();
+    if (message == null && notice != null) {
+      message = notice;
+      notifyListeners();
+    }
+  }
+
+  /// Leave the itinerary view. An active walk keeps its trail on screen.
+  void closeTrail() {
+    if (planning) finishPlanning();
+    if (session?.active == true) {
+      focused = selected;
+    } else {
+      focused = null;
+      selected = null;
+      session = null;
+      approach = null;
+      approachDestination = null;
+    }
+    notifyListeners();
   }
 
   Future<Fix> _positionForApproach() async {

@@ -13,11 +13,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get routingAttribution => 'Valhalla · © OpenStreetMap';
 
   @override
-  String get noJoinSegment => 'Ce GPX ne contient aucun segment à rejoindre.';
+  String get noJoinSegment =>
+      'Ce parcours ne contient aucun segment à rejoindre.';
 
   @override
   String get alreadyNearTrail =>
-      'Vous êtes déjà près du parcours. Vous pouvez le suivre depuis ici avec Go.';
+      'Vous êtes déjà sur le parcours : le suivi démarre ici.';
 
   @override
   String get cachedApproach =>
@@ -51,7 +52,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get demoNotice =>
-      'Démonstration : GPX et altitudes fictifs, carte réelle de Florence.';
+      'Démonstration : parcours et altitudes fictifs, carte réelle de Florence.';
 
   @override
   String get syncPending => 'Synchronisation en attente';
@@ -209,10 +210,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get damagedGpx =>
-      'Ce GPX contient un nom ou un texte dont l’encodage est abîmé. Corrigez-le dans le fichier d’origine avant de l’importer.';
+      'Ce fichier de parcours contient un nom ou un texte dont l’encodage est abîmé. Corrigez-le dans le fichier d’origine avant de l’importer.';
 
   @override
-  String get gpxSizeLimit => 'Limite : 50 Mo par GPX.';
+  String get gpxSizeLimit => 'Limite : 50 Mo par fichier de parcours.';
 
   @override
   String get incompleteUtf16 => 'Fichier UTF-16 incomplet.';
@@ -222,7 +223,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String unsupportedGpxEncoding(Object arg1) {
-    return 'Encodage GPX non pris en charge : $arg1. Exportez le fichier en UTF-8.';
+    return 'Encodage du fichier non pris en charge : $arg1. Exportez le fichier en UTF-8.';
   }
 
   @override
@@ -342,19 +343,20 @@ class AppLocalizationsFr extends AppLocalizations {
   String get mapAddressRejected => 'Adresse de carte refusée.';
 
   @override
-  String get gpxTooLarge => 'GPX trop volumineux (50 Mo maximum).';
+  String get gpxTooLarge =>
+      'Fichier de parcours trop volumineux (50 Mo maximum).';
 
   @override
   String get xmlEntitiesForbidden => 'Entités XML interdites.';
 
   @override
-  String get notGpx => 'Ce fichier n’est pas un GPX.';
+  String get notGpx => 'Ce fichier n’est pas un fichier de parcours (.gpx).';
 
   @override
-  String get invalidGpxCoordinates => 'Coordonnées GPX invalides.';
+  String get invalidGpxCoordinates => 'Coordonnées du parcours invalides.';
 
   @override
-  String get emptyGpx => 'Aucun parcours ni point d’intérêt dans ce GPX.';
+  String get emptyGpx => 'Aucun parcours ni point d’intérêt dans ce fichier.';
 
   @override
   String get invalidUsername => '3 à 32 lettres, chiffres ou caractères _.';
@@ -397,29 +399,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get view => 'Voir';
 
   @override
-  String get go => 'Go';
+  String get go => 'Lancer';
 
   @override
   String get keep => 'Garder';
 
   @override
-  String get joyOfWalking => 'LE PLAISIR D’AVANCER';
-
-  @override
-  String get nextTrailStartsHere => 'Votre prochain\nchemin commence ici.';
-
-  @override
-  String get libraryIntro =>
-      'Vos parcours, vos lieux. Prêts à vous accompagner, même loin du réseau.';
-
-  @override
-  String get importGpx => 'Importer un GPX';
+  String get importGpx => 'Importer un parcours';
 
   @override
   String get tryDemo => 'Essayer la démonstration · Florence';
-
-  @override
-  String get myLibrary => 'Ma bibliothèque';
 
   @override
   String itemCount(int arg1) {
@@ -434,11 +423,8 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get oneJourney => 'Tout un voyage, un seul parcours.';
-
-  @override
   String get importIntro =>
-      'Importez votre chemin de Compostelle, ou un fichier de points d’intérêt. Aucun découpage en étapes nécessaire.';
+      'Importez un parcours (fichier .gpx) : chemin de Compostelle, randonnée ou liste de lieux. Aucun découpage en étapes nécessaire.';
 
   @override
   String pointCount(int arg1) {
@@ -474,9 +460,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get savedPlaces => 'Lieux enregistrés sur le téléphone';
 
   @override
-  String get joinTrail => 'Rejoindre le parcours';
-
-  @override
   String get days => 'Journées';
 
   @override
@@ -487,15 +470,12 @@ class AppLocalizationsFr extends AppLocalizations {
       'Cette suppression sera aussi synchronisée avec votre serveur.';
 
   @override
-  String get offlineHeadline => 'L’esprit libre.\nMême sans réseau.';
-
-  @override
   String get sharedMaps =>
       'Les cartes sont partagées entre vos parcours et conservées sur votre téléphone.';
 
   @override
   String get automaticMapsInfo =>
-      'Les zones visibles se chargent automatiquement en ligne. Chaque GPX prépare ses cartes en arrière-plan. Hors ligne, seules les zones reçues restent visibles.';
+      'Les zones visibles se chargent automatiquement en ligne. Chaque parcours prépare ses cartes en arrière-plan. Hors ligne, seules les zones reçues restent visibles.';
 
   @override
   String get resumePreparation => 'Reprendre la préparation';
@@ -522,7 +502,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noInstalledMaps =>
-      'Aucune carte installée. Configurez votre serveur et son catalogue dans les réglages. Les GPX restent consultables.';
+      'Aucune carte installée. Configurez votre serveur et son catalogue dans les réglages. Les parcours restent consultables.';
 
   @override
   String get deleteMap => 'Supprimer cette carte';
@@ -775,9 +755,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get deleteWalk => 'Supprimer la sortie';
 
   @override
-  String get myWalks => 'Mes marches';
-
-  @override
   String get walkHistoryInfo =>
       'Les chemins que vous avez réellement parcourus.';
 
@@ -821,14 +798,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get allWalks => 'Toutes';
 
   @override
-  String get withGpx => 'Avec GPX';
+  String get withGpx => 'Sur un parcours';
 
   @override
   String get freeWalks => 'Libres';
 
   @override
   String get noWalks =>
-      'Aucune sortie ici pour le moment. Lancez un GPX avec Go ou enregistrez une marche libre.';
+      'Aucune sortie ici pour le moment. Lancez un parcours ou enregistrez une marche libre.';
 
   @override
   String get unreadableFilename => 'Nom de fichier illisible';
@@ -857,23 +834,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible d’ouvrir l’application ou le navigateur.';
 
   @override
-  String get nearestJoinInfo =>
-      'Vers le point du GPX le plus proche de votre position.';
-
-  @override
   String get reverseSuffix => ' · sens inverse';
-
-  @override
-  String get walkInGpix => 'À pied dans Gpix';
-
-  @override
-  String get onlineRouteInfo => 'Guidage sur la carte · calcul en ligne';
-
-  @override
-  String get walkInGoogleMaps => 'À pied avec Google Maps';
-
-  @override
-  String get driveInGoogleMaps => 'En voiture avec Google Maps';
 
   @override
   String get routingPrivacy =>
@@ -918,19 +879,8 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get deleteDayInfo => 'Le GPX et les autres portions sont conservés.';
-
-  @override
-  String trailsOnMap(int arg1) {
-    String _temp0 = intl.Intl.pluralLogic(
-      arg1,
-      locale: localeName,
-      other: '$arg1 parcours sur ma carte',
-      one: '1 parcours sur ma carte',
-      zero: '0 parcours sur ma carte',
-    );
-    return '$_temp0';
-  }
+  String get deleteDayInfo =>
+      'Le parcours et les autres portions sont conservés.';
 
   @override
   String get walkInProgressData => 'Marche en cours · données';
@@ -942,7 +892,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get walkedPlaces => 'Lieux parcourus';
 
   @override
-  String get offTrailDetails => 'Écart à la trace · détails';
+  String get offTrailDetails => 'Écart au parcours · détails';
 
   @override
   String dayNumber(Object arg1) {
@@ -955,10 +905,10 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get tapStart => 'Touchez le départ sur la trace.';
+  String get tapStart => 'Touchez le départ sur le parcours.';
 
   @override
-  String get tapEnd => 'Touchez l’arrivée sur la trace.';
+  String get tapEnd => 'Touchez l’arrivée sur le parcours.';
 
   @override
   String get reviewSection => 'Portion surlignée : vérifiez puis enregistrez.';
@@ -1010,7 +960,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get remaining => 'restants';
 
   @override
-  String get distanceToTrail => 'à la trace';
+  String get distanceToTrail => 'du parcours';
 
   @override
   String get toggleDetails => 'Ouvrir ou réduire les détails';
@@ -1019,7 +969,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trailReached => 'Parcours rejoint';
 
   @override
-  String get readyToFollow => 'Prêt à suivre votre GPX.';
+  String get readyToFollow => 'Prêt à suivre votre parcours.';
 
   @override
   String get findingAccuratePosition => 'Recherche d’une position GPS précise…';
@@ -1039,16 +989,13 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get followFromHere => 'Suivre le GPX depuis ici';
+  String get followFromHere => 'Suivre le parcours depuis ici';
 
   @override
   String get exitApproach => 'Quitter le guidage d’accès';
 
   @override
   String get recalculate => 'Recalculer';
-
-  @override
-  String get otherNavigation => 'Autre guidage';
 
   @override
   String get cachedRouteInfo =>
@@ -1068,7 +1015,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get resumeApproach => 'Reprendre vers le parcours';
 
   @override
-  String get followTrail => 'Go · suivre ce parcours';
+  String get followTrail => 'Lancer le parcours';
 
   @override
   String returnToTracking(Object arg1) {
@@ -1096,7 +1043,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get reverseDirection => 'Sens inverse · changer';
 
   @override
-  String get gpxDirection => 'Sens du GPX · changer';
+  String get gpxDirection => 'Sens d’origine · changer';
 
   @override
   String get currentWalk => 'Ma marche en cours';
@@ -1127,10 +1074,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get mapAroundYou => 'Votre carte, autour de vous';
-
-  @override
-  String get allTrailsInfo =>
-      'Tous vos parcours sont visibles. Touchez une trace pour la sélectionner.';
 
   @override
   String get accountServer => 'Compte et serveur';
@@ -1219,16 +1162,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get chooseTrailPassage =>
-      'La trace passe plusieurs fois ici. Quel passage choisir ?';
+      'Le parcours passe plusieurs fois ici. Quel passage choisir ?';
 
   @override
   String atGpxKilometre(Object arg1) {
-    return 'Au km $arg1 du GPX';
+    return 'Au km $arg1 du parcours';
   }
 
   @override
   String get tapSelectedTrail =>
-      'Touchez la trace sélectionnée. Zoomez pour placer la limite précisément.';
+      'Touchez le parcours sélectionné. Zoomez pour placer la limite précisément.';
 
   @override
   String get northUp => 'Passer au nord en haut';
@@ -1341,7 +1284,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get damagedText =>
-      'Un texte contient un caractère perdu. Corrigez son nom ou réimportez le GPX original.';
+      'Un texte contient un caractère perdu. Corrigez son nom ou réimportez le fichier d’origine.';
 
   @override
   String get invalidRouteCoordinates =>
@@ -1496,4 +1439,71 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get voiceGuidanceNotSaved =>
       'Préférence de guidage vocal non enregistrée sur ce téléphone.';
+
+  @override
+  String get menu => 'Menu';
+
+  @override
+  String get backToMap => 'Retour à la carte';
+
+  @override
+  String get searchPlaces => 'Rechercher une ville, une adresse…';
+
+  @override
+  String get clearSearch => 'Effacer la recherche';
+
+  @override
+  String get noPlaceFound => 'Aucun lieu trouvé.';
+
+  @override
+  String get placeSearchUnavailable =>
+      'La recherche de lieux nécessite une connexion. Réessayez une fois en ligne.';
+
+  @override
+  String trailCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count parcours',
+      one: '1 parcours',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String trailsHere(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count parcours ici',
+      one: '1 parcours ici',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String showTrail(String name) {
+    return 'Afficher $name';
+  }
+
+  @override
+  String get closeTrail => 'Fermer le parcours';
+
+  @override
+  String get close => 'Fermer';
+
+  @override
+  String get openInGoogleMaps => 'Y aller avec Google Maps';
+
+  @override
+  String get searchTrails => 'Rechercher un parcours';
+
+  @override
+  String noTrailMatch(String query) {
+    return 'Aucun parcours ne correspond à « $query ».';
+  }
+
+  @override
+  String get approachFallback =>
+      'Itinéraire vers le parcours indisponible hors ligne : le parcours est suivi directement et la distance qui vous en sépare reste affichée.';
 }
