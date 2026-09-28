@@ -32,9 +32,15 @@ The latest request is to join the nearest point on an actual GPX segment, includ
 
 The internal pedestrian approach uses the API's Valhalla adapter. Keep its blue route separate from the original green GPX and place the R marker at the real joining point. Validate arrival through GPS/proximity/progression before offering to follow the GPX from there, preserving reverse direction. If routing ends short of the target, display the final unguided gap rather than inventing a traversable connection.
 
-Initial calculation and recalculation require a connection. A saved approach is usable offline within its existing validity criteria. Cache instructions by language so a request for English cannot silently reuse French directions. Avoid routing on every location update; respect provider limits. Public routing is for low-volume use and a dedicated provider can be configured for scale. Voice guidance and perpetual automatic rerouting are not currently promised.
+Initial calculation and recalculation require a connection. A saved approach is usable offline within its existing validity criteria. Cache instructions by language so a request for English cannot silently reuse French directions. Avoid routing on every location update; respect provider limits. Public routing is for low-volume use and a dedicated provider can be configured for scale. Turn-by-turn voice guidance applies to the approach route geometry as to any followed route (see below); perpetual automatic rerouting is not currently promised.
 
 Google Maps is an explicit walking/driving fallback and receives the same nearest joining point. Show routing privacy information. Historical names referring to “departure” do not override the nearest-point behavior.
+
+## Turn-by-turn guidance
+
+While a GPX or approach route is followed, each direction change is announced about 100 metres ahead, then again when immediate (about 20 metres), including screen-off through the recording foreground service. Turns are detected geometrically inside each GPX segment on the shared distance axis (25-metre bearing windows, at least 35°, classified slight/turn/sharp/U-turn) and mirrored in reverse; segment gaps never create a turn. The next turn is always the one ahead, so a closer turn is announced only after the previous one has been passed. Leaving the trail and reaching the end of the trail or the approach route are also announced; arrival requires real progress so a loop does not announce it at the start.
+
+Voice uses the phone's own Android text-to-speech engine (offline, no paid service) in the app language, with navigation-guidance audio focus that ducks other audio. Voice is a device preference in Settings, on by default. A high-importance notification with a direction pictogram and localized text is posted only while Gpix is not visible; the visible map shows the same instruction in its top card and reopening the app removes the notification. Android 13+ asks for notification permission when navigation starts; refusal leaves voice guidance working. Delivery failures never interrupt tracking. Geometric turns cannot know about unmapped forks, and gradual bends may be announced as slight turns: field validation on real trails is required.
 
 ## Watches and health
 

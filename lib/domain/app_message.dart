@@ -78,6 +78,7 @@ class AppMessage {
   static const truncatedPmtiles = AppMessage('truncatedPmtiles');
   static const unsupportedMapStyle = AppMessage('unsupportedMapStyle');
   static const localPmtilesRequired = AppMessage('localPmtilesRequired');
+  static const voiceGuidanceNotSaved = AppMessage('voiceGuidanceNotSaved');
   static const nonLocalGraphics = AppMessage('nonLocalGraphics');
   static const externalMapResource = AppMessage('externalMapResource');
   static const unsupportedGlyphTemplate = AppMessage(

@@ -20,6 +20,16 @@ class SettingsView extends StatelessWidget {
       const SizedBox(height: 20),
       const LanguageSelector(),
       const SizedBox(height: 20),
+      if (app.guide != null)
+        Card(
+          child: SwitchListTile(
+            secondary: const Icon(Icons.record_voice_over_outlined),
+            title: Text(context.l10n.voiceGuidance),
+            subtitle: Text(context.l10n.voiceGuidanceInfo),
+            value: app.voiceGuidance,
+            onChanged: app.setVoiceGuidance,
+          ),
+        ),
       Card(
         child: ListTile(
           leading: const Icon(Icons.account_circle_outlined),

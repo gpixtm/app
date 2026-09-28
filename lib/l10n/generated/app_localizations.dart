@@ -2353,6 +2353,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Français'**
   String get frenchLanguage;
+
+  /// No description provided for @guidanceSlightLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Bear left'**
+  String get guidanceSlightLeft;
+
+  /// No description provided for @guidanceLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn left'**
+  String get guidanceLeft;
+
+  /// No description provided for @guidanceSharpLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn sharp left'**
+  String get guidanceSharpLeft;
+
+  /// No description provided for @guidanceUTurn.
+  ///
+  /// In en, this message translates to:
+  /// **'Make a U-turn'**
+  String get guidanceUTurn;
+
+  /// No description provided for @guidanceSlightRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Bear right'**
+  String get guidanceSlightRight;
+
+  /// No description provided for @guidanceRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn right'**
+  String get guidanceRight;
+
+  /// No description provided for @guidanceSharpRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn sharp right'**
+  String get guidanceSharpRight;
+
+  /// No description provided for @guidanceSlightLeftIn.
+  ///
+  /// In en, this message translates to:
+  /// **'{metres, plural, =1{In 1 metre, bear left} other{In {metres} metres, bear left}}'**
+  String guidanceSlightLeftIn(int metres);
+
+  /// No description provided for @guidanceLeftIn.
+  ///
+  /// In en, this message translates to:
+  /// **'{metres, plural, =1{In 1 metre, turn left} other{In {metres} metres, turn left}}'**
+  String guidanceLeftIn(int metres);
+
+  /// No description provided for @guidanceSharpLeftIn.
+  ///
+  /// In en, this message translates to:
+  /// **'{metres, plural, =1{In 1 metre, turn sharp left} other{In {metres} metres, turn sharp left}}'**
+  String guidanceSharpLeftIn(int metres);
+
+  /// No description provided for @guidanceUTurnIn.
+  ///
+  /// In en, this message translates to:
+  /// **'{metres, plural, =1{In 1 metre, make a U-turn} other{In {metres} metres, make a U-turn}}'**
+  String guidanceUTurnIn(int metres);
+
+  /// No description provided for @guidanceSlightRightIn.
+  ///
+  /// In en, this message translates to:
+  /// **'{metres, plural, =1{In 1 metre, bear right} other{In {metres} metres, bear right}}'**
+  String guidanceSlightRightIn(int metres);
+
+  /// No description provided for @guidanceRightIn.
+  ///
+  /// In en, this message translates to:
+  /// **'{metres, plural, =1{In 1 metre, turn right} other{In {metres} metres, turn right}}'**
+  String guidanceRightIn(int metres);
+
+  /// No description provided for @guidanceSharpRightIn.
+  ///
+  /// In en, this message translates to:
+  /// **'{metres, plural, =1{In 1 metre, turn sharp right} other{In {metres} metres, turn sharp right}}'**
+  String guidanceSharpRightIn(int metres);
+
+  /// No description provided for @guidanceArrive.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached the end of the trail'**
+  String get guidanceArrive;
+
+  /// No description provided for @guidanceReachTrail.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached the trail'**
+  String get guidanceReachTrail;
+
+  /// No description provided for @guidanceOffTrail.
+  ///
+  /// In en, this message translates to:
+  /// **'You have left the trail'**
+  String get guidanceOffTrail;
+
+  /// No description provided for @guidanceOffTrailBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the map to rejoin it.'**
+  String get guidanceOffTrailBody;
+
+  /// No description provided for @guidanceNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Now'**
+  String get guidanceNow;
+
+  /// No description provided for @nextDirection.
+  ///
+  /// In en, this message translates to:
+  /// **'Next direction'**
+  String get nextDirection;
+
+  /// No description provided for @voiceGuidance.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice guidance'**
+  String get voiceGuidance;
+
+  /// No description provided for @voiceGuidanceInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Speaks each direction change about 100 m ahead during navigation, even with the screen off. While Gpix is in the background, a notification also shows the direction.'**
+  String get voiceGuidanceInfo;
+
+  /// No description provided for @voiceGuidanceNotSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice guidance preference not saved on this phone.'**
+  String get voiceGuidanceNotSaved;
 }
 
 class _AppLocalizationsDelegate

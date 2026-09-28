@@ -2,6 +2,7 @@ package fr.gpix.gpix
 
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
@@ -30,6 +31,12 @@ class MainActivity : FlutterFragmentActivity() {
         awaiting?.success(if (granted.containsAll(permissions)) "connected" else "needsPermission")
         awaiting = null
     }
+    private val guidance by lazy { TurnGuidance(this) }
+    private var awaitingNotifications: MethodChannel.Result? = null
+    private val notificationLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        awaitingNotifications?.success(granted)
+        awaitingNotifications = null
+    }
     private fun available(): String = when (HealthConnectClient.getSdkStatus(this)) {
         HealthConnectClient.SDK_AVAILABLE -> "available"
         HealthConnectClient.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> "needsInstall"
@@ -53,6 +60,34 @@ class MainActivity : FlutterFragmentActivity() {
                 startActivity(Intent(Intent.ACTION_VIEW, uri))
                 result.success(null)
             } catch (e: Exception) { result.error("navigation", "Cannot open navigation", null) }
+        }
+        MethodChannel(engine.dartExecutor.binaryMessenger, "gpix/guidance").setMethodCallHandler { call, result ->
+            try {
+                when (call.method) {
+                    "prepare" -> when {
+                        guidance.canNotify() -> result.success(true)
+                        awaitingNotifications != null -> result.error("busy", "Request already open", null)
+                        else -> {
+                            awaitingNotifications = result
+                            notificationLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                        }
+                    }
+                    "announce" -> {
+                        guidance.announce(
+                            call.argument<String>("kind") ?: "",
+                            call.argument<String>("title") ?: "",
+                            call.argument<String>("body") ?: "",
+                            call.argument<String>("speech") ?: "",
+                            call.argument<String>("language") ?: "",
+                            call.argument<Boolean>("speak") == true,
+                            call.argument<Boolean>("notify") == true
+                        )
+                        result.success(null)
+                    }
+                    "clear" -> { guidance.clear(); result.success(null) }
+                    else -> result.notImplemented()
+                }
+            } catch (e: Exception) { result.error("guidance", "Guidance unavailable", null) }
         }
         MethodChannel(engine.dartExecutor.binaryMessenger, "gpix/health").setMethodCallHandler { call, result ->
             scope.launch {
@@ -109,8 +144,15 @@ class MainActivity : FlutterFragmentActivity() {
             }
         }
     }
+    override fun onResume() {
+        super.onResume()
+        // The visible map shows the current instruction; drop the stale notification.
+        guidance.clear()
+    }
     override fun onDestroy() {
-        awaiting?.error("closed", "Demande interrompue", null); awaiting = null
+        awaiting?.error("closed", "Request interrupted", null); awaiting = null
+        awaitingNotifications?.success(false); awaitingNotifications = null
+        guidance.close()
         scope.cancel()
         super.onDestroy()
     }

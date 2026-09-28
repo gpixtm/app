@@ -1349,4 +1349,131 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get frenchLanguage => 'Français';
+
+  @override
+  String get guidanceSlightLeft => 'Bear left';
+
+  @override
+  String get guidanceLeft => 'Turn left';
+
+  @override
+  String get guidanceSharpLeft => 'Turn sharp left';
+
+  @override
+  String get guidanceUTurn => 'Make a U-turn';
+
+  @override
+  String get guidanceSlightRight => 'Bear right';
+
+  @override
+  String get guidanceRight => 'Turn right';
+
+  @override
+  String get guidanceSharpRight => 'Turn sharp right';
+
+  @override
+  String guidanceSlightLeftIn(int metres) {
+    String _temp0 = intl.Intl.pluralLogic(
+      metres,
+      locale: localeName,
+      other: 'In $metres metres, bear left',
+      one: 'In 1 metre, bear left',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String guidanceLeftIn(int metres) {
+    String _temp0 = intl.Intl.pluralLogic(
+      metres,
+      locale: localeName,
+      other: 'In $metres metres, turn left',
+      one: 'In 1 metre, turn left',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String guidanceSharpLeftIn(int metres) {
+    String _temp0 = intl.Intl.pluralLogic(
+      metres,
+      locale: localeName,
+      other: 'In $metres metres, turn sharp left',
+      one: 'In 1 metre, turn sharp left',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String guidanceUTurnIn(int metres) {
+    String _temp0 = intl.Intl.pluralLogic(
+      metres,
+      locale: localeName,
+      other: 'In $metres metres, make a U-turn',
+      one: 'In 1 metre, make a U-turn',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String guidanceSlightRightIn(int metres) {
+    String _temp0 = intl.Intl.pluralLogic(
+      metres,
+      locale: localeName,
+      other: 'In $metres metres, bear right',
+      one: 'In 1 metre, bear right',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String guidanceRightIn(int metres) {
+    String _temp0 = intl.Intl.pluralLogic(
+      metres,
+      locale: localeName,
+      other: 'In $metres metres, turn right',
+      one: 'In 1 metre, turn right',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String guidanceSharpRightIn(int metres) {
+    String _temp0 = intl.Intl.pluralLogic(
+      metres,
+      locale: localeName,
+      other: 'In $metres metres, turn sharp right',
+      one: 'In 1 metre, turn sharp right',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get guidanceArrive => 'You have reached the end of the trail';
+
+  @override
+  String get guidanceReachTrail => 'You have reached the trail';
+
+  @override
+  String get guidanceOffTrail => 'You have left the trail';
+
+  @override
+  String get guidanceOffTrailBody => 'Check the map to rejoin it.';
+
+  @override
+  String get guidanceNow => 'Now';
+
+  @override
+  String get nextDirection => 'Next direction';
+
+  @override
+  String get voiceGuidance => 'Voice guidance';
+
+  @override
+  String get voiceGuidanceInfo =>
+      'Speaks each direction change about 100 m ahead during navigation, even with the screen off. While Gpix is in the background, a notification also shows the direction.';
+
+  @override
+  String get voiceGuidanceNotSaved =>
+      'Voice guidance preference not saved on this phone.';
 }

@@ -715,5 +715,77 @@
     }
   },
   "englishLanguage": "English",
-  "frenchLanguage": "Français"
+  "frenchLanguage": "Français",
+  "guidanceSlightLeft": "Bear left",
+  "guidanceLeft": "Turn left",
+  "guidanceSharpLeft": "Turn sharp left",
+  "guidanceUTurn": "Make a U-turn",
+  "guidanceSlightRight": "Bear right",
+  "guidanceRight": "Turn right",
+  "guidanceSharpRight": "Turn sharp right",
+  "guidanceSlightLeftIn": "{metres, plural, =1{In 1 metre, bear left} other{In {metres} metres, bear left}}",
+  "@guidanceSlightLeftIn": {
+    "placeholders": {
+      "metres": {
+        "type": "int"
+      }
+    }
+  },
+  "guidanceLeftIn": "{metres, plural, =1{In 1 metre, turn left} other{In {metres} metres, turn left}}",
+  "@guidanceLeftIn": {
+    "placeholders": {
+      "metres": {
+        "type": "int"
+      }
+    }
+  },
+  "guidanceSharpLeftIn": "{metres, plural, =1{In 1 metre, turn sharp left} other{In {metres} metres, turn sharp left}}",
+  "@guidanceSharpLeftIn": {
+    "placeholders": {
+      "metres": {
+        "type": "int"
+      }
+    }
+  },
+  "guidanceUTurnIn": "{metres, plural, =1{In 1 metre, make a U-turn} other{In {metres} metres, make a U-turn}}",
+  "@guidanceUTurnIn": {
+    "placeholders": {
+      "metres": {
+        "type": "int"
+      }
+    }
+  },
+  "guidanceSlightRightIn": "{metres, plural, =1{In 1 metre, bear right} other{In {metres} metres, bear right}}",
+  "@guidanceSlightRightIn": {
+    "placeholders": {
+      "metres": {
+        "type": "int"
+      }
+    }
+  },
+  "guidanceRightIn": "{metres, plural, =1{In 1 metre, turn right} other{In {metres} metres, turn right}}",
+  "@guidanceRightIn": {
+    "placeholders": {
+      "metres": {
+        "type": "int"
+      }
+    }
+  },
+  "guidanceSharpRightIn": "{metres, plural, =1{In 1 metre, turn sharp right} other{In {metres} metres, turn sharp right}}",
+  "@guidanceSharpRightIn": {
+    "placeholders": {
+      "metres": {
+        "type": "int"
+      }
+    }
+  },
+  "guidanceArrive": "You have reached the end of the trail",
+  "guidanceReachTrail": "You have reached the trail",
+  "guidanceOffTrail": "You have left the trail",
+  "guidanceOffTrailBody": "Check the map to rejoin it.",
+  "guidanceNow": "Now",
+  "nextDirection": "Next direction",
+  "voiceGuidance": "Voice guidance",
+  "voiceGuidanceInfo": "Speaks each direction change about 100 m ahead during navigation, even with the screen off. While Gpix is in the background, a notification also shows the direction.",
+  "voiceGuidanceNotSaved": "Voice guidance preference not saved on this phone."
 }

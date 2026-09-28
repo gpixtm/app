@@ -2,6 +2,7 @@ import '../domain/app_message.dart';
 
 import 'dart:async';
 
+import 'guide_navigation.dart';
 import 'library.dart';
 import 'prepare_maps.dart';
 import 'record_walk.dart';
@@ -28,7 +29,50 @@ class AppController {
     this.recorder,
     this.health,
     this.approachSource,
+    this.guide,
+    this.saveVoiceGuidance,
   });
+  final GuideNavigation? guide;
+  final Future<void> Function(bool)? saveVoiceGuidance;
+  bool get voiceGuidance => guide?.voice ?? false;
+  Future<void> setVoiceGuidance(bool enabled) async {
+    if (guide == null) return;
+    guide!.voice = enabled;
+    notifyListeners();
+    try {
+      await saveVoiceGuidance?.call(enabled);
+    } catch (_) {
+      message = AppMessage.voiceGuidanceNotSaved;
+      notifyListeners();
+    }
+  }
+
+  /// Next direction change of the active session, for the visible map.
+  UpcomingManeuver? get upcomingManeuver {
+    final s = session;
+    if (guide == null || s == null || !s.active || s.offTrail) return null;
+    return guide!.upcoming(s, approach: approach != null);
+  }
+
+  void _track(Fix fix) {
+    final s = session;
+    if (s == null || !s.active) return;
+    final now = DateTime.now();
+    final left = s.accept(fix, now);
+    if (left) unawaited(vibrate());
+    if (guide != null) {
+      unawaited(
+        guide!.update(
+          s,
+          approach: approach != null,
+          leftTrail: left,
+          foreground: foreground,
+          now: now,
+        ),
+      );
+    }
+  }
+
   final ApproachSource? approachSource;
   ApproachRoute? approach;
   bool approachReverse = false;
@@ -382,9 +426,7 @@ class AppController {
     _recordFixes = recorder?.fixes.stream.listen((fix) {
       if (_disposed) return;
       mapFix = fix;
-      if (session?.active == true && session!.accept(fix, DateTime.now())) {
-        unawaited(vibrate());
-      }
+      _track(fix);
       notifyListeners();
     });
     await refreshMaps();
@@ -510,6 +552,8 @@ class AppController {
     await run(() async {
       await gps.requestAccess();
       if (!foreground || _disposed) return;
+      await guide?.prepare();
+      if (!foreground || _disposed) return;
       if (recorder != null) await _record(source: selected);
       await _positions?.cancel();
       session!.resume();
@@ -527,7 +571,7 @@ class AppController {
         _positions = gps.watch().listen(
           (fix) {
             if (!foreground || _disposed) return;
-            if (session!.accept(fix, DateTime.now())) unawaited(vibrate());
+            _track(fix);
             notifyListeners();
           },
           onError: (Object e) {
@@ -543,6 +587,7 @@ class AppController {
     _freshness?.cancel();
     _resume = false;
     session?.pause();
+    unawaited(guide?.leave());
     unawaited(_positions?.cancel());
     _positions = null;
     unawaited(setAwake(false));
@@ -667,6 +712,7 @@ class AppController {
     _mapChanges?.cancel();
     _recordChanges?.cancel();
     _recordFixes?.cancel();
+    unawaited(guide?.leave());
     unawaited(setAwake(false));
     changes.close();
   }

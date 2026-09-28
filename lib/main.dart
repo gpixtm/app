@@ -1,5 +1,6 @@
 import 'data/health_connect.dart';
 import 'data/approach_source.dart';
+import 'data/android_guidance.dart';
 
 import 'package:uuid/uuid.dart';
 import 'package:flutter/foundation.dart';
@@ -10,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'application/library.dart';
+import 'application/guide_navigation.dart';
 import 'application/record_walk.dart';
 import 'data/recording_store.dart';
 import 'application/prepare_maps.dart';
@@ -27,6 +29,7 @@ import 'data/trail_codec.dart';
 import 'data/demo_seed.dart';
 import 'application/app_controller.dart';
 import 'presentation/auth.dart';
+import 'presentation/guidance_text.dart';
 import 'presentation/localization.dart';
 
 Future<void> main() async {
@@ -120,6 +123,9 @@ class _LibraryRuntime {
       trustedPreviousOrigin: trustedPreviousOrigin,
     );
     final db = await openLocalDatabase(storage.databasePath);
+    // Device preference: speech depends on this phone's audio, not the account.
+    const preferences = SecureCredentials();
+    final voice = await preferences.read('gpix.voiceGuidance') != 'false';
     final library = Library(
       SqliteTrailRepository(db),
       XmlGpxDecoder(placesName: (name) => messages.placesName(name)),
@@ -155,6 +161,15 @@ class _LibraryRuntime {
       setAwake: (on) => WakelockPlus.toggle(enable: on),
       vibrate: HapticFeedback.heavyImpact,
       connectionDetails: () => server.details,
+      guide: GuideNavigation(
+        AndroidGuidance(
+          sentences: (instruction) => describeGuidance(messages, instruction),
+          languageCode: () => locale.languageCode,
+        ),
+        voice: voice,
+      ),
+      saveVoiceGuidance: (enabled) =>
+          preferences.write('gpix.voiceGuidance', '$enabled'),
     );
     _close = () async {
       await controller.shutdown();

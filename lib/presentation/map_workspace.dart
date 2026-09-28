@@ -6,6 +6,7 @@ import '../application/app_controller.dart';
 import '../domain/models.dart';
 import 'design.dart';
 import 'elevation_chart.dart';
+import 'guidance_text.dart';
 import 'trail_map.dart';
 import 'walk_stats.dart';
 import 'join_departure.dart';
@@ -149,6 +150,8 @@ class _MapWorkspaceState extends State<MapWorkspace> {
     final p = s?.projection, fix = s?.fix;
     final approach = s != null ? app.approach : null;
     final direction = approach?.next(p?.along ?? 0);
+    final upcoming = app.approach == null ? app.upcomingManeuver : null;
+    final turn = upcoming != null && upcoming.metres <= 500 ? upcoming : null;
     return Stack(
       children: [
         widget.mapBuilder?.call(app) ??
@@ -169,33 +172,70 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                   horizontal: 14,
                   vertical: 12,
                 ),
-                child: Row(
-                  children: [
-                    Icon(
-                      trail != null && app.covers(app.approach?.trail ?? trail)
-                          ? Icons.offline_pin
-                          : Icons.map_outlined,
-                      color: forest,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        (app.approach != null
-                                ? context.l10n.towardsTrail(
-                                    app.selected?.name ?? '',
-                                  )
-                                : trail?.name) ??
-                            context.l10n.trailsOnMap(app.trails.length),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.w700),
+                child: turn != null
+                    ? Semantics(
+                        label: context.l10n.nextDirection,
+                        child: Row(
+                          children: [
+                            Icon(
+                              guidanceIcon(turn.kind),
+                              color: forest,
+                              size: 32,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    guidanceTitle(context.l10n, turn.kind),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  Text(
+                                    context.l10n.inMetres(turn.metres.round()),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.info_outline, size: 18),
+                          ],
+                        ),
+                      )
+                    : Row(
+                        children: [
+                          Icon(
+                            trail != null &&
+                                    app.covers(app.approach?.trail ?? trail)
+                                ? Icons.offline_pin
+                                : Icons.map_outlined,
+                            color: forest,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              (app.approach != null
+                                      ? context.l10n.towardsTrail(
+                                          app.selected?.name ?? '',
+                                        )
+                                      : trail?.name) ??
+                                  context.l10n.trailsOnMap(app.trails.length),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.info_outline, size: 18),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.info_outline, size: 18),
-                  ],
-                ),
               ),
             ),
           ),
