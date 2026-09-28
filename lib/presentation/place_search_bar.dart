@@ -127,6 +127,8 @@ class _PlaceSearchBarState extends State<PlaceSearchBar> {
                   textInputAction: TextInputAction.search,
                   decoration: InputDecoration(
                     hintText: context.l10n.searchPlaces,
+                    // Blend into the white pill instead of the themed fill.
+                    filled: false,
                     border: InputBorder.none,
                     isDense: true,
                   ),
