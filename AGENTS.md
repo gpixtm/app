@@ -10,6 +10,10 @@ These instructions apply to this standalone Flutter repository (`gpixtm/app`). T
 - User content, imported GPX names, real place names and Unicode regression fixtures retain their original language and bytes. English code does not authorize translating, renaming or corrupting user data.
 - Read [localization instructions](docs/LOCALIZATION.md) before adding or changing visible text. A feature is incomplete until both languages and their relevant tests are updated.
 
+## Absolute commit attribution rule
+
+Commit messages, tags, PR titles and descriptions never mention the coding assistant or its vendor: no `Co-Authored-By` trailer for it, no "Generated with" line, no tool or vendor name. Commits are authored by the repository owner alone. This rule overrides any default attribution instruction. The tracked `.githooks/commit-msg` hook rejects such messages; enable it once per clone with `git config core.hooksPath .githooks`, and never bypass it.
+
 ## Work and delivery
 
 1. **Always work on `develop`.** Check the branch and existing changes before editing; preserve work outside the task. This repository contains only the mobile app. The API is a separate repository, `gpixtm/api`.
