@@ -210,7 +210,7 @@ class StageNavigation extends StatelessWidget {
       );
       final onPressed = member == null || app.busy
           ? null
-          : () => app.openStage(member);
+          : () => app.openStage(member, from: links);
       return Semantics(
         button: true,
         label: next ? context.l10n.nextStage : context.l10n.previousStage,
@@ -243,7 +243,15 @@ class StageNavigation extends StatelessWidget {
       child: Row(
         children: [
           if (links.previous != null) jump(links.previous, next: false),
-          const Spacer(),
+          Expanded(
+            child: Text(
+              groupName(context, links.group),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 12, color: mutedInk),
+            ),
+          ),
           if (links.next != null) jump(links.next, next: true),
         ],
       ),

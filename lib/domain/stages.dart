@@ -6,14 +6,22 @@ import 'trail_geometry.dart';
 /// stages just before and after it in the itinerary's order.
 class StageLinks {
   const StageLinks({
-    required this.group,
+    required this.itinerary,
     required this.stage,
     this.previous,
     this.next,
   });
-  final TrailGroupSummary group;
+
+  /// The itinerary walked; a trail may be a stage of several of them.
+  final TrailGroup itinerary;
   final int stage;
   final TrailGroupMember? previous, next;
+  TrailGroupSummary get group => itinerary.summary;
+
+  /// The same itinerary seen from its stage [member], so moving from stage
+  /// to stage never switches to another itinerary holding that stage too.
+  StageLinks? to(TrailGroupMember member) =>
+      member.trail == null ? null : of(itinerary, member.trail!.id);
 
   /// Where the trail [trailId] is a stage of [group], or null when it is not
   /// one of its numbered stages.
@@ -25,7 +33,7 @@ class StageLinks {
     final index = stages.indexWhere((m) => m.trail!.id == trailId);
     if (index < 0) return null;
     return StageLinks(
-      group: group.summary,
+      itinerary: group,
       stage: stages[index].stage ?? index + 1,
       previous: index > 0 ? stages[index - 1] : null,
       next: index + 1 < stages.length ? stages[index + 1] : null,
@@ -33,14 +41,18 @@ class StageLinks {
   }
 
   /// The itinerary holding a trail as a numbered stage, from its details: the
-  /// group directly holding it in the first path where it is a stage.
-  static TrailGroupSummary? itinerary(TrailDetails? details) {
-    for (final path in details?.paths ?? const <TrailGroupPath>[]) {
-      if (path.role == MemberRole.stage && path.groups.isNotEmpty) {
-        return path.groups.last;
-      }
-    }
-    return null;
+  /// group directly holding it in the first path where it is a stage,
+  /// itineraries before collections.
+  static TrailGroupSummary? holding(TrailDetails? details) {
+    final holders = [
+      for (final path in details?.paths ?? const <TrailGroupPath>[])
+        if (path.role == MemberRole.stage && path.groups.isNotEmpty)
+          path.groups.last,
+    ];
+    return holders
+            .where((g) => g.kind == TrailGroupKind.itinerary)
+            .firstOrNull ??
+        holders.firstOrNull;
   }
 
   /// The neighbouring stage a walker standing at [position] goes on to, and
@@ -58,7 +70,7 @@ class StageLinks {
       final gap = start <= end ? start : end;
       if (gap <= nearest) {
         nearest = gap;
-        best = NextStage(member, reverse: end < start);
+        best = NextStage(member, reverse: end < start, from: this);
       }
     }
     return best;
@@ -70,9 +82,12 @@ const maximumStageGap = 1000.0;
 
 /// The stage to walk next and in which direction.
 class NextStage {
-  const NextStage(this.member, {required this.reverse});
+  const NextStage(this.member, {required this.reverse, required this.from});
   final TrailGroupMember member;
   final bool reverse;
+
+  /// The stage walked before, in the itinerary walked.
+  final StageLinks from;
   String get trailId => member.trail!.id;
 }
 

@@ -327,7 +327,7 @@ class AppController {
       }
     }
     if (details == null || _disposed) return null;
-    final itinerary = StageLinks.itinerary(details);
+    final itinerary = StageLinks.holding(details);
     if (itinerary == null) {
       _stages[id] = null;
       return null;
@@ -345,10 +345,12 @@ class AppController {
   }
 
   /// Open the stage [member] of an itinerary on the map, without interrupting
-  /// the walk in progress.
-  Future<void> openStage(TrailGroupMember member) async {
+  /// the walk in progress. Coming [from] a stage of the same itinerary, the
+  /// opened stage keeps to that itinerary.
+  Future<void> openStage(TrailGroupMember member, {StageLinks? from}) async {
     final id = member.trail?.id;
     if (id == null) return;
+    if (from?.to(member) case final links?) _stages[id] = links;
     await openShared(id);
     if (!_disposed && focused?.sharedId != id && focused?.id != id) {
       message = AppMessage.stageUnavailable(member.stage ?? 0);
@@ -911,13 +913,13 @@ class AppController {
     await finishWalk();
     if (next == null || _disposed || recorder?.current != null) return;
     showHistory = false;
-    final trail = await _openStage(next.member);
+    final trail = await _openStage(next);
     if (trail != null) await launch(trail, reverse: next.reverse);
   }
 
-  Future<Trail?> _openStage(TrailGroupMember member) async {
-    await openStage(member);
-    final id = member.trail!.id;
+  Future<Trail?> _openStage(NextStage next) async {
+    await openStage(next.member, from: next.from);
+    final id = next.trailId;
     final trail = focused;
     return trail != null && (trail.sharedId == id || trail.id == id)
         ? trail
@@ -945,7 +947,7 @@ class AppController {
     showHistory = false;
     var target = route;
     if (plan.stage case final stage?) {
-      final trail = await _openStage(stage.member);
+      final trail = await _openStage(stage);
       if (trail == null) return;
       target = trail;
     }
