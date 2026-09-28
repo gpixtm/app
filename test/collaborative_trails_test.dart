@@ -997,6 +997,9 @@ void main() {
         );
         await store.applyPlaces(TrailPlacePage([theirs], 5, false));
         await app.reload();
+        app.closeTrail();
+        expect(app.visiblePlaces, isEmpty, reason: 'shown with its trail');
+        app.focus(app.trails.firstWhere((t) => t.id == 'mine'));
         expect(app.visiblePlaces.single.author, 'marie');
         expect(await store.placeCursor(), 5);
         await store.applyPlaces(
