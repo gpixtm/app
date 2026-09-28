@@ -32,6 +32,8 @@ Record walks both with and without a GPX. History makes actual visited places ea
 
 Persist `RecordWalk` checkpoints locally. Filter inaccurate fixes and jumps; pauses/GPS gaps separate recorded segments. Android foreground location recording and its notification support screen-off walks. Stop following, pause and finish are distinct. Interruption restores a paused recording; completed walks sync to the API, while in-progress checkpoints are local and are not promised to resume on another phone.
 
+"Start a route" replaces the former free-walk button: a walk without a GPX draws itself on the map and, when finished, also becomes a reusable route (named "Route of <date>" in the app language), visible with the other trails and synced like an imported GPX. It is not created when every recorded point stays within 30 m of an existing route (GPS noise, between vertices included); any detour or extension beyond that is a new route. Walks shorter than 50 m stay in history only, and walks guided by a GPX never create a route. The route is saved before the walk is finished, so a retried interrupted finish finds it instead of duplicating it. Pause, resume and finish are available from the map panel as well as history.
+
 ## Joining a GPX
 
 There is no separate “join the trail” action. Starting a trail follows it directly when the walker is already on it (within 25 m with a precise fix); otherwise it computes and starts the internal walking approach. If the approach cannot be calculated (offline without a saved route), the trail itself is followed and the distance to it stays visible, with an explicit notice.

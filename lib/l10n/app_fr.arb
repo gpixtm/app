@@ -209,7 +209,7 @@
   "resume": "Reprendre",
   "finish": "Terminer",
   "liveStats": "Mes données en direct",
-  "recordFreeWalk": "Enregistrer une marche libre",
+  "startRoute": "Démarrer un parcours",
   "walkCountDistance": "{arg1, plural, =0{0 sorties} =1{1 sortie} other{{arg1} sorties}} · {arg2}",
   "viewAllWalkedPlaces": "Voir tous mes lieux parcourus",
   "allWalks": "Toutes",
@@ -288,7 +288,7 @@
   "planDays": "Planifier mes journées",
   "editDays": "{arg1, plural, =0{Mes journées} =1{Ma journée} other{Mes {arg1} journées}} · modifier",
   "offlineAvailability": "Disponibilité hors ligne",
-  "myFreeWalk": "Ma marche libre",
+  "routeInProgress": "Parcours en cours",
   "mapAroundYou": "Votre carte, autour de vous",
   "accountServer": "Compte et serveur",
   "accountServerInfo": "Identité, mot de passe et synchronisation",
@@ -397,5 +397,12 @@
   "openInGoogleMaps": "Y aller avec Google Maps",
   "searchTrails": "Rechercher un parcours",
   "noTrailMatch": "Aucun parcours ne correspond à « {query} ».",
-  "approachFallback": "Itinéraire vers le parcours indisponible hors ligne : le parcours est suivi directement et la distance qui vous en sépare reste affichée."
+  "approachFallback": "Itinéraire vers le parcours indisponible hors ligne : le parcours est suivi directement et la distance qui vous en sépare reste affichée.",
+  "finishRoute": "Terminer le parcours",
+  "finishRouteQuestion": "Terminer ce parcours ?",
+  "finishRouteInfo": "Votre marche sera conservée dans l’historique et, sauf si elle suit exactement un parcours existant, deviendra un nouveau parcours sur la carte. Tout est synchronisé avec votre compte.",
+  "routeCreated": "Parcours « {arg1} » créé et affiché sur la carte · synchronisation en attente",
+  "routeAlreadyKnown": "Cette marche suit « {arg1} » : aucun parcours en double n’a été créé.",
+  "routeTooShort": "Marche conservée dans l’historique ; trop courte pour devenir un parcours.",
+  "walkedRouteName": "Parcours du {date}"
 }

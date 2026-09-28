@@ -247,7 +247,7 @@ String resolveAppMessage(
   'resume' => l10n.resume,
   'finish' => l10n.finish,
   'liveStats' => l10n.liveStats,
-  'recordFreeWalk' => l10n.recordFreeWalk,
+  'startRoute' => l10n.startRoute,
   'walkCountDistance' => l10n.walkCountDistance(
     message.arguments[0] as int,
     argument(message.arguments[1]),
@@ -335,7 +335,7 @@ String resolveAppMessage(
   'planDays' => l10n.planDays,
   'editDays' => l10n.editDays(message.arguments[0] as int),
   'offlineAvailability' => l10n.offlineAvailability,
-  'myFreeWalk' => l10n.myFreeWalk,
+  'routeInProgress' => l10n.routeInProgress,
   'mapAroundYou' => l10n.mapAroundYou,
   'accountServer' => l10n.accountServer,
   'accountServerInfo' => l10n.accountServerInfo,
@@ -458,5 +458,16 @@ String resolveAppMessage(
     argument(message.arguments[0]).toString(),
   ),
   'approachFallback' => l10n.approachFallback,
+  'finishRoute' => l10n.finishRoute,
+  'finishRouteQuestion' => l10n.finishRouteQuestion,
+  'finishRouteInfo' => l10n.finishRouteInfo,
+  'routeCreated' => l10n.routeCreated(
+    argument(message.arguments[0]).toString(),
+  ),
+  'routeAlreadyKnown' => l10n.routeAlreadyKnown(
+    argument(message.arguments[0]).toString(),
+  ),
+  'routeTooShort' => l10n.routeTooShort,
+  'walkedRouteName' => l10n.walkedRouteName(message.arguments[0] as DateTime),
   _ => l10n.unexpectedError,
 };

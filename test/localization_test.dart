@@ -1,4 +1,7 @@
 import 'dart:convert';
+
+import 'package:intl/date_symbol_data_local.dart';
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -63,6 +66,19 @@ void main() {
     expect(english.itemsSaved(2), '2 items saved on this phone');
     expect(french.itemsSaved(1), 'Un élément enregistré sur ce téléphone');
     expect(french.itemCount(0), '0 éléments');
+  });
+
+  test('walked routes are named in the app language at creation', () async {
+    await initializeDateFormatting();
+    final started = DateTime(2026, 9, 28, 9);
+    expect(
+      lookupAppLocalizations(const Locale('en')).walkedRouteName(started),
+      'Route of Sep 28, 2026',
+    );
+    expect(
+      lookupAppLocalizations(const Locale('fr')).walkedRouteName(started),
+      'Parcours du 28 sept. 2026',
+    );
   });
 
   test(

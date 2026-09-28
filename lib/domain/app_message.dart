@@ -12,6 +12,11 @@ class AppMessage {
   static const noWatchData = AppMessage('noWatchData');
   static const watchDataAdded = AppMessage('watchDataAdded');
   static const walkSavedPending = AppMessage('walkSavedPending');
+  static AppMessage routeCreated(Object? arg1) =>
+      AppMessage('routeCreated', [arg1]);
+  static AppMessage routeAlreadyKnown(Object? arg1) =>
+      AppMessage('routeAlreadyKnown', [arg1]);
+  static const routeTooShort = AppMessage('routeTooShort');
   static const changesSavedPending = AppMessage('changesSavedPending');
   static const localMaps = AppMessage('localMaps');
   static const mapsStorageUnavailable = AppMessage('mapsStorageUnavailable');

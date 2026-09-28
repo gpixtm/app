@@ -404,7 +404,7 @@
   "resume": "Resume",
   "finish": "Finish",
   "liveStats": "My live data",
-  "recordFreeWalk": "Record a free walk",
+  "startRoute": "Start a route",
   "walkCountDistance": "{arg1, plural, =0{0 walks} =1{1 walk} other{{arg1} walks}} · {arg2}",
   "@walkCountDistance": {
     "placeholders": {
@@ -597,7 +597,7 @@
     }
   },
   "offlineAvailability": "Offline availability",
-  "myFreeWalk": "My free walk",
+  "routeInProgress": "Route in progress",
   "mapAroundYou": "Your map, around you",
   "accountServer": "Account and server",
   "accountServerInfo": "Identity, password and sync",
@@ -807,5 +807,34 @@
       }
     }
   },
-  "approachFallback": "Route to the trail unavailable offline: the trail itself is followed and your distance to it stays visible."
+  "approachFallback": "Route to the trail unavailable offline: the trail itself is followed and your distance to it stays visible.",
+  "finishRoute": "Finish the route",
+  "finishRouteQuestion": "Finish this route?",
+  "finishRouteInfo": "Your walk will be saved in history and, unless it exactly follows an existing route, become a new route on the map. Everything syncs with your account.",
+  "routeCreated": "Route “{arg1}” created and shown on the map · sync pending",
+  "@routeCreated": {
+    "placeholders": {
+      "arg1": {
+        "type": "String"
+      }
+    }
+  },
+  "routeAlreadyKnown": "This walk follows “{arg1}”: no duplicate route was created.",
+  "@routeAlreadyKnown": {
+    "placeholders": {
+      "arg1": {
+        "type": "String"
+      }
+    }
+  },
+  "routeTooShort": "Walk saved in history; too short to become a route.",
+  "walkedRouteName": "Route of {date}",
+  "@walkedRouteName": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  }
 }

@@ -10,6 +10,7 @@ import '../domain/trail_geometry.dart';
 import 'guidance_text.dart';
 import 'place_search_bar.dart';
 import 'trail_map.dart';
+import 'walk_controls.dart';
 import 'walk_stats.dart';
 import 'join_departure.dart';
 
@@ -780,6 +781,20 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                     ),
                   ],
                   if (trail.walk != null) WalkStats(trail),
+                  if (app.recorder != null &&
+                      app.recorder!.current == null &&
+                      s?.active != true &&
+                      approach == null)
+                    TextButton.icon(
+                      onPressed: app.busy
+                          ? null
+                          : () {
+                              app.closeTrail();
+                              app.freeWalk();
+                            },
+                      icon: const Icon(Icons.route),
+                      label: Text(context.l10n.startRoute),
+                    ),
                   if (trail.followable && trail.walk == null)
                     OutlinedButton.icon(
                       onPressed: app.busy
@@ -817,12 +832,16 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                 children: [
                   handle(),
                   Text(
-                    context.l10n.myFreeWalk,
+                    recordingRoute(app)
+                        ? context.l10n.routeInProgress
+                        : context.l10n.currentWalk,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
+                  const SizedBox(height: 8),
+                  WalkControls(app),
                   TextButton(
                     onPressed: widget.openHistory,
-                    child: Text(context.l10n.walkControls),
+                    child: Text(context.l10n.history),
                   ),
                   WalkStats(app.recorder!.current!.snapshot(DateTime.now())),
                   OutlinedButton.icon(
@@ -862,8 +881,8 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                     if (app.recorder != null)
                       TextButton.icon(
                         onPressed: app.busy ? null : app.freeWalk,
-                        icon: const Icon(Icons.hiking),
-                        label: Text(context.l10n.recordFreeWalk),
+                        icon: const Icon(Icons.route),
+                        label: Text(context.l10n.startRoute),
                       ),
                   ],
                 ),
@@ -879,8 +898,8 @@ class _MapWorkspaceState extends State<MapWorkspace> {
               backgroundColor: Colors.white,
               foregroundColor: forest,
               onPressed: app.busy ? null : app.freeWalk,
-              icon: const Icon(Icons.hiking),
-              label: Text(context.l10n.recordFreeWalk),
+              icon: const Icon(Icons.route),
+              label: Text(context.l10n.startRoute),
             ),
           ),
       ],

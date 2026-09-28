@@ -8,6 +8,7 @@ import '../application/app_controller.dart';
 import '../domain/models.dart';
 import '../domain/walk_metrics.dart';
 import 'design.dart';
+import 'walk_controls.dart';
 import 'walk_stats.dart';
 
 class HistoryView extends StatefulWidget {
@@ -26,26 +27,7 @@ class HistoryView extends StatefulWidget {
 class _HistoryViewState extends State<HistoryView> {
   int filter = 0;
   AppController get app => widget.app;
-  Future<void> finish() async {
-    final yes = await showDialog<bool>(
-      context: context,
-      builder: (c) => AlertDialog(
-        title: Text(context.l10n.finishWalkQuestion),
-        content: Text(context.l10n.finishWalkInfo),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c, false),
-            child: Text(context.l10n.continueAction),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(c, true),
-            child: Text(context.l10n.saveWalk),
-          ),
-        ],
-      ),
-    );
-    if (yes == true) await app.finishWalk();
-  }
+  Future<void> finish() => confirmFinishWalk(context, app);
 
   void details(Trail walk) {
     showModalBottomSheet<void>(
@@ -224,8 +206,8 @@ class _HistoryViewState extends State<HistoryView> {
                     await app.freeWalk();
                     if (app.recorder?.active == true) widget.openMap();
                   },
-            icon: const Icon(Icons.hiking),
-            label: Text(context.l10n.recordFreeWalk),
+            icon: const Icon(Icons.route),
+            label: Text(context.l10n.startRoute),
           ),
         const SizedBox(height: 12),
         Text(

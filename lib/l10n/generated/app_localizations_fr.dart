@@ -777,7 +777,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get liveStats => 'Mes données en direct';
 
   @override
-  String get recordFreeWalk => 'Enregistrer une marche libre';
+  String get startRoute => 'Démarrer un parcours';
 
   @override
   String walkCountDistance(int arg1, Object arg2) {
@@ -1070,7 +1070,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get offlineAvailability => 'Disponibilité hors ligne';
 
   @override
-  String get myFreeWalk => 'Ma marche libre';
+  String get routeInProgress => 'Parcours en cours';
 
   @override
   String get mapAroundYou => 'Votre carte, autour de vous';
@@ -1506,4 +1506,36 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get approachFallback =>
       'Itinéraire vers le parcours indisponible hors ligne : le parcours est suivi directement et la distance qui vous en sépare reste affichée.';
+
+  @override
+  String get finishRoute => 'Terminer le parcours';
+
+  @override
+  String get finishRouteQuestion => 'Terminer ce parcours ?';
+
+  @override
+  String get finishRouteInfo =>
+      'Votre marche sera conservée dans l’historique et, sauf si elle suit exactement un parcours existant, deviendra un nouveau parcours sur la carte. Tout est synchronisé avec votre compte.';
+
+  @override
+  String routeCreated(String arg1) {
+    return 'Parcours « $arg1 » créé et affiché sur la carte · synchronisation en attente';
+  }
+
+  @override
+  String routeAlreadyKnown(String arg1) {
+    return 'Cette marche suit « $arg1 » : aucun parcours en double n’a été créé.';
+  }
+
+  @override
+  String get routeTooShort =>
+      'Marche conservée dans l’historique ; trop courte pour devenir un parcours.';
+
+  @override
+  String walkedRouteName(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Parcours du $dateString';
+  }
 }

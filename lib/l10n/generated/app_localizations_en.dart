@@ -765,7 +765,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get liveStats => 'My live data';
 
   @override
-  String get recordFreeWalk => 'Record a free walk';
+  String get startRoute => 'Start a route';
 
   @override
   String walkCountDistance(int arg1, Object arg2) {
@@ -1053,7 +1053,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get offlineAvailability => 'Offline availability';
 
   @override
-  String get myFreeWalk => 'My free walk';
+  String get routeInProgress => 'Route in progress';
 
   @override
   String get mapAroundYou => 'Your map, around you';
@@ -1483,4 +1483,36 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get approachFallback =>
       'Route to the trail unavailable offline: the trail itself is followed and your distance to it stays visible.';
+
+  @override
+  String get finishRoute => 'Finish the route';
+
+  @override
+  String get finishRouteQuestion => 'Finish this route?';
+
+  @override
+  String get finishRouteInfo =>
+      'Your walk will be saved in history and, unless it exactly follows an existing route, become a new route on the map. Everything syncs with your account.';
+
+  @override
+  String routeCreated(String arg1) {
+    return 'Route “$arg1” created and shown on the map · sync pending';
+  }
+
+  @override
+  String routeAlreadyKnown(String arg1) {
+    return 'This walk follows “$arg1”: no duplicate route was created.';
+  }
+
+  @override
+  String get routeTooShort =>
+      'Walk saved in history; too short to become a route.';
+
+  @override
+  String walkedRouteName(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Route of $dateString';
+  }
 }

@@ -1,10 +1,12 @@
 import '../domain/app_message.dart';
 
 import 'dart:async';
+import 'dart:isolate';
 
 import '../domain/models.dart';
 import '../domain/ports.dart';
 import '../domain/walk_recording.dart';
+import '../domain/walked_route.dart';
 
 class RecordWalk {
   RecordWalk(
@@ -13,8 +15,10 @@ class RecordWalk {
     this.gps,
     this.newId, {
     this.freeWalkName,
+    this.routeName,
   });
   final String Function()? freeWalkName;
+  final String Function(DateTime started)? routeName;
   final String Function() newId;
   final RecordingStore store;
   final TrailRepository repository;
@@ -99,6 +103,28 @@ class RecordWalk {
     _positions = null;
     await save();
     notify();
+  }
+
+  /// Turn the current free walk into a reusable route, before [finish], so an
+  /// interrupted finish retried later finds that route instead of duplicating
+  /// it. Walks guided by a GPX never create a route.
+  Future<WalkedRoute?> keepRoute(List<Trail> known) async {
+    final recording = current;
+    if (recording == null || recording.saved.walk!.sourceTrailId != null) {
+      return null;
+    }
+    await pause();
+    final walk = recording.snapshot(DateTime.now());
+    final id = newId();
+    final name = routeName?.call(walk.walk!.started) ?? walk.name;
+    final routes = known.where((t) => t.walk == null).toList();
+    final result = await Isolate.run(
+      () => routeFromWalk(walk, routes, id: id, name: name),
+    );
+    if (result.outcome == WalkedRouteOutcome.created) {
+      await repository.save(result.trail!);
+    }
+    return result;
   }
 
   Future<Trail?> finish() async {

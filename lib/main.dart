@@ -155,6 +155,7 @@ class _LibraryRuntime {
         ),
         const Uuid().v4,
         freeWalkName: () => messages.freeWalk,
+        routeName: (started) => messages.walkedRouteName(started),
       ),
       library: library,
       loadDemo: () => seedDemo(db, storage.mapsDirectory, library),

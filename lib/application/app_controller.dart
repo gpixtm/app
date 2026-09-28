@@ -15,6 +15,7 @@ import '../domain/day_plan.dart';
 import '../domain/health_data.dart';
 import '../domain/approach.dart';
 import '../domain/place_search.dart';
+import '../domain/walked_route.dart';
 
 class AppController {
   AppController({
@@ -284,10 +285,25 @@ class AppController {
   });
   Future<void> finishWalk() => run(() async {
     stop();
+    final route = await recorder?.keepRoute(trails);
     final walk = await recorder?.finish();
     await reload();
-    if (walk != null) viewHistory(walk: walk);
     syncStatus = AppMessage.walkSavedPending;
+    switch (route) {
+      case WalkedRoute(outcome: WalkedRouteOutcome.created, :final trail?):
+        showHistory = false;
+        focus(trails.firstWhere((t) => t.id == trail.id, orElse: () => trail));
+        message = AppMessage.routeCreated(trail.name);
+        unawaited(prepareTrailMaps([trail]));
+      case WalkedRoute(outcome: WalkedRouteOutcome.alreadyKnown, :final trail?):
+        if (walk != null) viewHistory(walk: walk);
+        message = AppMessage.routeAlreadyKnown(trail.name);
+      case WalkedRoute(outcome: WalkedRouteOutcome.tooShort):
+        if (walk != null) viewHistory(walk: walk);
+        message = AppMessage.routeTooShort;
+      default:
+        if (walk != null) viewHistory(walk: walk);
+    }
     _scheduleSync();
     if (_browsing && foreground) unawaited(browseLocation());
   });

@@ -1352,11 +1352,11 @@ abstract class AppLocalizations {
   /// **'My live data'**
   String get liveStats;
 
-  /// No description provided for @recordFreeWalk.
+  /// No description provided for @startRoute.
   ///
   /// In en, this message translates to:
-  /// **'Record a free walk'**
-  String get recordFreeWalk;
+  /// **'Start a route'**
+  String get startRoute;
 
   /// No description provided for @walkCountDistance.
   ///
@@ -1826,11 +1826,11 @@ abstract class AppLocalizations {
   /// **'Offline availability'**
   String get offlineAvailability;
 
-  /// No description provided for @myFreeWalk.
+  /// No description provided for @routeInProgress.
   ///
   /// In en, this message translates to:
-  /// **'My free walk'**
-  String get myFreeWalk;
+  /// **'Route in progress'**
+  String get routeInProgress;
 
   /// No description provided for @mapAroundYou.
   ///
@@ -2485,6 +2485,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Route to the trail unavailable offline: the trail itself is followed and your distance to it stays visible.'**
   String get approachFallback;
+
+  /// No description provided for @finishRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish the route'**
+  String get finishRoute;
+
+  /// No description provided for @finishRouteQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish this route?'**
+  String get finishRouteQuestion;
+
+  /// No description provided for @finishRouteInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Your walk will be saved in history and, unless it exactly follows an existing route, become a new route on the map. Everything syncs with your account.'**
+  String get finishRouteInfo;
+
+  /// No description provided for @routeCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Route “{arg1}” created and shown on the map · sync pending'**
+  String routeCreated(String arg1);
+
+  /// No description provided for @routeAlreadyKnown.
+  ///
+  /// In en, this message translates to:
+  /// **'This walk follows “{arg1}”: no duplicate route was created.'**
+  String routeAlreadyKnown(String arg1);
+
+  /// No description provided for @routeTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Walk saved in history; too short to become a route.'**
+  String get routeTooShort;
+
+  /// No description provided for @walkedRouteName.
+  ///
+  /// In en, this message translates to:
+  /// **'Route of {date}'**
+  String walkedRouteName(DateTime date);
 }
 
 class _AppLocalizationsDelegate
