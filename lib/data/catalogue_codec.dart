@@ -161,6 +161,51 @@ class CatalogueCodec {
     members: [for (final m in j['members'] as List) _member(_map(m))],
   );
 
+  /// A group as [fullGroup] reads it, to keep an itinerary's stages on the
+  /// phone for walking it offline.
+  static Map<String, dynamic> encodeFullGroup(TrailGroup g) => {
+    ...encodeDetails(g.details),
+    ...encodeGroup(g.summary),
+    'description': g.description,
+    'parents': [for (final p in g.parents) encodeGroup(p)],
+    'members': [
+      for (final m in g.members)
+        {
+          'role': m.role.name,
+          'stage': m.stage,
+          if (m.trail case final trail?) ...{
+            'type': 'trail',
+            'trail': encodeTrail(trail),
+          } else if (m.group case final group?) ...{
+            'type': 'group',
+            'group': encodeGroup(group),
+          },
+        },
+    ],
+  };
+
+  static Map<String, dynamic> encodeTrail(SharedTrail t) => {
+    'id': t.id,
+    'fingerprint': t.fingerprint,
+    'name': t.name,
+    'author': t.author,
+    'metres': t.metres,
+    'outline': [
+      for (final line in t.outline)
+        [
+          for (final p in line) [p.lat, p.lon],
+        ],
+    ],
+    'reviews': t.reviews,
+    'average': t.average,
+    'change': t.change,
+    'source': t.source,
+    'ref': t.ref,
+    'bounds': t.bounds == null
+        ? null
+        : [t.bounds!.south, t.bounds!.west, t.bounds!.north, t.bounds!.east],
+  };
+
   static TrailGroupMember _member(Map<String, dynamic> m) => TrailGroupMember(
     role(m['role']),
     stage: m['stage'] as int?,

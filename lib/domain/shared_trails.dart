@@ -178,6 +178,11 @@ abstract interface class SharedTrailStore {
   Future<void> keepDetails(String trailId, TrailDetails details);
   Future<TrailDetails?> details(String trailId);
   Future<void> forgetDetails(String trailId);
+
+  /// The last read copy of an itinerary, to find a walked trail's next stage
+  /// offline. Groups are public catalogue data.
+  Future<void> keepGroup(TrailGroup group);
+  Future<TrailGroup?> group(String groupId);
   Future<TrailReviews?> reviews(String trailId);
   Future<void> keepReviews(TrailReviews reviews);
 

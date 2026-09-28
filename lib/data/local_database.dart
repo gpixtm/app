@@ -17,7 +17,7 @@ import 'trail_codec.dart';
 
 Future<Database> openLocalDatabase(String path) => openDatabase(
   path,
-  version: 4,
+  version: 5,
   onUpgrade: (db, from, _) async {
     if (from < 2) await _createStatistics(db);
     if (from < 3) {
@@ -25,6 +25,7 @@ Future<Database> openLocalDatabase(String path) => openDatabase(
       await _createSharing(db);
     }
     if (from < 4) await _browseCatalogue(db);
+    if (from < 5) await _keepGroups(db);
   },
   onCreate: (db, _) async {
     await _createStatistics(db);
@@ -42,6 +43,7 @@ Future<Database> openLocalDatabase(String path) => openDatabase(
       'CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)',
     );
     await _browseCatalogue(db);
+    await _keepGroups(db);
   },
 );
 
@@ -78,6 +80,12 @@ Future<void> _browseCatalogue(DatabaseExecutor db) async {
   );
 }
 
+/// Version 5: the last read itineraries holding a walked trail, so its next
+/// stage is known offline.
+Future<void> _keepGroups(DatabaseExecutor db) => db.execute(
+  'CREATE TABLE catalogue_groups (group_id TEXT PRIMARY KEY, payload TEXT NOT NULL)',
+);
+
 const _placeCursor = 'trail-places-cursor';
 
 class SqliteSharedTrailStore implements SharedTrailStore {
@@ -106,6 +114,24 @@ class SqliteSharedTrailStore implements SharedTrailStore {
   @override
   Future<void> forgetDetails(String trailId) =>
       db.delete('catalogue_details', where: 'trail_id=?', whereArgs: [trailId]);
+
+  @override
+  Future<void> keepGroup(TrailGroup group) => db.insert('catalogue_groups', {
+    'group_id': group.summary.id,
+    'payload': jsonEncode(CatalogueCodec.encodeFullGroup(group)),
+  }, conflictAlgorithm: ConflictAlgorithm.replace);
+
+  @override
+  Future<TrailGroup?> group(String groupId) async {
+    final rows = await db.query(
+      'catalogue_groups',
+      where: 'group_id=?',
+      whereArgs: [groupId],
+    );
+    return rows.isEmpty
+        ? null
+        : CatalogueCodec.fullGroup(jsonDecode(rows.first['payload'] as String));
+  }
 
   @override
   Future<TrailReviews?> reviews(String trailId) async {

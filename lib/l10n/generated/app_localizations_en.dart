@@ -1692,11 +1692,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reviewCompletionRequired =>
-      'Walk the whole trail once with Gpix recording to give your review.';
+      'Walk the whole trail with Gpix recording, in one go or over several walks, to give your review.';
 
   @override
   String reviewProgress(int percent) {
-    return 'Your best recorded walk covers $percent% of this trail.';
+    return 'Your recorded walks together cover $percent% of this trail.';
   }
 
   @override
@@ -1760,7 +1760,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get completionRequired => 'Walk the whole trail before reviewing it.';
+  String get completionRequired =>
+      'Walk the whole trail, in one go or over several walks, before reviewing it.';
 
   @override
   String get invalidRating => 'Choose a rating from 1 to 5 stars.';
@@ -2574,4 +2575,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get walkBLetter => 'B';
+
+  @override
+  String stageUnavailable(int stage) {
+    return 'Stage $stage is not on this phone. Connect to the internet, or make the itinerary available offline before leaving.';
+  }
+
+  @override
+  String get previousStage => 'Previous stage';
+
+  @override
+  String get nextStage => 'Next stage';
+
+  @override
+  String get trailEndReached => 'End of the trail reached';
+
+  @override
+  String stageEndReached(int stage) {
+    return 'End of stage $stage reached';
+  }
+
+  @override
+  String get finishStageInfo => 'Finish to save this walk and its statistics.';
+
+  @override
+  String finishAndStartStage(int stage) {
+    return 'Finish and start stage $stage';
+  }
+
+  @override
+  String get continueRoute => 'Continue from here';
+
+  @override
+  String get continueRouteInfo =>
+      'Starts from where you are, in the direction of your last walk. Past the end of a stage, the next stage starts.';
 }

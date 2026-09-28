@@ -79,6 +79,60 @@ class WalkControls extends StatelessWidget {
   }
 }
 
+/// The end of the followed trail is reached: finish the walk, or finish it
+/// and start the next stage of the itinerary from here. Each stage is its
+/// own walk, with its statistics.
+class TrailEndCard extends StatelessWidget {
+  const TrailEndCard(this.app, {super.key});
+  final AppController app;
+  @override
+  Widget build(BuildContext context) {
+    final links = app.stagesOf(app.selected);
+    final next = app.nextStage;
+    final stage = next?.member.stage;
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(4, 4, 12, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.sports_score, color: forest),
+              title: Text(
+                links == null
+                    ? context.l10n.trailEndReached
+                    : context.l10n.stageEndReached(links.stage),
+              ),
+              subtitle: Text(context.l10n.finishStageInfo),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  if (next != null && stage != null)
+                    FilledButton.icon(
+                      onPressed: app.busy ? null : () => app.finishStage(next),
+                      icon: const Icon(Icons.skip_next),
+                      label: Text(context.l10n.finishAndStartStage(stage)),
+                    ),
+                  OutlinedButton.icon(
+                    onPressed: app.busy ? null : () => app.finishStage(),
+                    icon: const Icon(Icons.flag_outlined),
+                    label: Text(context.l10n.finish),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /// Whether the walk is being recorded or paused, and any recording error.
 class RecordingStatus extends StatelessWidget {
   const RecordingStatus(this.app, {super.key});

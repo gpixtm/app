@@ -2747,13 +2747,13 @@ abstract class AppLocalizations {
   /// No description provided for @reviewCompletionRequired.
   ///
   /// In en, this message translates to:
-  /// **'Walk the whole trail once with Gpix recording to give your review.'**
+  /// **'Walk the whole trail with Gpix recording, in one go or over several walks, to give your review.'**
   String get reviewCompletionRequired;
 
   /// No description provided for @reviewProgress.
   ///
   /// In en, this message translates to:
-  /// **'Your best recorded walk covers {percent}% of this trail.'**
+  /// **'Your recorded walks together cover {percent}% of this trail.'**
   String reviewProgress(int percent);
 
   /// No description provided for @reviewsOffline.
@@ -2849,7 +2849,7 @@ abstract class AppLocalizations {
   /// No description provided for @completionRequired.
   ///
   /// In en, this message translates to:
-  /// **'Walk the whole trail before reviewing it.'**
+  /// **'Walk the whole trail, in one go or over several walks, before reviewing it.'**
   String get completionRequired;
 
   /// No description provided for @invalidRating.
@@ -4021,6 +4021,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'B'**
   String get walkBLetter;
+
+  /// No description provided for @stageUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage {stage} is not on this phone. Connect to the internet, or make the itinerary available offline before leaving.'**
+  String stageUnavailable(int stage);
+
+  /// No description provided for @previousStage.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous stage'**
+  String get previousStage;
+
+  /// No description provided for @nextStage.
+  ///
+  /// In en, this message translates to:
+  /// **'Next stage'**
+  String get nextStage;
+
+  /// No description provided for @trailEndReached.
+  ///
+  /// In en, this message translates to:
+  /// **'End of the trail reached'**
+  String get trailEndReached;
+
+  /// No description provided for @stageEndReached.
+  ///
+  /// In en, this message translates to:
+  /// **'End of stage {stage} reached'**
+  String stageEndReached(int stage);
+
+  /// No description provided for @finishStageInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish to save this walk and its statistics.'**
+  String get finishStageInfo;
+
+  /// No description provided for @finishAndStartStage.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish and start stage {stage}'**
+  String finishAndStartStage(int stage);
+
+  /// No description provided for @continueRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue from here'**
+  String get continueRoute;
+
+  /// No description provided for @continueRouteInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts from where you are, in the direction of your last walk. Past the end of a stage, the next stage starts.'**
+  String get continueRouteInfo;
 }
 
 class _AppLocalizationsDelegate

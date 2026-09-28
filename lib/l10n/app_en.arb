@@ -1001,8 +1001,8 @@
   "editReview": "Edit my review",
   "deleteMyReview": "Delete my review",
   "deleteReviewQuestion": "Delete your review?",
-  "reviewCompletionRequired": "Walk the whole trail once with Gpix recording to give your review.",
-  "reviewProgress": "Your best recorded walk covers {percent}% of this trail.",
+  "reviewCompletionRequired": "Walk the whole trail with Gpix recording, in one go or over several walks, to give your review.",
+  "reviewProgress": "Your recorded walks together cover {percent}% of this trail.",
   "@reviewProgress": {
     "placeholders": {
       "percent": {
@@ -1039,7 +1039,7 @@
       }
     }
   },
-  "completionRequired": "Walk the whole trail before reviewing it.",
+  "completionRequired": "Walk the whole trail, in one go or over several walks, before reviewing it.",
   "invalidRating": "Choose a rating from 1 to 5 stars.",
   "reviewTooLong": "Your comment is too long (2,000 characters maximum).",
   "addPlaceHere": "Add a place here",
@@ -1551,5 +1551,35 @@
   "totalActiveTime": "Total active time",
   "usualSpeed": "Usual speed",
   "walkALetter": "A",
-  "walkBLetter": "B"
+  "walkBLetter": "B",
+  "stageUnavailable": "Stage {stage} is not on this phone. Connect to the internet, or make the itinerary available offline before leaving.",
+  "@stageUnavailable": {
+    "placeholders": {
+      "stage": {
+        "type": "int"
+      }
+    }
+  },
+  "previousStage": "Previous stage",
+  "nextStage": "Next stage",
+  "trailEndReached": "End of the trail reached",
+  "stageEndReached": "End of stage {stage} reached",
+  "@stageEndReached": {
+    "placeholders": {
+      "stage": {
+        "type": "int"
+      }
+    }
+  },
+  "finishStageInfo": "Finish to save this walk and its statistics.",
+  "finishAndStartStage": "Finish and start stage {stage}",
+  "@finishAndStartStage": {
+    "placeholders": {
+      "stage": {
+        "type": "int"
+      }
+    }
+  },
+  "continueRoute": "Continue from here",
+  "continueRouteInfo": "Starts from where you are, in the direction of your last walk. Past the end of a stage, the next stage starts."
 }
