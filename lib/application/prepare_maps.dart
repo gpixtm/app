@@ -40,7 +40,17 @@ class PrepareMaps {
     if (!_closed) changes.add(null);
   }
 
-  Future<void> initialize() async {
+  /// Requests made while the saved queue is still restoring wait for it, so
+  /// they never overwrite the durable queue with a partial one.
+  Future<void> _restoring = Future.value();
+  Future<void> _restored() async {
+    try {
+      await _restoring;
+    } catch (_) {}
+  }
+
+  Future<void> initialize() => _restoring = _restore();
+  Future<void> _restore() async {
     for (final saved in await store.restore()) {
       _areas[saved.area.key] = saved.area;
       if (saved.ready) {
@@ -49,10 +59,13 @@ class PrepareMaps {
         _queue.add(saved.area.key);
       }
     }
+    _notify();
     _kick();
   }
 
   Future<void> trails(List<Trail> trails) async {
+    await _restored();
+    if (_closed) return;
     final plans = await Isolate.run(
       () => {for (final t in trails) t.id: MapPlan.trail(t)},
     );
@@ -67,6 +80,7 @@ class PrepareMaps {
   }
 
   Future<void> viewport(Bounds bounds, double zoom) async {
+    await _restored();
     if (_closed) return;
     if (!_add(MapPlan.viewport(bounds, zoom), true)) return;
     await _persist();
@@ -92,7 +106,10 @@ class PrepareMaps {
   }
 
   Future<void> _persist() {
-    final snapshot = _areas.values.toList();
+    final snapshot = [
+      for (final area in _areas.values)
+        StoredMapArea(area, _ready.contains(area.key)),
+    ];
     final next = _writes.then((_) => store.remember(snapshot));
     _writes = next.catchError((Object _) {});
     return next;
@@ -121,6 +138,7 @@ class PrepareMaps {
           });
           if (_closed) break;
           _ready.add(key);
+          unawaited(_persist().catchError((Object _) {}));
           error = null;
         } catch (_) {
           if (_closed) break;
@@ -141,6 +159,7 @@ class PrepareMaps {
   Future<void> close() async {
     _closed = true;
     _retry?.cancel();
+    await _restored();
     await _writes;
     await store.close();
     await changes.close();

@@ -984,10 +984,22 @@ class AppController {
       _mapChanges = automaticMaps!.changes.stream.listen(
         (_) => notifyListeners(),
       );
-      await automaticMaps!.initialize();
-      unawaited(prepareTrailMaps(trails));
+      // The map opens at once; the saved download queue restores behind it.
+      unawaited(_restoreMaps());
     }
     _scheduleSync();
+  }
+
+  Future<void> _restoreMaps() async {
+    try {
+      await automaticMaps!.initialize();
+    } catch (_) {
+      if (!_disposed) {
+        message = AppMessage.mapsStorageUnavailable;
+        notifyListeners();
+      }
+    }
+    if (!_disposed) await prepareTrailMaps(trails);
   }
 
   Future<void> reload() async {

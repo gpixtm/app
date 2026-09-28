@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:isolate';
 
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
@@ -325,15 +326,47 @@ Future<void> enqueue(
 class SqliteTrailRepository implements TrailRepository {
   const SqliteTrailRepository(this.db);
   final Database db;
+
+  /// Beyond this many payload characters, decoding moves off the UI isolate:
+  /// long walk histories otherwise freeze the screen while the library opens.
+  static const _backgroundDecoding = 256 * 1024;
+
+  static List<Trail> _decode(List<(String, String?)> rows) => [
+    for (final (payload, publicId) in rows)
+      TrailCodec.decode(jsonDecode(payload)).withPublicId(publicId),
+  ];
+
   @override
-  Future<List<Trail>> all() async =>
-      (await db.query('trails', where: 'deleted = 0', orderBy: 'rowid DESC'))
-          .map(
-            (r) =>
-                TrailCodec.decode(jsonDecode(r['payload'] as String))
-                    .withPublicId(r['public_id'] as String?),
-          )
-          .toList();
+  Future<List<Trail>> all() async {
+    final rows = [
+      for (final r in await db.query(
+        'trails',
+        columns: ['payload', 'public_id'],
+        where: 'deleted = 0',
+        orderBy: 'rowid DESC',
+      ))
+        (r['payload'] as String, r['public_id'] as String?),
+    ];
+    final size = rows.fold(0, (sum, r) => sum + r.$1.length);
+    return size < _backgroundDecoding
+        ? _decode(rows)
+        : Isolate.run(() => _decode(rows));
+  }
+
+  @override
+  Future<Trail?> find(String id) async {
+    final rows = await db.query(
+      'trails',
+      columns: ['payload', 'public_id'],
+      where: 'id = ? AND deleted = 0',
+      whereArgs: [id],
+    );
+    if (rows.isEmpty) return null;
+    return _decode([
+      (rows.first['payload'] as String, rows.first['public_id'] as String?),
+    ]).single;
+  }
+
   @override
   Future<Set<String>> offlineCopies() async => {
     for (final r in await db.rawQuery(

@@ -48,7 +48,7 @@ void main() {
         const area = MapArea(13, 4186, 2803, 14);
         final store = NativeAutomaticMaps(root);
         await store.restore();
-        await store.remember([area]);
+        await store.remember([const StoredMapArea(area, false)]);
         await store.download(area, (_) {});
         final bounds = definition!['bounds'] as List;
         expect(bounds[0][0], greaterThan(area.bounds.south));
@@ -62,6 +62,71 @@ void main() {
         await restored.download(area, (_) {});
         expect(downloads, 1);
         await restored.close();
+      } finally {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(channel, null);
+        await root.delete(recursive: true);
+      }
+    },
+  );
+  test(
+    'launch trusts recorded readiness and still reads the legacy manifest',
+    () async {
+      const channel = MethodChannel('plugins.flutter.io/maplibre_gl');
+      final root = await Directory.systemTemp.createTemp('gpix-native-maps');
+      const ready = MapArea(13, 4186, 2803, 14),
+          pending = MapArea(13, 4187, 2803, 14);
+      final statuses = <int>[];
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (call) async {
+            switch (call.method) {
+              case 'getListOfRegions':
+                return jsonEncode([
+                  for (final (id, area) in [(1, ready), (2, pending)])
+                    {
+                      'id': id,
+                      'definition': {
+                        'bounds': [
+                          [0.0, 0.0],
+                          [1.0, 1.0],
+                        ],
+                        'mapStyleUrl':
+                            'https://tiles.openfreemap.org/styles/liberty',
+                        'minZoom': 0.0,
+                        'maxZoom': 14.0,
+                      },
+                      'metadata': {'gpix-area': area.key},
+                    },
+                ]);
+              case 'getOfflineRegionStatus':
+                statuses.add(call.arguments['id'] as int);
+                return jsonEncode({
+                  'completedResourceCount': 1,
+                  'requiredResourceCount': 1,
+                  'completedResourceSize': 1,
+                  'isComplete': true,
+                  'downloadProgress': 100,
+                });
+              default:
+                return null;
+            }
+          });
+      try {
+        final manifest = File('${root.path}/automatic-areas.json');
+        await manifest.writeAsString(jsonEncode([ready.key, pending.key]));
+        final legacy = await NativeAutomaticMaps(root).restore();
+        expect(legacy.every((a) => a.ready), isTrue);
+        expect(statuses, unorderedEquals([1, 2]));
+        statuses.clear();
+        final store = NativeAutomaticMaps(root);
+        await store.remember([
+          const StoredMapArea(ready, true),
+          const StoredMapArea(pending, false),
+        ]);
+        final restored = await store.restore();
+        expect(restored.map((a) => a.area.key), [ready.key, pending.key]);
+        expect(restored.every((a) => a.ready), isTrue);
+        expect(statuses, [2]);
       } finally {
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
             .setMockMethodCallHandler(channel, null);

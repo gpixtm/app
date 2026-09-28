@@ -124,7 +124,10 @@ class StoredMapArea {
 abstract interface class AutomaticMapStore {
   String get style;
   Future<List<StoredMapArea>> restore();
-  Future<void> remember(List<MapArea> areas);
+
+  /// Record the intended areas with their readiness, so a launch does not ask
+  /// the map engine again about areas already complete.
+  Future<void> remember(List<StoredMapArea> areas);
   Future<void> download(MapArea area, void Function(double) progress);
   Future<void> close();
 }

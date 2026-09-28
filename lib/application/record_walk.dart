@@ -46,9 +46,7 @@ class RecordWalk {
     final saved = await store.read();
     if (saved != null) {
       // Finishing can be interrupted between the durable history write and clear.
-      if ((await repository.all()).any(
-        (t) => t.id == saved.id && t.walk?.ended != null,
-      )) {
+      if ((await repository.find(saved.id))?.walk?.ended != null) {
         await store.clear();
       } else {
         current = WalkRecording(saved);

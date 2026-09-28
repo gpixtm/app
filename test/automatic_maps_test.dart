@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gpix/application/prepare_maps.dart';
 import 'package:gpix/domain/automatic_maps.dart';
@@ -6,17 +8,27 @@ import 'package:gpix/domain/models.dart';
 class Store implements AutomaticMapStore {
   List<MapArea> saved = [];
   final ready = <String>{};
+  final recordedReady = <String>{};
   final requests = <String>[];
   bool online = true;
+  Future<void>? restoring;
   @override
   String get style => 'https://maps.test/style';
   @override
-  Future<List<StoredMapArea>> restore() async => [
-    for (final a in saved) StoredMapArea(a, ready.contains(a.key)),
-  ];
+  Future<List<StoredMapArea>> restore() async {
+    await restoring;
+    return [for (final a in saved) StoredMapArea(a, ready.contains(a.key))];
+  }
+
   @override
-  Future<void> remember(List<MapArea> areas) async {
-    saved = areas;
+  Future<void> remember(List<StoredMapArea> areas) async {
+    saved = [for (final a in areas) a.area];
+    recordedReady
+      ..clear()
+      ..addAll([
+        for (final a in areas)
+          if (a.ready) a.area.key,
+      ]);
   }
 
   @override
@@ -106,6 +118,37 @@ void main() {
     await third.initialize();
     expect(third.pendingCount, 0);
     await third.close();
+  });
+  test('completed areas are recorded ready for the next launch', () async {
+    final store = Store();
+    final maps = PrepareMaps(store);
+    await maps.initialize();
+    await maps.viewport(const Bounds(4.02, 49.24, 4.04, 49.26), 13);
+    await settle(maps);
+    await maps.close();
+    expect(store.saved, isNotEmpty);
+    expect(store.recordedReady, store.saved.map((a) => a.key).toSet());
+  });
+  test('requests made while the queue restores keep the saved areas', () async {
+    final store = Store();
+    final trail = route([
+      [const GeoPoint(49.25, 4.03), const GeoPoint(49.251, 4.031)],
+    ]);
+    store.saved = MapPlan.trail(trail);
+    final saved = store.saved.map((a) => a.key).toSet();
+    final gate = Completer<void>();
+    store.restoring = gate.future;
+    final maps = PrepareMaps(store);
+    final restoring = maps.initialize();
+    final moved = maps.viewport(const Bounds(2.34, 48.84, 2.36, 48.86), 15);
+    await Future<void>.delayed(Duration.zero);
+    expect(store.saved.map((a) => a.key).toSet(), saved);
+    gate.complete();
+    await restoring;
+    await moved;
+    expect(store.saved.map((a) => a.key).toSet().containsAll(saved), isTrue);
+    expect(store.saved.length, greaterThan(saved.length));
+    await maps.close();
   });
   test('camera moves and zooms enqueue new areas automatically without duplicating identical view', () async {
     final store = Store(), maps = PrepareMaps(Store());

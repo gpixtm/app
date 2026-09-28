@@ -9,6 +9,39 @@ void main() {
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
   test(
+    'a large library decodes off the UI isolate with the same trails',
+    () async {
+      final dir = await Directory.systemTemp.createTemp('gpix-test');
+      final db = await openLocalDatabase('${dir.path}/library.db');
+      final repository = SqliteTrailRepository(db);
+      for (var i = 0; i < 3; i++) {
+        await repository.save(
+          Trail(
+            id: 'walk-$i',
+            name: 'Chemin des crêtes 🥾 $i',
+            segments: [
+              [
+                for (var p = 0; p < 10000; p++)
+                  GeoPoint(45 + p / 100000, 6 + i / 10, 1200.5),
+              ],
+            ],
+            pois: [],
+          ),
+        );
+      }
+      final trails = await repository.all();
+      expect(trails.map((t) => t.id), ['walk-2', 'walk-1', 'walk-0']);
+      expect(trails.first.name, 'Chemin des crêtes 🥾 2');
+      expect(trails.first.segments.single.length, 10000);
+      expect((await repository.find('walk-1'))!.name, 'Chemin des crêtes 🥾 1');
+      await repository.delete('walk-1');
+      expect(await repository.find('walk-1'), isNull);
+      expect(await repository.find('unknown'), isNull);
+      await db.close();
+      await dir.delete(recursive: true);
+    },
+  );
+  test(
     'durable outbox survives lost ACK, later edit, restart and tombstone',
     () async {
       final dir = await Directory.systemTemp.createTemp('gpix-test');

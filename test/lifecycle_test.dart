@@ -14,6 +14,9 @@ class Repository implements TrailRepository {
   @override
   Future<List<Trail>> all() async => list;
   @override
+  Future<Trail?> find(String id) async =>
+      list.where((t) => t.id == id).firstOrNull;
+  @override
   Future<void> delete(String id) async => list.removeWhere((t) => t.id == id);
   @override
   Future<void> save(Trail t) async {

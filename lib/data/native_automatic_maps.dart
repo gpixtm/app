@@ -31,26 +31,37 @@ class NativeAutomaticMaps implements AutomaticMapStore {
         _regions[r.metadata['gpix-area'] as String] = r;
       }
     }
-    final keys = await _manifest.exists()
-        ? (jsonDecode(await _manifest.readAsString()) as List).cast<String>()
-        : <String>[];
-    final result = <StoredMapArea>[];
-    for (final key in keys) {
-      final area = MapArea.parse(key), region = _regions[key];
-      final ready =
-          region != null &&
-          (await native.getOfflineRegionStatus(region.id)).isComplete;
-      result.add(StoredMapArea(area, ready));
-    }
-    return result;
+    final saved = await _manifest.exists()
+        ? jsonDecode(await _manifest.readAsString()) as List
+        : const [];
+    // Areas recorded complete are trusted; only the others, and every area of
+    // a legacy manifest (plain keys), ask the map engine, all at once.
+    return Future.wait([
+      for (final entry in saved)
+        _stored(
+          entry is String ? entry : entry['key'] as String,
+          entry is Map && entry['ready'] == true,
+        ),
+    ]);
+  }
+
+  Future<StoredMapArea> _stored(String key, bool recordedReady) async {
+    final area = MapArea.parse(key), region = _regions[key];
+    final ready =
+        region != null &&
+        (recordedReady ||
+            (await native.getOfflineRegionStatus(region.id)).isComplete);
+    return StoredMapArea(area, ready);
   }
 
   @override
-  Future<void> remember(List<MapArea> areas) async {
+  Future<void> remember(List<StoredMapArea> areas) async {
     await directory.create(recursive: true);
     final temp = File('${_manifest.path}.part');
     await temp.writeAsString(
-      jsonEncode(areas.map((a) => a.key).toList()),
+      jsonEncode([
+        for (final a in areas) {'key': a.area.key, 'ready': a.ready},
+      ]),
       flush: true,
     );
     await temp.rename(_manifest.path);

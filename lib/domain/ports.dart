@@ -2,6 +2,9 @@ import 'models.dart';
 
 abstract interface class TrailRepository {
   Future<List<Trail>> all();
+
+  /// One stored trail, without reading the whole library.
+  Future<Trail?> find(String id);
   Future<void> save(Trail trail);
 
   /// Keep a downloaded shared trail on this phone without queuing a change.
