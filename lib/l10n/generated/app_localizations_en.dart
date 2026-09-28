@@ -1164,6 +1164,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get headingUp => 'Orient with the phone';
 
   @override
+  String get compassNorthUp =>
+      'Compass: the red tip points north. Tap to turn the map north up.';
+
+  @override
   String get recenter => 'Recenter on my position';
 
   @override

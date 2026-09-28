@@ -2024,6 +2024,12 @@ abstract class AppLocalizations {
   /// **'Orient with the phone'**
   String get headingUp;
 
+  /// No description provided for @compassNorthUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Compass: the red tip points north. Tap to turn the map north up.'**
+  String get compassNorthUp;
+
   /// No description provided for @recenter.
   ///
   /// In en, this message translates to:

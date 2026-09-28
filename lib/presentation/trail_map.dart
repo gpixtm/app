@@ -16,6 +16,7 @@ import '../domain/point_attachment.dart';
 import '../domain/heading.dart';
 import '../domain/trail_geometry.dart';
 import '../application/app_controller.dart';
+import 'compass_needle.dart';
 import 'map_features.dart';
 import 'position_arrow.dart';
 import 'pin_images.dart';
@@ -49,6 +50,11 @@ class _TrailMapState extends State<TrailMap> {
   StreamSubscription<void>? changes;
   final pointer = HeadingFilter(seconds: .22, deadband: 1);
   final cameraHeading = HeadingFilter(seconds: .85, deadband: 3);
+
+  /// Phone heading shown by the compass button while no walk is active.
+  final needle = HeadingFilter(seconds: .15, deadband: .5);
+  final needleHeading = ValueNotifier<double?>(null);
+  bool shownNavigating = false;
   bool loaded = false, follow = true, headingUp = true;
   bool updating = false, pending = false, wasActive = false;
   bool resetNavigationZoom = false;
@@ -259,15 +265,20 @@ class _TrailMapState extends State<TrailMap> {
   void initState() {
     super.initState();
     unawaited(app.browseLocation());
-    changes = app.changes.stream.listen((_) => update());
+    changes = app.changes.stream.listen((_) {
+      // The orientation button becomes a compass outside walks.
+      if (mounted && navigating != shownNavigating) setState(() {});
+      unawaited(update());
+    });
     compass = FlutterCompass.events?.listen((e) {
-      if (!app.foreground ||
-          !navigating ||
-          e.heading == null ||
-          !e.heading!.isFinite) {
+      if (!app.foreground || e.heading == null || !e.heading!.isFinite) {
         return;
       }
       final now = DateTime.now();
+      if (!navigating) {
+        needleHeading.value = needle.add(e.heading!, now);
+        return;
+      }
       pointer.add(e.heading!, now);
       cameraHeading.add(pointer.value!, now);
       headingTime = now;
@@ -284,6 +295,7 @@ class _TrailMapState extends State<TrailMap> {
     app.stopBrowsing();
     changes?.cancel();
     compass?.cancel();
+    needleHeading.dispose();
     super.dispose();
   }
 
@@ -995,6 +1007,7 @@ class _TrailMapState extends State<TrailMap> {
             },
           ],
         });
+    shownNavigating = navigating;
     return Stack(
       children: [
         Listener(
@@ -1097,19 +1110,46 @@ class _TrailMapState extends State<TrailMap> {
           top: 12,
           child: Column(
             children: [
-              FloatingActionButton.small(
-                heroTag: 'orientation',
-                tooltip: headingUp
-                    ? context.l10n.northUp
-                    : context.l10n.headingUp,
-                backgroundColor: Colors.white,
-                onPressed: () {
-                  setState(() => headingUp = !headingUp);
-                  follow = true;
-                  updateCamera(force: true);
-                },
-                child: Icon(headingUp ? Icons.explore : Icons.north),
-              ),
+              if (shownNavigating)
+                FloatingActionButton.small(
+                  heroTag: 'orientation',
+                  tooltip: headingUp
+                      ? context.l10n.northUp
+                      : context.l10n.headingUp,
+                  backgroundColor: Colors.white,
+                  onPressed: () {
+                    setState(() => headingUp = !headingUp);
+                    follow = true;
+                    updateCamera(force: true);
+                  },
+                  child: Icon(headingUp ? Icons.explore : Icons.north),
+                )
+              else
+                FloatingActionButton.small(
+                  heroTag: 'orientation',
+                  tooltip: context.l10n.compassNorthUp,
+                  backgroundColor: Colors.white,
+                  onPressed: () {
+                    final c = controller, old = c?.cameraPosition;
+                    if (old == null) return;
+                    unawaited(
+                      c!.animateCamera(
+                        CameraUpdate.newCameraPosition(
+                          CameraPosition(
+                            target: old.target,
+                            zoom: old.zoom,
+                            bearing: 0,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  child: ValueListenableBuilder(
+                    valueListenable: needleHeading,
+                    builder: (context, heading, _) =>
+                        CompassNeedle(-(heading ?? 0)),
+                  ),
+                ),
               const SizedBox(height: 8),
               FloatingActionButton.small(
                 heroTag: 'recenter',

@@ -637,6 +637,7 @@
   "tapSelectedTrail": "Tap the selected trail. Zoom in to place the boundary precisely.",
   "northUp": "Switch to north-up",
   "headingUp": "Orient with the phone",
+  "compassNorthUp": "Compass: the red tip points north. Tap to turn the map north up.",
   "recenter": "Recenter on my position",
   "distanceWalked": "Distance walked",
   "activeDuration": "Active duration",

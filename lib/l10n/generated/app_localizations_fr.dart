@@ -1183,6 +1183,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get headingUp => 'Orienter selon le téléphone';
 
   @override
+  String get compassNorthUp =>
+      'Boussole : la pointe rouge indique le nord. Touchez pour remettre la carte nord en haut.';
+
+  @override
   String get recenter => 'Recentrer sur ma position';
 
   @override
