@@ -63,9 +63,9 @@ class _TrailMapState extends State<TrailMap> {
   bool? renderedPlanning;
   List<Map<String, dynamic>> markers = [];
   List<({math.Point point, String label, String color})> markerViews = [];
-  late final Future<Uint8List> arrow = positionArrowPng(
-    MediaQuery.devicePixelRatioOf(context),
-  );
+
+  /// Zoom the direction arrow was last sized for.
+  double? arrowZoom;
   late final Future<Uint8List> ownPin = trailPinPng(
     MediaQuery.devicePixelRatioOf(context),
     catalogue: false,
@@ -543,17 +543,19 @@ class _TrailMapState extends State<TrailMap> {
               ),
           ]),
         );
+        final zoom = c.cameraPosition?.zoom ?? navigationZoom;
         await c.setGeoJsonSource(
           'heading',
           collection([
             if (fix != null && heading != null)
-              feature(
-                'Point',
-                [fix.point.lon, fix.point.lat],
-                {'bearing': heading},
+              ...positionArrowFeatures(
+                fix.point,
+                heading,
+                metresPerPixel(zoom, fix.point.lat),
               ),
           ]),
         );
+        arrowZoom = heading == null ? null : zoom;
         final active = navigating;
         final starting =
             active &&
@@ -764,23 +766,56 @@ class _TrailMapState extends State<TrailMap> {
       ),
       enableInteraction: false,
     );
-    try {
-      await c.addImage(positionArrowImage, await arrow);
-    } catch (e) {
-      // Without the image the dot still shows the position.
-      debugPrint('Position arrow: $e');
-    }
-    await c.addSymbolLayer(
+    const beam = [
+      '==',
+      ['get', 'part'],
+      'beam',
+    ];
+    const chevron = [
+      '==',
+      ['get', 'part'],
+      'arrow',
+    ];
+    await c.addFillLayer(
+      'heading',
+      'heading-beam',
+      const FillLayerProperties(
+        fillColor: positionArrowHex,
+        fillOpacity: ['get', 'opacity'],
+        fillAntialias: false,
+      ),
+      filter: beam,
+      enableInteraction: false,
+    );
+    await c.addLineLayer(
+      'heading',
+      'heading-shadow',
+      const LineLayerProperties(
+        lineColor: '#000000',
+        lineOpacity: .22,
+        lineWidth: 7,
+        lineBlur: 3,
+        lineJoin: 'round',
+      ),
+      filter: chevron,
+      enableInteraction: false,
+    );
+    await c.addLineLayer(
+      'heading',
+      'heading-rim',
+      const LineLayerProperties(
+        lineColor: '#ffffff',
+        lineWidth: 4.5,
+        lineJoin: 'round',
+      ),
+      filter: chevron,
+      enableInteraction: false,
+    );
+    await c.addFillLayer(
       'heading',
       'heading-arrow',
-      const SymbolLayerProperties(
-        iconImage: positionArrowImage,
-        iconRotate: ['get', 'bearing'],
-        iconRotationAlignment: 'map',
-        iconPitchAlignment: 'map',
-        iconAllowOverlap: true,
-        iconIgnorePlacement: true,
-      ),
+      const FillLayerProperties(fillColor: positionArrowHex),
+      filter: chevron,
       enableInteraction: false,
     );
     if (!mounted) return;
@@ -900,8 +935,14 @@ class _TrailMapState extends State<TrailMap> {
             onStyleLoadedCallback: styleLoaded,
             onMapClick: tap,
             // Pins move with the map natively; only day labels are placed here.
-            onCameraMove: (_) {
+            onCameraMove: (position) {
               if (markers.isNotEmpty) unawaited(projectMarkers());
+              // The arrow is drawn in ground units: resize it on zoom.
+              final sized = arrowZoom;
+              if (sized != null && (position.zoom - sized).abs() > .05) {
+                arrowZoom = position.zoom;
+                unawaited(update());
+              }
             },
             trackCameraPosition: true,
             onCameraIdle: () async {

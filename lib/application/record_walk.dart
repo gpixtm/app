@@ -120,8 +120,13 @@ class RecordWalk {
 
   /// Turn the current free walk into a reusable route, before [finish], so an
   /// interrupted finish retried later finds that route instead of duplicating
-  /// it. Walks guided by a GPX never create a route.
-  Future<WalkedRoute?> keepRoute(List<Trail> known) async {
+  /// it. Walks guided by a GPX never create a route. [name] and [description]
+  /// are the walker's own; without a name the route is named after its date.
+  Future<WalkedRoute?> keepRoute(
+    List<Trail> known, {
+    String? name,
+    String description = '',
+  }) async {
     final recording = current;
     if (recording == null || recording.saved.walk!.sourceTrailId != null) {
       return null;
@@ -131,10 +136,16 @@ class RecordWalk {
     // The route's line decides its shared identity, like an imported GPX.
     final fingerprint = identity?.fingerprint(walk.segments);
     final id = fingerprint == null ? newId() : identity!.sharedId(fingerprint);
-    final name = routeName?.call(walk.walk!.started) ?? walk.name;
+    final routeTitle = name ?? routeName?.call(walk.walk!.started) ?? walk.name;
     final routes = known.where((t) => t.walk == null).toList();
     final result = await Isolate.run(
-      () => routeFromWalk(walk, routes, id: id, name: name),
+      () => routeFromWalk(
+        walk,
+        routes,
+        id: id,
+        name: routeTitle,
+        description: description,
+      ),
     );
     if (result.outcome == WalkedRouteOutcome.created) {
       await repository.save(result.trail!);
@@ -142,14 +153,16 @@ class RecordWalk {
     return result;
   }
 
-  /// [routeId] links a free walk to the route it created or matched.
-  Future<Trail?> finish({String? routeId}) async {
+  /// [routeId] links a free walk to the route it created or matched; [name]
+  /// replaces the provisional name the walk was recorded under.
+  Future<Trail?> finish({String? routeId, String? name}) async {
     if (current == null) return null;
     await pause();
     final result = current!.snapshot(
       DateTime.now(),
       finished: true,
       routeId: routeId,
+      name: name,
     );
     await repository.save(result);
     await store.clear();

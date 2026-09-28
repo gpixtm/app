@@ -219,6 +219,7 @@
   "unreadableFilename": "Nom de fichier illisible",
   "unreadableFilenameInfo": "Le téléphone a fourni un nom abîmé. Saisissez le nom du parcours pour conserver les bons caractères.",
   "trailName": "Nom du parcours",
+  "routeDescriptionOptional": "Description (facultative)",
   "enterName": "Saisissez un nom.",
   "replaceDamagedText": "Remplacez les caractères abîmés.",
   "cancel": "Annuler",

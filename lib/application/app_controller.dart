@@ -727,11 +727,21 @@ class AppController {
     await recorder?.pause();
     if (_browsing && foreground) unawaited(browseLocation());
   });
-  Future<void> finishWalk() => run(() async {
+
+  /// [name] and [description] are what the walker wrote when finishing;
+  /// without them the walk keeps its provisional name.
+  Future<void> finishWalk({
+    String? name,
+    String description = '',
+  }) => run(() async {
     stop();
     unawaited(recap?.leave());
-    final route = await recorder?.keepRoute(trails);
-    final walk = await recorder?.finish(routeId: route?.trail?.id);
+    final route = await recorder?.keepRoute(
+      trails,
+      name: name,
+      description: description,
+    );
+    final walk = await recorder?.finish(routeId: route?.trail?.id, name: name);
     if (walk != null) {
       try {
         await statistics?.addWalk(walk);

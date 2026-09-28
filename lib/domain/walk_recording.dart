@@ -140,21 +140,25 @@ class WalkRecording {
     return true;
   }
 
-  Trail snapshot(DateTime now, {bool finished = false, String? routeId}) =>
-      Trail(
-        id: saved.id,
-        name: saved.name,
-        segments: segments,
-        pois: [],
-        walk: WalkDetails(
-          started: saved.walk!.started,
-          ended: finished ? now : null,
-          seconds: seconds(now),
-          sourceTrailId: saved.walk!.sourceTrailId,
-          routeId: routeId ?? saved.walk!.routeId,
-          samples: List.unmodifiable(samples),
-          health: health,
-          reference: saved.walk!.reference,
-        ),
-      );
+  Trail snapshot(
+    DateTime now, {
+    bool finished = false,
+    String? routeId,
+    String? name,
+  }) => Trail(
+    id: saved.id,
+    name: name ?? saved.name,
+    segments: segments,
+    pois: [],
+    walk: WalkDetails(
+      started: saved.walk!.started,
+      ended: finished ? now : null,
+      seconds: seconds(now),
+      sourceTrailId: saved.walk!.sourceTrailId,
+      routeId: routeId ?? saved.walk!.routeId,
+      samples: List.unmodifiable(samples),
+      health: health,
+      reference: saved.walk!.reference,
+    ),
+  );
 }

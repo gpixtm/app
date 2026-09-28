@@ -260,6 +260,7 @@ String resolveAppMessage(
   'unreadableFilename' => l10n.unreadableFilename,
   'unreadableFilenameInfo' => l10n.unreadableFilenameInfo,
   'trailName' => l10n.trailName,
+  'routeDescriptionOptional' => l10n.routeDescriptionOptional,
   'enterName' => l10n.enterName,
   'replaceDamagedText' => l10n.replaceDamagedText,
   'cancel' => l10n.cancel,

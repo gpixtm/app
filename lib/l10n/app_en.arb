@@ -424,6 +424,7 @@
   "unreadableFilename": "Unreadable file name",
   "unreadableFilenameInfo": "The phone provided a damaged name. Enter the trail name to preserve the correct characters.",
   "trailName": "Trail name",
+  "routeDescriptionOptional": "Description (optional)",
   "enterName": "Enter a name.",
   "replaceDamagedText": "Replace the damaged characters.",
   "cancel": "Cancel",

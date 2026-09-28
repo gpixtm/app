@@ -3,24 +3,37 @@ import 'localization.dart';
 import 'package:flutter/material.dart';
 
 import '../application/app_controller.dart';
+import 'finish_route_dialog.dart';
 
 /// Whether the recording in progress will become a route when finished.
 bool recordingRoute(AppController app) =>
     app.recorder?.current?.saved.walk?.sourceTrailId == null;
 
 Future<void> confirmFinishWalk(BuildContext context, AppController app) async {
-  final route = recordingRoute(app);
+  // A free walk becomes a route the walker names before it is shared.
+  if (recordingRoute(app)) {
+    final started = app.recorder?.current?.saved.walk?.started;
+    final details = await showDialog<RouteDetails>(
+      context: context,
+      builder: (_) => FinishRouteDialog(
+        suggestedName: started == null
+            ? ''
+            : context.l10n.walkedRouteName(started),
+      ),
+    );
+    if (details != null) {
+      await app.finishWalk(
+        name: details.name,
+        description: details.description,
+      );
+    }
+    return;
+  }
   final yes = await showDialog<bool>(
     context: context,
     builder: (c) => AlertDialog(
-      title: Text(
-        route
-            ? context.l10n.finishRouteQuestion
-            : context.l10n.finishWalkQuestion,
-      ),
-      content: Text(
-        route ? context.l10n.finishRouteInfo : context.l10n.finishWalkInfo,
-      ),
+      title: Text(context.l10n.finishWalkQuestion),
+      content: Text(context.l10n.finishWalkInfo),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(c, false),

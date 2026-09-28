@@ -1,74 +1,70 @@
 import 'dart:math' as math;
-import 'dart:typed_data';
-import 'dart:ui' as ui;
 
-import 'package:flutter/painting.dart';
+import '../domain/models.dart';
+import 'map_features.dart';
 
-/// Map style image name of the walker's direction arrow.
-const positionArrowImage = 'position-arrow';
+/// Map colour of the walker's direction arrow.
+const positionArrowHex = '#2563eb';
 
-/// Logical side of the square arrow image; the arrow sits at its centre so the
-/// map anchors it exactly on the GPS position.
-const positionArrowSide = 64.0;
+const _earthRadius = 6371008.8;
 
-const _blue = Color(0xff2563eb);
+/// Ground metres covered by one logical pixel of the map at [zoom] and
+/// [latitude]; the map uses 512-pixel tiles.
+double metresPerPixel(double zoom, double latitude) =>
+    2 *
+    math.pi *
+    _earthRadius *
+    math.cos(latitude * math.pi / 180) /
+    (512 * math.pow(2, zoom));
 
-/// Paints the direction arrow pointing up, centred on [centre]: a soft beam
-/// showing where the walker faces, then a compact white-rimmed navigation
-/// chevron whose visual centre is the position itself.
-void paintPositionArrow(Canvas canvas, Offset centre) {
-  const beamRadius = 30.0, beamHalfAngle = 32 * math.pi / 180;
-  final beam = Path()
-    ..moveTo(centre.dx, centre.dy)
-    ..arcTo(
-      Rect.fromCircle(center: centre, radius: beamRadius),
-      -math.pi / 2 - beamHalfAngle,
-      beamHalfAngle * 2,
-      false,
-    )
-    ..close();
-  canvas.drawPath(
-    beam,
-    Paint()
-      ..shader = ui.Gradient.radial(centre, beamRadius, [
-        _blue.withValues(alpha: .42),
-        _blue.withValues(alpha: 0),
-      ]),
-  );
-
-  final arrow = Path()
-    ..moveTo(centre.dx, centre.dy - 12)
-    ..lineTo(centre.dx + 9.5, centre.dy + 10)
-    ..lineTo(centre.dx, centre.dy + 5)
-    ..lineTo(centre.dx - 9.5, centre.dy + 10)
-    ..close();
-  canvas.drawShadow(arrow, const Color(0xff000000), 2.5, false);
-  canvas.drawPath(
-    arrow,
-    Paint()
-      ..color = const Color(0xffffffff)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 4.5
-      ..strokeJoin = StrokeJoin.round,
-  );
-  canvas.drawPath(arrow, Paint()..color = _blue);
-}
-
-/// PNG of the arrow at [pixelRatio] physical pixels per logical pixel, so the
-/// map shows it at [positionArrowSide] logical pixels on every screen.
-Future<Uint8List> positionArrowPng(double pixelRatio) async {
-  final recorder = ui.PictureRecorder();
-  final canvas = Canvas(recorder)..scale(pixelRatio);
-  paintPositionArrow(
-    canvas,
-    const Offset(positionArrowSide / 2, positionArrowSide / 2),
-  );
-  final side = (positionArrowSide * pixelRatio).round();
-  final image = await recorder.endRecording().toImage(side, side);
-  try {
-    final data = await image.toByteData(format: ui.ImageByteFormat.png);
-    return data!.buffer.asUint8List();
-  } finally {
-    image.dispose();
+/// The walker's direction arrow as map polygons: a soft beam showing where
+/// the walker faces, then a compact navigation chevron whose visual centre is
+/// the position itself. Polygons move with the map on every update, whereas a
+/// map icon replaced at each position fades in again and flickers. Sizes are
+/// logical pixels converted with [metresPerPixel], so the arrow keeps its size
+/// on screen; [bearing] is clockwise from north in degrees.
+List<Map<String, dynamic>> positionArrowFeatures(
+  GeoPoint position,
+  double bearing,
+  double metresPerPixel,
+) {
+  final angle = bearing * math.pi / 180;
+  final forward = (east: math.sin(angle), north: math.cos(angle));
+  final right = (east: math.cos(angle), north: -math.sin(angle));
+  final latitude = position.lat * math.pi / 180;
+  // (x, y) are screen-like offsets for an arrow pointing up: y grows downwards.
+  List<double> at(double x, double y) {
+    final east = (x * right.east - y * forward.east) * metresPerPixel;
+    final north = (x * right.north - y * forward.north) * metresPerPixel;
+    return [
+      position.lon + east / (_earthRadius * math.cos(latitude)) * 180 / math.pi,
+      position.lat + north / _earthRadius * 180 / math.pi,
+    ];
   }
+
+  // Nested sectors add up to a beam that fades away from the walker.
+  const beamHalfAngle = 32 * math.pi / 180;
+  List<List<double>> sector(double radius) => [
+    at(0, 0),
+    for (var i = 0; i <= 12; i++)
+      at(
+        radius * math.sin(-beamHalfAngle + beamHalfAngle * i / 6),
+        -radius * math.cos(-beamHalfAngle + beamHalfAngle * i / 6),
+      ),
+    at(0, 0),
+  ];
+  final chevron = [at(0, -12), at(9.5, 10), at(0, 5), at(-9.5, 10), at(0, -12)];
+  return [
+    for (final (radius, opacity) in const [
+      (30.0, .12),
+      (20.0, .13),
+      (10.0, .15),
+    ])
+      feature(
+        'Polygon',
+        [sector(radius)],
+        {'part': 'beam', 'opacity': opacity},
+      ),
+    feature('Polygon', [chevron], {'part': 'arrow'}),
+  ];
 }

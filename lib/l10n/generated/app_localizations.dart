@@ -1412,6 +1412,12 @@ abstract class AppLocalizations {
   /// **'Trail name'**
   String get trailName;
 
+  /// No description provided for @routeDescriptionOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get routeDescriptionOptional;
+
   /// No description provided for @enterName.
   ///
   /// In en, this message translates to:

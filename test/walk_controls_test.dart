@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:ui' as ui;
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +11,8 @@ import 'package:gpix/domain/models.dart';
 import 'package:gpix/domain/ports.dart';
 import 'package:gpix/domain/walk_recording.dart';
 import 'package:gpix/presentation/app.dart';
+import 'package:gpix/presentation/finish_route_dialog.dart';
+import 'package:gpix/presentation/localization.dart';
 import 'package:gpix/presentation/position_arrow.dart';
 
 import 'lifecycle_test.dart' show Repository, Maps, Gps, Elevation, Sync;
@@ -133,20 +135,172 @@ void main() {
     app.dispose();
   });
 
-  test('the direction arrow image is centred on the position', () async {
-    final bytes = await positionArrowPng(2);
-    final codec = await ui.instantiateImageCodec(bytes);
-    final image = (await codec.getNextFrame()).image;
-    expect(image.width, (positionArrowSide * 2).round());
-    expect(image.height, (positionArrowSide * 2).round());
-    final pixels = (await image.toByteData())!;
-    int alpha(int x, int y) => pixels.getUint8((y * image.width + x) * 4 + 3);
-    final c = image.width ~/ 2;
-    expect(alpha(c, c), 255, reason: 'the arrow covers the position');
-    expect(alpha(0, 0), 0, reason: 'corners stay transparent');
-    // The beam lies ahead (north) of the arrow, never behind it.
-    expect(alpha(c, c - 40), greaterThan(0));
-    expect(alpha(c, c + 40), 0);
-    image.dispose();
+  test('a finished free walk becomes a route named and described by the '
+      'walker; the walk in history takes that name', () async {
+    final gps = _Gps();
+    final repository = Repository();
+    var ids = 0;
+    final app = AppController(
+      library: Library(repository, XmlGpxDecoder(), Elevation()),
+      maps: Maps(),
+      gps: Gps(),
+      sync: Sync(),
+      setAwake: (_) async {},
+      vibrate: () async {},
+      recorder: RecordWalk(
+        _MemoryRecording(),
+        repository,
+        gps,
+        () => 'id-${ids++}',
+        routeName: (_) => 'Route of the day',
+      ),
+    );
+    await app.freeWalk();
+    // About 85 m walked north, one fix per second.
+    final start = DateTime.now().subtract(const Duration(seconds: 14));
+    for (var i = 0; i < 16; i++) {
+      gps.positions.add(
+        Fix(GeoPoint(43 + i * .00005, 3), 5, start.add(Duration(seconds: i))),
+      );
+      await Future<void>.delayed(Duration.zero);
+    }
+    await app.finishWalk(
+      name: 'Boucle des crêtes 🌲',
+      description: 'Par le bois de Connigis',
+    );
+    final route = app.trails.single;
+    expect(route.name, 'Boucle des crêtes 🌲');
+    expect(route.description, 'Par le bois de Connigis');
+    final walk = app.history.single;
+    expect(walk.name, 'Boucle des crêtes 🌲');
+    expect(walk.walk!.routeId, route.id);
+    expect(app.recorder!.current, isNull);
+    app.dispose();
+  });
+
+  for (final language in ['en', 'fr']) {
+    testWidgets('finishing a route asks for its name and an optional '
+        'description ($language)', (tester) async {
+      final l10n = lookupAppLocalizations(Locale(language));
+      RouteDetails? result;
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: Locale(language),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () async => result = await showDialog<RouteDetails>(
+                  context: context,
+                  builder: (_) =>
+                      const FinishRouteDialog(suggestedName: 'Suggested'),
+                ),
+                child: const Text('finish'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('finish'));
+      await tester.pumpAndSettle();
+      expect(find.text(l10n.finishRouteQuestion), findsOneWidget);
+      expect(find.text('Suggested'), findsOneWidget);
+      expect(find.text(l10n.routeDescriptionOptional), findsOneWidget);
+
+      final fields = find.byType(TextFormField);
+      await tester.enterText(fields.first, '   ');
+      await tester.tap(find.text(l10n.saveWalk));
+      await tester.pumpAndSettle();
+      expect(find.text(l10n.enterName), findsOneWidget);
+      expect(result, isNull);
+
+      await tester.enterText(fields.first, ' Tour du Grand Bois ');
+      await tester.enterText(fields.last, 'Boue après la pluie');
+      await tester.tap(find.text(l10n.saveWalk));
+      await tester.pumpAndSettle();
+      expect(result?.name, 'Tour du Grand Bois');
+      expect(result?.description, 'Boue après la pluie');
+
+      // Continuing the walk closes the dialog without finishing.
+      result = null;
+      await tester.tap(find.text('finish'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(l10n.continueAction));
+      await tester.pumpAndSettle();
+      expect(find.byType(FinishRouteDialog), findsNothing);
+      expect(result, isNull);
+    });
+  }
+
+  group('direction arrow polygons', () {
+    const position = GeoPoint(49.03, 3.54);
+    // Clockwise from north; flat approximation, exact enough over metres.
+    double bearingBetween(GeoPoint a, GeoPoint b) {
+      final east = (b.lon - a.lon) * math.cos(a.lat * math.pi / 180);
+      final north = b.lat - a.lat;
+      return (math.atan2(east, north) * 180 / math.pi + 360) % 360;
+    }
+
+    List<GeoPoint> ring(Map<String, dynamic> feature) => [
+      for (final c in (feature['geometry']['coordinates'] as List).first)
+        GeoPoint((c as List)[1] as double, c[0] as double),
+    ];
+    Map<String, dynamic> part(List<Map<String, dynamic>> all, String name) =>
+        all.lastWhere((f) => f['properties']['part'] == name);
+
+    test(
+      'the chevron points along the bearing and centres on the position',
+      () {
+        for (final bearing in [0.0, 90.0, 225.0]) {
+          final arrow = ring(
+            part(positionArrowFeatures(position, bearing, 1), 'arrow'),
+          );
+          final tip = arrow.first;
+          // 12 logical pixels ahead at one metre per pixel.
+          expect(distance(position, tip), closeTo(12, .01));
+          expect(bearingBetween(position, tip), closeTo(bearing % 360, .5));
+          // The notch lies behind the position, the wings beside it.
+          expect(distance(position, arrow[2]), closeTo(5, .01));
+          expect(
+            bearingBetween(position, arrow[2]),
+            closeTo((bearing + 180) % 360, .5),
+          );
+        }
+      },
+    );
+
+    test('the beam fans out ahead of the walker only', () {
+      final beams = positionArrowFeatures(
+        position,
+        0,
+        1,
+      ).where((f) => f['properties']['part'] == 'beam').toList();
+      expect(beams, hasLength(3));
+      for (final beam in beams) {
+        for (final p in ring(beam).skip(1).take(13)) {
+          expect(p.lat, greaterThan(position.lat), reason: 'ahead (north)');
+        }
+      }
+    });
+
+    test('the arrow keeps its screen size at every zoom', () {
+      double tip(double zoom) => distance(
+        position,
+        ring(
+          part(
+            positionArrowFeatures(
+              position,
+              0,
+              metresPerPixel(zoom, position.lat),
+            ),
+            'arrow',
+          ),
+        ).first,
+      );
+      expect(tip(15) / tip(16), closeTo(2, .001));
+      // Zoom 16 at this latitude: about 0.78 m per logical pixel.
+      expect(metresPerPixel(16, position.lat), closeTo(.782, .01));
+    });
   });
 }

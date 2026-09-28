@@ -818,6 +818,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trailName => 'Nom du parcours';
 
   @override
+  String get routeDescriptionOptional => 'Description (facultative)';
+
+  @override
   String get enterName => 'Saisissez un nom.';
 
   @override

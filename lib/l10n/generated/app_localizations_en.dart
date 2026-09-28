@@ -806,6 +806,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trailName => 'Trail name';
 
   @override
+  String get routeDescriptionOptional => 'Description (optional)';
+
+  @override
   String get enterName => 'Enter a name.';
 
   @override

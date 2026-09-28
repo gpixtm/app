@@ -28,10 +28,17 @@ WalkedRoute routeFromWalk(
   Iterable<Trail> known, {
   required String id,
   required String name,
+  String description = '',
   double tolerance = routeTolerance,
 }) {
   final segments = walk.segments.where((s) => s.length > 1).toList();
-  final route = Trail(id: id, name: name, segments: segments, pois: const []);
+  final route = Trail(
+    id: id,
+    name: name,
+    description: description,
+    segments: segments,
+    pois: const [],
+  );
   if (TrailGeometry(route).total < minimumRouteMetres) {
     return const WalkedRoute(WalkedRouteOutcome.tooShort);
   }
