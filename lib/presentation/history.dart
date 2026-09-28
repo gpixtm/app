@@ -74,6 +74,14 @@ class _HistoryViewState extends State<HistoryView> {
                   icon: const Icon(Icons.watch_outlined),
                   label: Text(context.l10n.importWatchData),
                 ),
+                if (current.walk?.ended != null)
+                  OutlinedButton.icon(
+                    onPressed: app.busy || app.health == null
+                        ? null
+                        : () => app.shareToHealth(current),
+                    icon: const Icon(Icons.ios_share),
+                    label: Text(context.l10n.shareToHealth),
+                  ),
                 if (app.message != null) Text(context.message(app.message!)),
                 TextButton(
                   onPressed: () {

@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="health_privacy">Gpix · Données de santé\n\nGpix lit uniquement les pas, calories actives et fréquences cardiaques que vous autorisez dans Health Connect, pour la période d’une marche choisie.\n\nLa lecture se déclenche lorsque vous touchez « Compléter avec ma montre ». Ces mesures complètent la sortie enregistrée sur votre téléphone et sont synchronisées avec votre API personnelle pour les retrouver sur vos autres téléphones.\n\nAucune donnée de santé n’est utilisée à des fins publicitaires. Gpix n’écrit aucune donnée dans Health Connect.\n\nVous pouvez retirer les autorisations dans Health Connect à tout moment. Cela arrête les nouvelles lectures ; les valeurs déjà importées restent dans les sorties jusqu’à leur suppression dans l’historique Gpix.</string>
+    <string name="health_privacy">Gpix · Données de santé
+
+Gpix lit uniquement les pas, calories actives et fréquences cardiaques que vous autorisez dans Health Connect, pour la période d’une marche choisie, ainsi que votre dernier poids afin d’estimer les calories actives si vous n’en avez pas saisi dans Gpix.
+
+La lecture des mesures se déclenche lorsque vous touchez « Compléter avec ma montre », et le poids est lu au début d’une sortie. Les mesures complètent la sortie enregistrée sur votre téléphone et sont synchronisées avec votre API personnelle pour les retrouver sur vos autres téléphones. Le poids lu dans Health Connect reste sur ce téléphone.
+
+Si vous activez le partage, Gpix écrit chaque sortie terminée dans Health Connect comme exercice, avec son tracé, sa distance, son dénivelé positif, ainsi que les pas et les calories actives estimées mesurés par votre téléphone. Les valeurs importées de votre montre ne sont jamais réécrites.
+
+Aucune donnée de santé n’est utilisée à des fins publicitaires.
+
+Vous pouvez retirer les autorisations dans Health Connect à tout moment. Cela arrête les nouvelles lectures et écritures ; les valeurs déjà importées restent dans les sorties jusqu’à leur suppression dans l’historique Gpix, et les sorties exportées restent dans Health Connect jusqu’à leur suppression dans Health Connect.</string>
     <string name="guidance_channel">Guidage pas à pas</string>
     <string name="guidance_channel_description">Changements de direction annoncés pendant le suivi d’un parcours</string>
     <string name="recap_channel">Bilan kilométrique</string>

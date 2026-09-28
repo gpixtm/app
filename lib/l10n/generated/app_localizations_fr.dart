@@ -1229,11 +1229,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get statsExplanation =>
-      'Durée active : hors pauses manuelles. Allure et vitesse moyennes calculées sur cette durée. Dénivelés estimés à partir des altitudes GPS filtrées.';
+      'Durée active : hors pauses manuelles. Allure et vitesse moyennes calculées sur cette durée. Dénivelés estimés à partir des altitudes GPS filtrées. Pas comptés par le podomètre du téléphone ; calories actives estimées à partir de la vitesse, des pentes et de votre poids.';
 
   @override
   String get noImportedWatchData =>
-      'Montre : aucune mesure importée. Les valeurs manquantes ne sont pas estimées.';
+      'Montre : aucune mesure importée. Pas et calories proviennent du téléphone.';
 
   @override
   String healthSources(Object arg1, Object arg2) {
@@ -2143,4 +2143,95 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get myTrailTag => 'Mon parcours';
+
+  @override
+  String recapSteps(int steps) {
+    final intl.NumberFormat stepsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String stepsString = stepsNumberFormat.format(steps);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      steps,
+      locale: localeName,
+      other: '$stepsString pas.',
+      one: '1 pas.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recapCalories(int calories) {
+    final intl.NumberFormat caloriesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String caloriesString = caloriesNumberFormat.format(calories);
+
+    return '$caloriesString kcal actives brûlées, estimation.';
+  }
+
+  @override
+  String get recapItemSteps => 'Nombre de pas';
+
+  @override
+  String get recapItemCalories => 'Calories actives (estimation)';
+
+  @override
+  String estimatedCalories(int calories) {
+    final intl.NumberFormat caloriesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String caloriesString = caloriesNumberFormat.format(calories);
+
+    return '≈ $caloriesString kcal';
+  }
+
+  @override
+  String get walkerProfile => 'Poids pour les calories';
+
+  @override
+  String get walkerProfileInfo =>
+      'Les calories actives sont estimées à partir de votre vitesse, des pentes et du poids que vous déplacez (modèles ACSM et Minetti). Votre poids est conservé dans votre compte. Les mesures importées de votre montre remplacent l’estimation.';
+
+  @override
+  String get bodyWeight => 'Poids corporel (kg)';
+
+  @override
+  String get packWeight => 'Sac à dos (kg)';
+
+  @override
+  String get invalidBodyWeight => 'Saisissez un poids entre 25 et 300 kg.';
+
+  @override
+  String get invalidPackWeight => 'Saisissez un poids de sac entre 0 et 60 kg.';
+
+  @override
+  String get profileNotSaved => 'Poids non enregistré sur ce téléphone.';
+
+  @override
+  String get caloriesNeedWeight =>
+      'Indiquez votre poids dans les paramètres pour estimer les calories actives.';
+
+  @override
+  String healthWeightUsed(String weight) {
+    return 'Poids de Health Connect utilisé tant que ce champ est vide : $weight kg.';
+  }
+
+  @override
+  String get shareHealth => 'Partager mes sorties avec Health Connect';
+
+  @override
+  String get shareHealthInfo =>
+      'À la fin d’une sortie, Gpix l’ajoute à Health Connect comme exercice, avec son tracé, sa distance, son dénivelé positif, ainsi que les pas du téléphone et les calories actives estimées. Les valeurs issues de votre montre ne sont pas renvoyées. Les applications que vous autorisez, comme Samsung Health, peuvent ensuite la lire.';
+
+  @override
+  String get shareToHealth => 'Envoyer à Health Connect';
+
+  @override
+  String get healthShared => 'Sortie ajoutée à Health Connect';
+
+  @override
+  String get healthSharePermission =>
+      'Autorisez Gpix à écrire des exercices dans Health Connect pour partager vos sorties.';
+
+  @override
+  String get healthShareFailed =>
+      'Impossible d’ajouter la sortie à Health Connect. Vous pouvez la renvoyer depuis sa page d’historique.';
 }

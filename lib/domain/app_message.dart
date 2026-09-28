@@ -86,6 +86,10 @@ class AppMessage {
   static const unsupportedMapStyle = AppMessage('unsupportedMapStyle');
   static const localPmtilesRequired = AppMessage('localPmtilesRequired');
   static const voiceGuidanceNotSaved = AppMessage('voiceGuidanceNotSaved');
+  static const profileNotSaved = AppMessage('profileNotSaved');
+  static const healthShared = AppMessage('healthShared');
+  static const healthSharePermission = AppMessage('healthSharePermission');
+  static const healthShareFailed = AppMessage('healthShareFailed');
   static const nonLocalGraphics = AppMessage('nonLocalGraphics');
   static const externalMapResource = AppMessage('externalMapResource');
   static const unsupportedGlyphTemplate = AppMessage(

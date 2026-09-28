@@ -1210,11 +1210,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statsExplanation =>
-      'Active duration excludes manual pauses. Average pace and speed use this duration. Elevation changes are estimated from filtered GPS altitudes.';
+      'Active duration excludes manual pauses. Average pace and speed use this duration. Elevation changes are estimated from filtered GPS altitudes. Steps come from the phone’s step counter; active calories are estimated from speed, slopes and your weight.';
 
   @override
   String get noImportedWatchData =>
-      'Watch: no measurements imported. Missing values are not estimated.';
+      'Watch: no measurements imported. Steps and calories come from the phone.';
 
   @override
   String healthSources(Object arg1, Object arg2) {
@@ -2110,4 +2110,96 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get myTrailTag => 'My trail';
+
+  @override
+  String recapSteps(int steps) {
+    final intl.NumberFormat stepsNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String stepsString = stepsNumberFormat.format(steps);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      steps,
+      locale: localeName,
+      other: '$stepsString steps.',
+      one: '1 step.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recapCalories(int calories) {
+    final intl.NumberFormat caloriesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String caloriesString = caloriesNumberFormat.format(calories);
+
+    return '$caloriesString active kcal burned, estimated.';
+  }
+
+  @override
+  String get recapItemSteps => 'Steps';
+
+  @override
+  String get recapItemCalories => 'Active calories (estimate)';
+
+  @override
+  String estimatedCalories(int calories) {
+    final intl.NumberFormat caloriesNumberFormat =
+        intl.NumberFormat.decimalPattern(localeName);
+    final String caloriesString = caloriesNumberFormat.format(calories);
+
+    return '≈ $caloriesString kcal';
+  }
+
+  @override
+  String get walkerProfile => 'Weight for calories';
+
+  @override
+  String get walkerProfileInfo =>
+      'Active calories are estimated from your speed, the slopes and the weight you move (ACSM and Minetti models). Your weight is kept in your account. Measurements imported from your watch replace the estimate.';
+
+  @override
+  String get bodyWeight => 'Body weight (kg)';
+
+  @override
+  String get packWeight => 'Backpack (kg)';
+
+  @override
+  String get invalidBodyWeight => 'Enter a weight between 25 and 300 kg.';
+
+  @override
+  String get invalidPackWeight =>
+      'Enter a backpack weight between 0 and 60 kg.';
+
+  @override
+  String get profileNotSaved => 'Weight not saved on this phone.';
+
+  @override
+  String get caloriesNeedWeight =>
+      'Set your weight in Settings to estimate active calories.';
+
+  @override
+  String healthWeightUsed(String weight) {
+    return 'Using $weight kg from Health Connect while this field is empty.';
+  }
+
+  @override
+  String get shareHealth => 'Share walks with Health Connect';
+
+  @override
+  String get shareHealthInfo =>
+      'When a walk ends, Gpix adds it to Health Connect as an exercise with its route, distance, elevation gain, and the phone’s steps and estimated active calories. Values that came from your watch are not sent back. Apps you allow, such as Samsung Health, can then read it.';
+
+  @override
+  String get shareToHealth => 'Send to Health Connect';
+
+  @override
+  String get healthShared => 'Walk added to Health Connect';
+
+  @override
+  String get healthSharePermission =>
+      'Allow Gpix to write exercises in Health Connect to share your walks.';
+
+  @override
+  String get healthShareFailed =>
+      'Could not add the walk to Health Connect. You can send it again from its history page.';
 }

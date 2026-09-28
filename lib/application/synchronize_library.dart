@@ -3,6 +3,7 @@ import '../domain/ports.dart';
 import '../domain/shared_trails.dart';
 import '../domain/sync.dart';
 import '../domain/trail_statistics.dart';
+import '../domain/walk_energy.dart';
 
 class SynchronizeLibrary implements Synchronizer {
   SynchronizeLibrary(
@@ -10,7 +11,35 @@ class SynchronizeLibrary implements Synchronizer {
     this.transport, {
     this.statistics,
     this.shared,
+    this.profile,
   });
+
+  /// Walker profile: a local change is sent first, otherwise the account's
+  /// profile replaces the cache (the latest saved change wins).
+  final ({ProfileTransport transport, ProfileStore store})? profile;
+  Future<void> _syncProfile() async {
+    final p = profile;
+    if (p == null) return;
+    try {
+      final local = await p.store.read();
+      if (local.pending) {
+        await p.transport.send(local.profile);
+        final latest = await p.store.read();
+        // A change made while sending stays pending for the next sync.
+        if (latest.profile == local.profile) {
+          await p.store.save(local.profile, pending: false);
+        }
+      } else {
+        final remote = await p.transport.fetch();
+        if (!(await p.store.read()).pending) {
+          await p.store.save(remote, pending: false);
+        }
+      }
+    } catch (_) {
+      // Offline or older API: the cached profile stays in use.
+    }
+  }
+
   final SyncStore store;
   final SyncTransport transport;
 
@@ -96,6 +125,7 @@ class SynchronizeLibrary implements Synchronizer {
       }
       await store.merge(await transport.pull());
       await _refreshStatistics();
+      await _syncProfile();
       await refreshShared();
       final conflicts = await store.conflictsCount();
       return conflicts == 0

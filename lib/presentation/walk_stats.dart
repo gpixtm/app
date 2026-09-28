@@ -20,6 +20,8 @@ class WalkStats extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final m = WalkMetrics(trail), health = trail.walk?.health;
+    final steps = trail.walk?.bestSteps;
+    final estimate = trail.walk?.estimatedCalories;
     final pace = m.paceSeconds?.round();
     final values = <String, String>{
       context.l10n.distanceWalked: kilometers(m.metres),
@@ -48,10 +50,15 @@ class WalkStats extends StatelessWidget {
       context.l10n.maxHeartRate: health?.maxHeartRate == null
           ? '—'
           : '${health!.maxHeartRate!.round()} bpm',
-      context.l10n.steps: health?.steps?.toString() ?? '—',
-      context.l10n.activeCalories: health?.activeCalories == null
+      context.l10n.steps: steps == null
           ? '—'
-          : '${health!.activeCalories!.round()} kcal',
+          : NumberFormat.decimalPattern(context.l10n.localeName).format(steps),
+      // A watch measurement, once imported, replaces the phone's estimate.
+      context.l10n.activeCalories: health?.activeCalories != null
+          ? '${health!.activeCalories!.round()} kcal'
+          : estimate == null
+          ? '—'
+          : context.l10n.estimatedCalories(estimate.round()),
     };
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,6 +99,13 @@ class WalkStats extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Text(context.l10n.statsExplanation, style: TextStyle(fontSize: 11)),
+        if (estimate == null && health?.activeCalories == null) ...[
+          const SizedBox(height: 4),
+          Text(
+            context.l10n.caloriesNeedWeight,
+            style: const TextStyle(fontSize: 11),
+          ),
+        ],
         const SizedBox(height: 8),
         Text(
           health == null

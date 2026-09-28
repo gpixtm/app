@@ -20,6 +20,7 @@ import '../domain/catalogue.dart';
 import '../domain/place_search.dart';
 import '../domain/shared_trails.dart';
 import '../domain/trail_statistics.dart';
+import '../domain/walk_energy.dart';
 import '../domain/walk_recap.dart';
 import '../domain/walked_route.dart';
 
@@ -44,7 +45,126 @@ class AppController {
     this.statistics,
     this.saveSpokenRecap,
     this.collaborative,
+    this.profiles,
+    this.saveShareWithHealth,
+    this.shareWithHealth = false,
   });
+
+  /// Walker weight and pack for calorie estimates (account data).
+  final ProfileStore? profiles;
+  WalkerProfile walker = const WalkerProfile();
+
+  /// Latest weight another app wrote to Health Connect; used only while the
+  /// profile has none, and never copied into the account.
+  double? healthWeightKg;
+
+  /// Moved mass for calories: own weight, else Health Connect's, plus pack.
+  double? get massKg {
+    final weight = walker.weightKg ?? healthWeightKg;
+    return weight == null ? null : weight + (walker.packKg ?? 0);
+  }
+
+  Future<void> _loadProfile() async {
+    if (profiles == null) return;
+    try {
+      walker = (await profiles!.read()).profile;
+      recorder?.massKg = massKg;
+    } catch (_) {}
+  }
+
+  Future<void> refreshHealthWeight() async {
+    if (health == null) return;
+    try {
+      final weight = await health!.latestWeight();
+      healthWeightKg = weight != null && WalkerProfile.validWeight(weight)
+          ? weight
+          : null;
+    } catch (_) {
+      return;
+    }
+    if (_disposed) return;
+    recorder?.massKg = massKg;
+    notifyListeners();
+  }
+
+  /// Device preference: Health Connect permissions belong to this phone.
+  bool shareWithHealth;
+  final Future<void> Function(bool)? saveShareWithHealth;
+  Future<void> setShareWithHealth(bool enabled) async {
+    if (health == null) return;
+    if (enabled) {
+      try {
+        var status = await health!.sharingStatus();
+        if (status == HealthAvailability.needsPermission) {
+          status = await health!.authorizeSharing();
+        }
+        if (status != HealthAvailability.connected) {
+          message = status == HealthAvailability.needsPermission
+              ? AppMessage.healthSharePermission
+              : AppMessage.healthShareFailed;
+          notifyListeners();
+          return;
+        }
+      } catch (_) {
+        message = AppMessage.healthShareFailed;
+        notifyListeners();
+        return;
+      }
+    }
+    shareWithHealth = enabled;
+    notifyListeners();
+    try {
+      await saveShareWithHealth?.call(enabled);
+    } catch (_) {}
+  }
+
+  /// Send a finished walk to Health Connect; repeating it updates, never
+  /// duplicates. [ask] requests the write permission when missing.
+  Future<bool> _share(Trail walk, {required bool ask}) async {
+    final export = HealthExport.of(walk);
+    if (health == null || export == null) return false;
+    var status = await health!.sharingStatus();
+    if (ask && status == HealthAvailability.needsPermission) {
+      status = await health!.authorizeSharing();
+    }
+    if (status != HealthAvailability.connected) {
+      throw MessageFailure(
+        status == HealthAvailability.needsPermission
+            ? AppMessage.healthSharePermission
+            : AppMessage.healthShareFailed,
+      );
+    }
+    await health!.share(export);
+    return true;
+  }
+
+  Future<void> shareToHealth(Trail walk) => run(() async {
+    try {
+      if (await _share(walk, ask: true)) message = AppMessage.healthShared;
+    } on MessageFailure {
+      rethrow;
+    } catch (_) {
+      throw MessageFailure(AppMessage.healthShareFailed);
+    }
+  });
+
+  Future<void> saveProfile(WalkerProfile value) async {
+    if (profiles == null ||
+        !WalkerProfile.validWeight(value.weightKg) ||
+        !WalkerProfile.validPack(value.packKg)) {
+      return;
+    }
+    walker = value;
+    recorder?.massKg = massKg;
+    notifyListeners();
+    try {
+      await profiles!.save(value, pending: true);
+      _scheduleSync();
+    } catch (_) {
+      message = AppMessage.profileNotSaved;
+      notifyListeners();
+    }
+  }
 
   /// Trails every walker shared and the open-data catalogue; absent in tests
   /// and older setups.
@@ -714,6 +834,8 @@ class AppController {
     _mapPositions = null;
     await _positions?.cancel();
     _positions = null;
+    // A weight entered meanwhile in another health app applies to this walk.
+    if (walker.weightKg == null) unawaited(refreshHealthWeight());
     await recorder!.start(source: source);
   }
 
@@ -765,6 +887,14 @@ class AppController {
         message = AppMessage.routeTooShort;
       default:
         if (walk != null) viewHistory(walk: walk);
+    }
+    if (walk != null && shareWithHealth) {
+      try {
+        await _share(walk, ask: false);
+      } catch (_) {
+        // The walk is saved; say what needs doing: send it again from history.
+        message = AppMessage.healthShareFailed;
+      }
     }
     _scheduleSync();
     if (_browsing && foreground) unawaited(browseLocation());
@@ -969,6 +1099,8 @@ class AppController {
   }
 
   Future<void> initialize() async {
+    await _loadProfile();
+    unawaited(refreshHealthWeight());
     await recorder?.initialize();
     _recordChanges = recorder?.changes.stream.listen((_) => notifyListeners());
     _recordFixes = recorder?.fixes.stream.listen((fix) {
@@ -1005,6 +1137,7 @@ class AppController {
   Future<void> reload() async {
     if (_disposed) return;
     final all = await library.repository.all();
+    await _loadProfile();
     trails = all.where((t) => t.walk == null).toList();
     history = all.where((t) => t.walk != null).toList()
       ..sort((a, b) => b.walk!.started.compareTo(a.walk!.started));

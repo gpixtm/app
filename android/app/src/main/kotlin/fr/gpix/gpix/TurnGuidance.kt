@@ -84,9 +84,11 @@ class TurnGuidance(context: Context) : TextToSpeech.OnInitListener {
         }
         ready = true
         tts.setAudioAttributes(attributes)
+        tts.addEarcon(BELL, context.packageName, R.raw.guidance_bell)
         tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {}
-            override fun onDone(utteranceId: String?) { audio.abandonAudioFocusRequest(focus) }
+            // Bell and pause are queued before the words; release audio after the words.
+            override fun onDone(utteranceId: String?) { if (utteranceId == UTTERANCE_ID) audio.abandonAudioFocusRequest(focus) }
             @Deprecated("Deprecated in Java")
             override fun onError(utteranceId: String?) { audio.abandonAudioFocusRequest(focus) }
         })
@@ -99,7 +101,10 @@ class TurnGuidance(context: Context) : TextToSpeech.OnInitListener {
         val locale = Locale.forLanguageTag(language.ifBlank { "en" })
         if (tts.isLanguageAvailable(locale) >= TextToSpeech.LANG_AVAILABLE) tts.language = locale
         audio.requestAudioFocus(focus)
-        tts.speak(text, if (interrupt) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD, null, UTTERANCE_ID)
+        // Like a sports coach: a bell, one second of silence, then the words.
+        tts.playEarcon(BELL, if (interrupt) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD, null, "$UTTERANCE_ID-bell")
+        tts.playSilentUtterance(BELL_PAUSE_MS, TextToSpeech.QUEUE_ADD, "$UTTERANCE_ID-pause")
+        tts.speak(text, TextToSpeech.QUEUE_ADD, null, UTTERANCE_ID)
     }
 
     private fun localized(language: String): Context {
@@ -176,6 +181,8 @@ class TurnGuidance(context: Context) : TextToSpeech.OnInitListener {
         private const val RECAP_CHANNEL_ID = "gpix_recap"
         private const val RECAP_NOTIFICATION_ID = 4802
         private const val UTTERANCE_ID = "gpix-guidance"
+        private const val BELL = "[gpix-bell]"
+        private const val BELL_PAUSE_MS = 1000L
         private const val FOREST = 0xFF174B38.toInt()
         private val ICONS = mapOf(
             "slightLeft" to R.drawable.ic_guidance_slight_left,

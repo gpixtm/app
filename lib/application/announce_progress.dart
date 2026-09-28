@@ -106,6 +106,8 @@ class AnnounceProgress {
       usualKmh: usual?.averageKmh,
       previousWalks: usual?.walks,
       ascent: metrics.hasElevation ? metrics.ascent : null,
+      steps: snapshot.walk!.steps,
+      calories: snapshot.walk!.estimatedCalories,
     );
   }
 
