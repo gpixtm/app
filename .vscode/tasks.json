@@ -4,8 +4,11 @@
     {
       "label": "Gpix: prepare local API if available",
       "type": "process",
-      "command": "dart",
+      "command": "puro",
       "args": [
+        "-e",
+        "gpix",
+        "dart",
         "tool/start_dev_api.dart"
       ],
       "options": {

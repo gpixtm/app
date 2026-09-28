@@ -1,6 +1,23 @@
 # Development and Android debugging
 
-Open this repository in VS Code. Install the Flutter/Dart extensions. In the full workspace the pinned SDK is `../.tooling/flutter`; for a standalone clone install the matching Flutter version and select it through VS Code's Flutter SDK command. Machine-specific `.vscode/settings.json` is ignored.
+Open this repository in VS Code. Install the Flutter/Dart extensions and set up the Flutter SDK with Puro as described below. Machine-specific `.vscode/settings.json` is ignored.
+
+## Flutter SDK (Puro)
+
+The SDK is managed by [Puro](https://puro.dev) in a dedicated environment named `gpix`, pinned to Flutter **3.47.5** stable (framework `6a19cca564`, Dart 3.13.4). It is isolated from Puro's shared `stable` environment and from any `flutter` installed on `PATH`, so other projects are unaffected.
+
+One-time setup, from the repository root:
+
+```sh
+puro create gpix 3.47.5
+puro use gpix
+```
+
+`puro use` writes a local `.puro.json` (listed in `.git/info/exclude`, not committed) and points VS Code's `dart.flutterSdkPath` and `dart.sdkPath` at the environment in `.vscode/settings.json`. Restart VS Code afterwards. The next `puro flutter pub get` rewrites `flutter.sdk` in the ignored `android/local.properties`.
+
+Check the active SDK with `puro flutter --version`. If `flutter` on `PATH` points to another installation, keep calling `puro flutter` / `puro dart` explicitly rather than the bare commands. Outside this repository (for example the sibling API's `make dev`), there is no `.puro.json`, so tools pass the environment explicitly: `puro -e gpix dart …`.
+
+To move to a newer stable release, check the latest tag on [flutter/flutter](https://github.com/flutter/flutter/tags), then run `puro upgrade gpix <version>`. Update the version in this section and in `AGENTS.md`, adjust `environment.sdk` in `pubspec.yaml` if the Dart version changes, then run the full validation below and a native build.
 
 Copy `config/dev.example.json` and `config/prod.example.json` to the corresponding ignored `*.local.json` files. Set `API_URL` to your private LAN HTTP origin for Dev and an HTTPS origin for Prod. Optional Dev-only `AUTH_PREFILL_IDENTIFIER` / `AUTH_PREFILL_PASSWORD` can be placed in the ignored Dev JSON; never commit them. Prod has no prefill values.
 
@@ -16,17 +33,17 @@ Production uses HTTPS and real accounts. Never disable certificate validation or
 
 ## Validate and build
 
-Use `flutter`/`dart` below, or their pinned full-workspace paths (`../.tooling/flutter/bin/flutter.bat` and `dart.bat` on Windows).
+Run every command through the `gpix` Puro environment:
 
 ```sh
-flutter pub get
-flutter gen-l10n
-dart tool/generate_message_resolver.dart
-dart format lib test tool
-flutter analyze
-flutter test
-flutter build apk --debug --target=lib/main.dart --flavor dev --dart-define-from-file=config/dev.local.json --target-platform android-arm64 --split-per-abi
-flutter build apk --debug --target=lib/main.dart --flavor prod --dart-define-from-file=config/prod.local.json --target-platform android-arm64 --split-per-abi
+puro flutter pub get
+puro flutter gen-l10n
+puro dart tool/generate_message_resolver.dart
+puro dart format lib test tool
+puro flutter analyze
+puro flutter test
+puro flutter build apk --debug --target=lib/main.dart --flavor dev --dart-define-from-file=config/dev.local.json --target-platform android-arm64 --split-per-abi
+puro flutter build apk --debug --target=lib/main.dart --flavor prod --dart-define-from-file=config/prod.local.json --target-platform android-arm64 --split-per-abi
 ```
 
 Integration tests requiring a live API must be configured explicitly; a skipped integration test is not a server validation. `tool/*_smoke.dart` entry points are test harnesses and must never replace the real app in a delivery. Use a full restart after native changes. Personal-device installation requires a user request.

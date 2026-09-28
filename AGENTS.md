@@ -22,7 +22,7 @@ These instructions apply to this standalone Flutter repository (`gpixtm/app`). T
 ## Architecture and code
 
 - Flutter is explicitly required. Dart/Flutter implements the application; Kotlin implements necessary Android adapters. Android, initially Pixel 8, is the reference platform. Preserve the Flutter choice rather than rewriting in Kotlin/Compose.
-- Use the existing pinned SDK in the full workspace (`../.tooling/flutter`); a standalone clone can use the matching installed Flutter SDK. Read versions from the SDK, pubspec, lock and Gradle files. Preserve dependency locks; do not perform unrelated upgrades or alter a global SDK.
+- Manage the Flutter SDK with [Puro](https://puro.dev) through the dedicated `gpix` environment, pinned to Flutter **3.47.5** stable (Dart 3.13.4). Run commands as `puro flutter …` / `puro dart …`; setup and upgrades are described in the [development guide](docs/DEBUG-VSCODE.md#flutter-sdk-puro). Never rely on a bare `flutter` from `PATH`, and do not modify other Puro environments or a global SDK. Read versions from the SDK, pubspec, lock and Gradle files. Preserve dependency locks; do not perform unrelated upgrades.
 - Use **Clean Architecture**, without duplicating business rules, geometry, persistence or shared widgets.
 - `lib/domain/`: entities, ports and business rules in pure Dart. No Flutter, plugin, HTTP, storage or upper-layer imports.
 - `lib/application/`: pure Dart orchestration through ports. `AppController` uses a Dart change stream, not `ChangeNotifier`. Inject GPS, vibration, wake-lock, naming and other external capabilities.
