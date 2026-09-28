@@ -3385,6 +3385,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Catalogue trail kept offline on this phone'**
   String get catalogueTrailKeptOffline;
+
+  /// No description provided for @trailDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'distance'**
+  String get trailDistance;
+
+  /// No description provided for @trailAscent.
+  ///
+  /// In en, this message translates to:
+  /// **'ascent'**
+  String get trailAscent;
 }
 
 class _AppLocalizationsDelegate

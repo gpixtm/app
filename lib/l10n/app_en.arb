@@ -1187,5 +1187,7 @@
   "groupNotYours": "Only its author can change this group.",
   "searchTooLong": "Search too long (200 characters maximum).",
   "invalidRecordingReference": "The trail this walk followed could not be saved with it.",
-  "catalogueTrailKeptOffline": "Catalogue trail kept offline on this phone"
+  "catalogueTrailKeptOffline": "Catalogue trail kept offline on this phone",
+  "trailDistance": "distance",
+  "trailAscent": "ascent"
 }

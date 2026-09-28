@@ -7,6 +7,7 @@ import '../domain/models.dart';
 import 'design.dart';
 import 'elevation_chart.dart';
 import '../domain/trail_geometry.dart';
+import '../domain/walk_metrics.dart';
 import 'guidance_text.dart';
 import 'place_search_bar.dart';
 import 'trail_map.dart';
@@ -580,18 +581,34 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                         handle(),
                         Row(
                           children: [
-                            metric(
-                              p == null || s == null
-                                  ? '—'
-                                  : kilometers(
-                                      s.geometry.remaining(p, s.reverse),
-                                    ),
-                              context.l10n.remaining,
-                            ),
-                            metric(
-                              p == null ? '—' : '${p.offTrail.round()} m',
-                              context.l10n.distanceToTrail,
-                            ),
+                            // Following: what is left. Browsing: the trail's
+                            // own length and climb, the first things to know.
+                            if (s?.active == true || approach != null) ...[
+                              metric(
+                                p == null || s == null
+                                    ? '—'
+                                    : kilometers(
+                                        s.geometry.remaining(p, s.reverse),
+                                      ),
+                                context.l10n.remaining,
+                              ),
+                              metric(
+                                p == null ? '—' : '${p.offTrail.round()} m',
+                                context.l10n.distanceToTrail,
+                              ),
+                            ] else if (WalkMetrics(trail)
+                                case final metrics) ...[
+                              metric(
+                                kilometers(metrics.metres),
+                                context.l10n.trailDistance,
+                              ),
+                              metric(
+                                metrics.maximumAltitude == null
+                                    ? '—'
+                                    : '${metrics.ascent.round()} m',
+                                context.l10n.trailAscent,
+                              ),
+                            ],
                             IconButton(
                               tooltip: context.l10n.toggleDetails,
                               onPressed: toggleSheet,

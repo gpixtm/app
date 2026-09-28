@@ -650,5 +650,7 @@ String resolveAppMessage(
   'searchTooLong' => l10n.searchTooLong,
   'invalidRecordingReference' => l10n.invalidRecordingReference,
   'catalogueTrailKeptOffline' => l10n.catalogueTrailKeptOffline,
+  'trailDistance' => l10n.trailDistance,
+  'trailAscent' => l10n.trailAscent,
   _ => l10n.unexpectedError,
 };

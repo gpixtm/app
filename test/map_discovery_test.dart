@@ -72,17 +72,21 @@ void main() {
     expect(stickyAnchors(moved, [], const Bounds(1.5, -1, 4, 1)), isEmpty);
   });
 
-  test('overlapping pins merge into one pin listing every trail', () {
-    final a = line('a', []), b = line('b', []), c = line('c', []);
-    final pins = clusterPins([
-      (a, const Offset(100, 100)),
-      (b, const Offset(120, 110)),
-      (c, const Offset(300, 300)),
-    ]);
-    expect(pins.length, 2);
-    expect(pins.first.trails.map((t) => t.id), ['a', 'b']);
-    expect(pins.first.position, const Offset(110, 105));
-    expect(pins.last.trails.single.id, 'c');
+  test('own and catalogue pins go to separate clustered sources', () {
+    final own = line('own', []), public = line('public', []);
+    final anchors = [
+      (own, const GeoPoint(45, 6)),
+      (public, const GeoPoint(45.001, 6.001)),
+    ];
+    Map<String, dynamic> kind(bool catalogue) => pinFeatures(
+      anchors,
+      catalogue: catalogue,
+      isCatalogue: (t) => t.id == 'public',
+    );
+    final features = kind(false)['features'] as List;
+    expect(features.single['properties'], {'trail': 'own'});
+    expect(features.single['geometry']['coordinates'], [6, 45]);
+    expect((kind(true)['features'] as List).single['id'], 'public');
   });
 
   test('trail search ignores case and French accents', () {
@@ -149,6 +153,48 @@ void main() {
       },
     );
   });
+
+  for (final (language, distance, ascent) in [
+    ('en', 'distance', 'ascent'),
+    ('fr', 'distance', 'dénivelé +'),
+  ]) {
+    testWidgets('an open trail shows its length and climb ($language)', (
+      tester,
+    ) async {
+      final app = fixtures.controller();
+      final trail = Trail(
+        id: 'climb',
+        name: 'Montée',
+        segments: [
+          [
+            const GeoPoint(45, 6, 1000),
+            const GeoPoint(45.009, 6, 1080),
+            const GeoPoint(45.018, 6, 1060),
+          ],
+        ],
+        pois: const [],
+      );
+      await app.library.repository.save(trail);
+      await app.reload();
+      app.focus(trail);
+      await tester.pumpWidget(
+        LocalizedApp(
+          controller: LocaleController(initialLocale: Locale(language)),
+          homeBuilder: (_) => Home(
+            app,
+            mapBuilder: (_) => const ColoredBox(color: Colors.green),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text(distance), findsOneWidget);
+      expect(find.text(ascent), findsOneWidget);
+      expect(find.text('80 m'), findsOneWidget, reason: 'only the climb');
+      expect(find.text(language == 'fr' ? '2,0 km' : '2.0 km'), findsOneWidget);
+      await tester.pumpWidget(const SizedBox());
+      app.dispose();
+    });
+  }
 
   testWidgets('the menu opens every page over the map and back returns to it', (
     tester,

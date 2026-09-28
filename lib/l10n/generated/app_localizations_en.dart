@@ -2067,4 +2067,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get catalogueTrailKeptOffline =>
       'Catalogue trail kept offline on this phone';
+
+  @override
+  String get trailDistance => 'distance';
+
+  @override
+  String get trailAscent => 'ascent';
 }

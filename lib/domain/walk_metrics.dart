@@ -6,24 +6,25 @@ import 'trail_geometry.dart';
 class WalkMetrics {
   WalkMetrics(Trail trail, {DateTime? now}) {
     metres = TrailGeometry(trail).total;
-    final walk = trail.walk;
-    if (walk == null) return;
-    activeSeconds = walk.seconds;
-    elapsedSeconds = (walk.ended ?? now ?? DateTime.now())
-        .difference(walk.started)
-        .inSeconds
-        .clamp(0, 1 << 30);
-    if (activeSeconds > 0 && metres > 0) {
-      averageKmh = metres / activeSeconds * 3.6;
-      paceSeconds = activeSeconds / (metres / 1000);
-    }
-    final samples = walk.samples;
-    for (var i = 1; i < samples.length; i++) {
-      final a = samples[i - 1], b = samples[i];
-      final seconds = b.time.difference(a.time).inMilliseconds / 1000;
-      if (a.segment != b.segment || seconds <= 0 || seconds > 30) continue;
-      final speed = distance(a.point, b.point) / seconds;
-      if (speed <= 7) maxKmh = math.max(maxKmh ?? 0, speed * 3.6);
+    // Times and speeds exist for walks only; a trail has length and climb.
+    if (trail.walk case final walk?) {
+      activeSeconds = walk.seconds;
+      elapsedSeconds = (walk.ended ?? now ?? DateTime.now())
+          .difference(walk.started)
+          .inSeconds
+          .clamp(0, 1 << 30);
+      if (activeSeconds > 0 && metres > 0) {
+        averageKmh = metres / activeSeconds * 3.6;
+        paceSeconds = activeSeconds / (metres / 1000);
+      }
+      final samples = walk.samples;
+      for (var i = 1; i < samples.length; i++) {
+        final a = samples[i - 1], b = samples[i];
+        final seconds = b.time.difference(a.time).inMilliseconds / 1000;
+        if (a.segment != b.segment || seconds <= 0 || seconds > 30) continue;
+        final speed = distance(a.point, b.point) / seconds;
+        if (speed <= 7) maxKmh = math.max(maxKmh ?? 0, speed * 3.6);
+      }
     }
     // Three-metre hysteresis avoids summing each small altitude fluctuation.
     for (final segment in trail.segments) {

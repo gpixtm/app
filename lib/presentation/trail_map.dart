@@ -17,6 +17,7 @@ import '../domain/trail_geometry.dart';
 import '../application/app_controller.dart';
 import 'map_features.dart';
 import 'position_arrow.dart';
+import 'pin_images.dart';
 import 'trail_pins.dart';
 import 'trail_places.dart';
 
@@ -65,11 +66,20 @@ class _TrailMapState extends State<TrailMap> {
   late final Future<Uint8List> arrow = positionArrowPng(
     MediaQuery.devicePixelRatioOf(context),
   );
+  late final Future<Uint8List> ownPin = trailPinPng(
+    MediaQuery.devicePixelRatioOf(context),
+    catalogue: false,
+  );
+  late final Future<Uint8List> cataloguePin = trailPinPng(
+    MediaQuery.devicePixelRatioOf(context),
+    catalogue: true,
+  );
 
   /// Centre of each unselected trail's visible portion. Trails are only drawn
-  /// once selected; until then a pin is their only mark on the map.
+  /// once selected; until then a pin is their only mark on the map. Pins are
+  /// map layers clustered by the map itself, recomputed only when the camera
+  /// stops or the pinned trails change, never while moving.
   List<(Trail, GeoPoint)> anchors = [];
-  List<TrailPin> pins = [];
   Object? anchoredTrails;
   bool? anchoredPins;
   String? anchoredFocus;
@@ -97,7 +107,84 @@ class _TrailMapState extends State<TrailMap> {
           if (trail.id != app.focused?.id) trail,
       ], view);
     }
-    await projectMarkers();
+    for (final catalogue in [false, true]) {
+      await c.setGeoJsonSource(
+        catalogue ? cataloguePinSource : ownPinSource,
+        pinFeatures(
+          anchors,
+          catalogue: catalogue,
+          isCatalogue: (trail) => !app.stored(trail),
+        ),
+      );
+    }
+  }
+
+  static const pinLayers = [
+    'own-pin-clusters',
+    'own-pin-points',
+    'catalogue-pin-clusters',
+    'catalogue-pin-points',
+  ];
+
+  /// A touched pin opens its trail (or lists the trails sharing its spot); a
+  /// touched cluster zooms in until it splits, as on AllTrails.
+  Future<bool> tapPin(math.Point<double> screen) async {
+    final c = controller;
+    if (c == null || !showPins) return false;
+    final ratio = defaultTargetPlatform == TargetPlatform.android
+        ? MediaQuery.devicePixelRatioOf(context)
+        : 1.0;
+    final List hits;
+    try {
+      hits = await c.queryRenderedFeaturesInRect(
+        Rect.fromCenter(
+          center: Offset(screen.x, screen.y),
+          width: 36 * ratio,
+          height: 36 * ratio,
+        ),
+        pinLayers,
+        null,
+      );
+    } catch (_) {
+      return false;
+    }
+    if (!mounted || hits.isEmpty) return false;
+    final features = [
+      for (final hit in hits)
+        if (hit is Map) hit.cast<String, dynamic>(),
+    ];
+    final ids = {
+      for (final f in features)
+        if ((f['properties'] as Map?)?['trail'] case final String id) id,
+    };
+    final trails = [
+      for (final trail in app.pinned)
+        if (ids.contains(trail.id)) trail,
+    ];
+    if (trails.isNotEmpty) {
+      if (widget.onPin != null) {
+        widget.onPin!(trails);
+      } else {
+        unawaited(app.open(trails.first));
+      }
+      return true;
+    }
+    final cluster = features
+        .where((f) => (f['properties'] as Map?)?['cluster'] == true)
+        .firstOrNull;
+    final coordinates = (cluster?['geometry'] as Map?)?['coordinates'] as List?;
+    if (coordinates == null) return false;
+    follow = false;
+    await c.animateCamera(
+      CameraUpdate.newLatLngZoom(
+        LatLng(
+          (coordinates[1] as num).toDouble(),
+          (coordinates[0] as num).toDouble(),
+        ),
+        (c.cameraPosition?.zoom ?? 10) + 2,
+      ),
+    );
+    return true;
   }
 
   Future<void> projectMarkers() async {
@@ -109,22 +196,22 @@ class _TrailMapState extends State<TrailMap> {
       while (projectAgain && loaded && mounted) {
         projectAgain = false;
         final snapshot = markers;
-        final anchored = anchors;
-        final locations = await controller!.toScreenLocationBatch([
-          ...snapshot.map((m) {
-            final coordinates = m['geometry']['coordinates'] as List;
-            return LatLng(coordinates[1] as double, coordinates[0] as double);
-          }),
-          for (final (_, p) in anchored) LatLng(p.lat, p.lon),
-        ]);
+        final locations = snapshot.isEmpty
+            ? const <math.Point>[]
+            : await controller!.toScreenLocationBatch([
+                ...snapshot.map((m) {
+                  final coordinates = m['geometry']['coordinates'] as List;
+                  return LatLng(
+                    coordinates[1] as double,
+                    coordinates[0] as double,
+                  );
+                }),
+              ]);
         if (!mounted) return;
-        if (!identical(snapshot, markers) || !identical(anchored, anchors)) {
+        if (!identical(snapshot, markers)) {
           projectAgain = true;
           continue;
         }
-        final ratio = defaultTargetPlatform == TargetPlatform.android
-            ? MediaQuery.devicePixelRatioOf(context)
-            : 1.0;
         setState(() {
           markerViews = [
             for (var i = 0; i < snapshot.length; i++)
@@ -134,16 +221,6 @@ class _TrailMapState extends State<TrailMap> {
                 color: snapshot[i]['properties']['color'] as String,
               ),
           ];
-          pins = clusterPins([
-            for (var i = 0; i < anchored.length; i++)
-              (
-                anchored[i].$1,
-                Offset(
-                  locations[snapshot.length + i].x / ratio,
-                  locations[snapshot.length + i].y / ratio,
-                ),
-              ),
-          ], catalogue: (trail) => !app.stored(trail));
         });
       }
     } catch (_) {
@@ -604,6 +681,78 @@ class _TrailMapState extends State<TrailMap> {
       ),
       enableInteraction: false,
     );
+    for (final (source, color, image) in [
+      (ownPinSource, ownTrailHex, ownPinImage),
+      (cataloguePinSource, catalogueHex, cataloguePinImage),
+    ]) {
+      final prefix = source.replaceFirst('-pins', '');
+      await c.addSource(
+        source,
+        GeojsonSourceProperties(
+          data: collection([]),
+          cluster: true,
+          clusterRadius: 48,
+          clusterMaxZoom: 15,
+        ),
+      );
+      await c.addCircleLayer(
+        source,
+        '$prefix-pin-clusters',
+        CircleLayerProperties(
+          circleColor: color,
+          circleOpacity: .92,
+          circleRadius: [
+            'step',
+            ['get', 'point_count'],
+            17,
+            10,
+            21,
+            100,
+            26,
+          ],
+          circleStrokeColor: '#ffffff',
+          circleStrokeWidth: 3,
+        ),
+        filter: ['has', 'point_count'],
+        enableInteraction: false,
+      );
+      await c.addSymbolLayer(
+        source,
+        '$prefix-pin-counts',
+        const SymbolLayerProperties(
+          textField: ['get', 'point_count_abbreviated'],
+          textFont: ['Noto Sans Bold'],
+          textSize: 13,
+          textColor: '#ffffff',
+          textAllowOverlap: true,
+          textIgnorePlacement: true,
+        ),
+        filter: ['has', 'point_count'],
+        enableInteraction: false,
+      );
+      try {
+        await c.addImage(
+          image,
+          await (source == cataloguePinSource ? cataloguePin : ownPin),
+        );
+      } catch (e) {
+        debugPrint('Pin image: $e');
+      }
+      await c.addSymbolLayer(
+        source,
+        '$prefix-pin-points',
+        SymbolLayerProperties(
+          iconImage: image,
+          iconAllowOverlap: true,
+          iconIgnorePlacement: true,
+        ),
+        filter: [
+          '!',
+          ['has', 'point_count'],
+        ],
+        enableInteraction: false,
+      );
+    }
     await c.addCircleLayer(
       'position',
       'position-dot',
@@ -689,6 +838,7 @@ class _TrailMapState extends State<TrailMap> {
       }
       return;
     }
+    if (await tapPin(screen)) return;
     final nearPlaces = app.visiblePlaces
         .where((place) => distance(p, place.point) <= tolerance)
         .toList();
@@ -749,7 +899,10 @@ class _TrailMapState extends State<TrailMap> {
             onMapCreated: (c) => controller = c,
             onStyleLoadedCallback: styleLoaded,
             onMapClick: tap,
-            onCameraMove: (_) => unawaited(projectMarkers()),
+            // Pins move with the map natively; only day labels are placed here.
+            onCameraMove: (_) {
+              if (markers.isNotEmpty) unawaited(projectMarkers());
+            },
             trackCameraPosition: true,
             onCameraIdle: () async {
               unawaited(refreshAnchors());
@@ -824,21 +977,6 @@ class _TrailMapState extends State<TrailMap> {
               ),
             ),
           ),
-        if (showPins)
-          for (final pin in pins)
-            Positioned(
-              left: pin.position.dx,
-              top: pin.position.dy,
-              child: FractionalTranslation(
-                translation: const Offset(-.5, -.5),
-                child: TrailPinView(
-                  pin,
-                  onTap: () => widget.onPin != null
-                      ? widget.onPin!(pin.trails)
-                      : app.open(pin.trails.first),
-                ),
-              ),
-            ),
         Positioned(
           right: 12,
           top: 12,

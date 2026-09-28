@@ -547,5 +547,7 @@
   "groupNotYours": "Seul son auteur peut modifier ce groupe.",
   "searchTooLong": "Recherche trop longue (200 caractères maximum).",
   "invalidRecordingReference": "Le parcours suivi par cette marche n’a pas pu être enregistré avec elle.",
-  "catalogueTrailKeptOffline": "Parcours du catalogue gardé hors ligne sur ce téléphone"
+  "catalogueTrailKeptOffline": "Parcours du catalogue gardé hors ligne sur ce téléphone",
+  "trailDistance": "distance",
+  "trailAscent": "dénivelé +"
 }

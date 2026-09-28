@@ -2097,4 +2097,10 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get catalogueTrailKeptOffline =>
       'Parcours du catalogue gardé hors ligne sur ce téléphone';
+
+  @override
+  String get trailDistance => 'distance';
+
+  @override
+  String get trailAscent => 'dénivelé +';
 }
