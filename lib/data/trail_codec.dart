@@ -105,6 +105,8 @@ class TrailCodec {
         'seconds': walk.seconds,
         'sourceTrailId': walk.sourceTrailId,
         'routeId': ?walk.routeId,
+        'steps': ?walk.steps,
+        'estimatedCalories': ?walk.estimatedCalories,
         'samples': [
           for (final s in walk.samples)
             [
@@ -163,6 +165,9 @@ class TrailCodec {
             seconds: j['walk']['seconds'] as int,
             sourceTrailId: j['walk']['sourceTrailId'] as String?,
             routeId: j['walk']['routeId'] as String?,
+            steps: j['walk']['steps'] as int?,
+            estimatedCalories: (j['walk']['estimatedCalories'] as num?)
+                ?.toDouble(),
             samples: [
               for (final s in (j['walk']['samples'] as List? ?? []))
                 WalkSample(

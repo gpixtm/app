@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="health_privacy">Gpix · Health data\n\nGpix reads only the steps, active calories and heart rate you authorize in Health Connect, for the period of a selected walk.\n\nReading starts when you tap “Add watch measurements”. These measurements enrich the walk saved on your phone and are synced with your personal API so you can access them on other phones.\n\nHealth data is never used for advertising. Gpix does not write data to Health Connect.\n\nYou can revoke permissions in Health Connect at any time. This stops new reads; imported values remain in walks until you delete them from Gpix history.</string>
+    <string name="health_privacy">Gpix · Health data
+
+Gpix reads only the steps, active calories and heart rate you authorize in Health Connect, for the period of a selected walk, and your latest body weight to estimate active calories when you have not entered one in Gpix.
+
+Reading starts when you tap “Add watch measurements”, and the weight is read when a walk starts. Walk measurements enrich the walk saved on your phone and are synced with your personal API so you can access them on other phones. The weight read from Health Connect stays on this phone.
+
+If you turn on sharing, Gpix writes each finished walk to Health Connect as an exercise with its route, distance, elevation gain, and the steps and estimated active calories measured by your phone. Values imported from your watch are never written back.
+
+Health data is never used for advertising.
+
+You can revoke permissions in Health Connect at any time. This stops new reads and writes; imported values remain in walks until you delete them from Gpix history, and exported walks remain in Health Connect until you delete them there.</string>
     <string name="guidance_channel">Turn-by-turn guidance</string>
     <string name="guidance_channel_description">Direction changes announced while following a trail</string>
     <string name="recap_channel">Kilometre summary</string>

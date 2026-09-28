@@ -1,6 +1,7 @@
 import 'data/health_connect.dart';
 import 'data/approach_source.dart';
 import 'data/android_guidance.dart';
+import 'data/android_step_counter.dart';
 import 'data/photon_place_search.dart';
 
 import 'package:uuid/uuid.dart';
@@ -138,7 +139,11 @@ class _LibraryRuntime {
     final spokenRecap = RecapItem.parse(
       await preferences.read('gpix.spokenRecap'),
     );
+    // Health Connect permissions are per phone, so is sharing.
+    final shareWithHealth =
+        await preferences.read('gpix.shareHealth') == 'true';
     final statistics = SqliteTrailStatisticsStore(db);
+    final profiles = SqliteProfileStore(db);
     final sharedTrails = SqliteSharedTrailStore(db);
     final sharedTransport = ApiSharedTrailTransport(scopedServer);
     final guidance = AndroidGuidance(
@@ -177,7 +182,9 @@ class _LibraryRuntime {
         freeWalkName: () => messages.freeWalk,
         routeName: (started) => messages.walkedRouteName(started),
         identity: const HashedTrailIdentity(),
+        steps: const AndroidStepCounter(),
       ),
+      profiles: profiles,
       library: library,
       loadDemo: () => seedDemo(db, storage.mapsDirectory, library),
       maps: OfflineMaps(db, storage.mapsDirectory, scopedServer),
@@ -191,6 +198,10 @@ class _LibraryRuntime {
           store: statistics,
         ),
         shared: (transport: sharedTransport, store: sharedTrails),
+        profile: (
+          transport: ApiProfileTransport(scopedServer),
+          store: profiles,
+        ),
       ),
       setAwake: (on) => WakelockPlus.toggle(enable: on),
       vibrate: HapticFeedback.heavyImpact,
@@ -206,6 +217,9 @@ class _LibraryRuntime {
       ),
       saveSpokenRecap: (items) =>
           preferences.write('gpix.spokenRecap', RecapItem.format(items)),
+      shareWithHealth: shareWithHealth,
+      saveShareWithHealth: (enabled) =>
+          preferences.write('gpix.shareHealth', '$enabled'),
       collaborative: CollaborativeTrails(
         sharedTrails,
         sharedTransport,

@@ -10,6 +10,7 @@ import '../domain/ports.dart';
 import '../domain/shared_trails.dart';
 import '../domain/sync.dart';
 import '../domain/trail_statistics.dart';
+import '../domain/walk_energy.dart';
 import 'catalogue_codec.dart';
 import 'shared_trail_codec.dart';
 import 'trail_codec.dart';
@@ -245,6 +246,32 @@ class SqliteSharedTrailStore implements SharedTrailStore {
     'trail_id': reviews.trailId,
     'payload': jsonEncode(SharedTrailCodec.encodeReviews(reviews)),
   }, conflictAlgorithm: ConflictAlgorithm.replace);
+}
+
+/// The walker profile belongs to the account; this database is already
+/// scoped to environment, server and user.
+class SqliteProfileStore implements ProfileStore {
+  const SqliteProfileStore(this.db);
+  final Database db;
+  static const _key = 'walkerProfile';
+  @override
+  Future<({WalkerProfile profile, bool pending})> read() async {
+    final rows = await db.query('settings', where: 'key=?', whereArgs: [_key]);
+    if (rows.isEmpty) return (profile: const WalkerProfile(), pending: false);
+    final json =
+        jsonDecode(rows.first['value'] as String) as Map<String, dynamic>;
+    return (
+      profile: WalkerProfile.fromJson(json),
+      pending: json['pending'] == true,
+    );
+  }
+
+  @override
+  Future<void> save(WalkerProfile profile, {required bool pending}) =>
+      db.insert('settings', {
+        'key': _key,
+        'value': jsonEncode({...profile.toJson(), 'pending': pending}),
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
 }
 
 class SqliteTrailStatisticsStore implements TrailStatisticsStore {

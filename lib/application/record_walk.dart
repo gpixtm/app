@@ -19,7 +19,31 @@ class RecordWalk {
     this.freeWalkName,
     this.routeName,
     this.identity,
+    this.steps,
   });
+
+  /// Phone step counter; absent or refused leaves the steps unknown.
+  final StepCounter? steps;
+  bool _counting = false;
+
+  /// Total moved mass (walker and pack) for the calorie estimate.
+  double? get massKg => _massKg;
+  set massKg(double? value) {
+    _massKg = value;
+    current?.massKg = value;
+    notify();
+  }
+
+  double? _massKg;
+
+  Future<void> _readSteps() async {
+    if (!_counting) return;
+    try {
+      final counter = await steps!.read();
+      if (counter != null) current?.countSteps(counter);
+    } catch (_) {}
+  }
+
   final String Function()? freeWalkName;
 
   /// A route takes the shared identifier of its line when available.
@@ -49,7 +73,7 @@ class RecordWalk {
       if ((await repository.find(saved.id))?.walk?.ended != null) {
         await store.clear();
       } else {
-        current = WalkRecording(saved);
+        current = WalkRecording(saved)..massKg = _massKg;
       }
     }
   }
@@ -75,13 +99,22 @@ class RecordWalk {
         ),
       ),
     );
-    current!.resume(now);
+    current!
+      ..massKg = _massKg
+      ..resume(now);
     error = null;
+    try {
+      _counting = await steps?.start() ?? false;
+    } catch (_) {
+      _counting = false;
+    }
+    await _readSteps();
     await save();
     _positions = gps.watch().listen(
       (fix) {
         if (_closed || !active) return;
         if (current!.accept(fix, DateTime.now())) unawaited(save());
+        unawaited(_readSteps());
         fixes.add(fix);
         notify();
       },
@@ -90,7 +123,8 @@ class RecordWalk {
         unawaited(pause());
       },
     );
-    _checkpoint = Timer.periodic(const Duration(seconds: 15), (_) {
+    _checkpoint = Timer.periodic(const Duration(seconds: 15), (_) async {
+      await _readSteps();
       unawaited(save());
       notify();
     });
@@ -108,7 +142,14 @@ class RecordWalk {
   }
 
   Future<void> pause() async {
+    await _readSteps();
     current?.pause(DateTime.now());
+    if (_counting) {
+      _counting = false;
+      try {
+        await steps!.stop();
+      } catch (_) {}
+    }
     _checkpoint?.cancel();
     await _positions?.cancel();
     _positions = null;

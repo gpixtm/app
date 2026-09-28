@@ -652,8 +652,8 @@
   "maxHeartRate": "Maximum heart rate",
   "steps": "Steps",
   "activeCalories": "Active calories",
-  "statsExplanation": "Active duration excludes manual pauses. Average pace and speed use this duration. Elevation changes are estimated from filtered GPS altitudes.",
-  "noImportedWatchData": "Watch: no measurements imported. Missing values are not estimated.",
+  "statsExplanation": "Active duration excludes manual pauses. Average pace and speed use this duration. Elevation changes are estimated from filtered GPS altitudes. Steps come from the phone’s step counter; active calories are estimated from speed, slopes and your weight.",
+  "noImportedWatchData": "Watch: no measurements imported. Steps and calories come from the phone.",
   "healthSources": "Health Connect · {arg1}\nSources: {arg2}",
   "@healthSources": {
     "placeholders": {
@@ -1212,5 +1212,56 @@
     }
   },
   "offlineTag": "Offline",
-  "myTrailTag": "My trail"
+  "myTrailTag": "My trail",
+  "recapSteps": "{steps, plural, =1{1 step.} other{{steps} steps.}}",
+  "@recapSteps": {
+    "placeholders": {
+      "steps": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "recapCalories": "{calories} active kcal burned, estimated.",
+  "@recapCalories": {
+    "placeholders": {
+      "calories": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "recapItemSteps": "Steps",
+  "recapItemCalories": "Active calories (estimate)",
+  "estimatedCalories": "≈ {calories} kcal",
+  "@estimatedCalories": {
+    "placeholders": {
+      "calories": {
+        "type": "int",
+        "format": "decimalPattern"
+      }
+    }
+  },
+  "walkerProfile": "Weight for calories",
+  "walkerProfileInfo": "Active calories are estimated from your speed, the slopes and the weight you move (ACSM and Minetti models). Your weight is kept in your account. Measurements imported from your watch replace the estimate.",
+  "bodyWeight": "Body weight (kg)",
+  "packWeight": "Backpack (kg)",
+  "invalidBodyWeight": "Enter a weight between 25 and 300 kg.",
+  "invalidPackWeight": "Enter a backpack weight between 0 and 60 kg.",
+  "profileNotSaved": "Weight not saved on this phone.",
+  "caloriesNeedWeight": "Set your weight in Settings to estimate active calories.",
+  "healthWeightUsed": "Using {weight} kg from Health Connect while this field is empty.",
+  "@healthWeightUsed": {
+    "placeholders": {
+      "weight": {
+        "type": "String"
+      }
+    }
+  },
+  "shareHealth": "Share walks with Health Connect",
+  "shareHealthInfo": "When a walk ends, Gpix adds it to Health Connect as an exercise with its route, distance, elevation gain, and the phone’s steps and estimated active calories. Values that came from your watch are not sent back. Apps you allow, such as Samsung Health, can then read it.",
+  "shareToHealth": "Send to Health Connect",
+  "healthShared": "Walk added to Health Connect",
+  "healthSharePermission": "Allow Gpix to write exercises in Health Connect to share your walks.",
+  "healthShareFailed": "Could not add the walk to Health Connect. You can send it again from its history page."
 }

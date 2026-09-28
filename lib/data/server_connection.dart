@@ -11,6 +11,7 @@ import '../domain/auth.dart';
 import '../domain/connection_settings.dart';
 import '../domain/sync.dart';
 import '../domain/trail_statistics.dart';
+import '../domain/walk_energy.dart';
 import 'trail_codec.dart';
 
 class ServerConnection implements AuthService {
@@ -365,6 +366,19 @@ class ApiSyncTransport implements SyncTransport {
             ),
           )
           .toList();
+}
+
+class ApiProfileTransport implements ProfileTransport {
+  ApiProfileTransport(this.server);
+  final ServerConnection server;
+  @override
+  Future<WalkerProfile> fetch() async => WalkerProfile.fromJson(
+    (await server.request('/api/profile')) as Map<String, dynamic>,
+  );
+  @override
+  Future<void> send(WalkerProfile profile) async {
+    await server.request('/api/profile', body: profile.toJson(), method: 'PUT');
+  }
 }
 
 class ApiStatisticsTransport implements StatisticsTransport {

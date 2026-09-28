@@ -2117,13 +2117,13 @@ abstract class AppLocalizations {
   /// No description provided for @statsExplanation.
   ///
   /// In en, this message translates to:
-  /// **'Active duration excludes manual pauses. Average pace and speed use this duration. Elevation changes are estimated from filtered GPS altitudes.'**
+  /// **'Active duration excludes manual pauses. Average pace and speed use this duration. Elevation changes are estimated from filtered GPS altitudes. Steps come from the phone’s step counter; active calories are estimated from speed, slopes and your weight.'**
   String get statsExplanation;
 
   /// No description provided for @noImportedWatchData.
   ///
   /// In en, this message translates to:
-  /// **'Watch: no measurements imported. Missing values are not estimated.'**
+  /// **'Watch: no measurements imported. Steps and calories come from the phone.'**
   String get noImportedWatchData;
 
   /// No description provided for @healthSources.
@@ -3451,6 +3451,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'My trail'**
   String get myTrailTag;
+
+  /// No description provided for @recapSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'{steps, plural, =1{1 step.} other{{steps} steps.}}'**
+  String recapSteps(int steps);
+
+  /// No description provided for @recapCalories.
+  ///
+  /// In en, this message translates to:
+  /// **'{calories} active kcal burned, estimated.'**
+  String recapCalories(int calories);
+
+  /// No description provided for @recapItemSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'Steps'**
+  String get recapItemSteps;
+
+  /// No description provided for @recapItemCalories.
+  ///
+  /// In en, this message translates to:
+  /// **'Active calories (estimate)'**
+  String get recapItemCalories;
+
+  /// No description provided for @estimatedCalories.
+  ///
+  /// In en, this message translates to:
+  /// **'≈ {calories} kcal'**
+  String estimatedCalories(int calories);
+
+  /// No description provided for @walkerProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight for calories'**
+  String get walkerProfile;
+
+  /// No description provided for @walkerProfileInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Active calories are estimated from your speed, the slopes and the weight you move (ACSM and Minetti models). Your weight is kept in your account. Measurements imported from your watch replace the estimate.'**
+  String get walkerProfileInfo;
+
+  /// No description provided for @bodyWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Body weight (kg)'**
+  String get bodyWeight;
+
+  /// No description provided for @packWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Backpack (kg)'**
+  String get packWeight;
+
+  /// No description provided for @invalidBodyWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a weight between 25 and 300 kg.'**
+  String get invalidBodyWeight;
+
+  /// No description provided for @invalidPackWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a backpack weight between 0 and 60 kg.'**
+  String get invalidPackWeight;
+
+  /// No description provided for @profileNotSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight not saved on this phone.'**
+  String get profileNotSaved;
+
+  /// No description provided for @caloriesNeedWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your weight in Settings to estimate active calories.'**
+  String get caloriesNeedWeight;
+
+  /// No description provided for @healthWeightUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Using {weight} kg from Health Connect while this field is empty.'**
+  String healthWeightUsed(String weight);
+
+  /// No description provided for @shareHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Share walks with Health Connect'**
+  String get shareHealth;
+
+  /// No description provided for @shareHealthInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'When a walk ends, Gpix adds it to Health Connect as an exercise with its route, distance, elevation gain, and the phone’s steps and estimated active calories. Values that came from your watch are not sent back. Apps you allow, such as Samsung Health, can then read it.'**
+  String get shareHealthInfo;
+
+  /// No description provided for @shareToHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to Health Connect'**
+  String get shareToHealth;
+
+  /// No description provided for @healthShared.
+  ///
+  /// In en, this message translates to:
+  /// **'Walk added to Health Connect'**
+  String get healthShared;
+
+  /// No description provided for @healthSharePermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow Gpix to write exercises in Health Connect to share your walks.'**
+  String get healthSharePermission;
+
+  /// No description provided for @healthShareFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not add the walk to Health Connect. You can send it again from its history page.'**
+  String get healthShareFailed;
 }
 
 class _AppLocalizationsDelegate

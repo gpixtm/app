@@ -2,6 +2,8 @@
 enum RecapItem {
   distance,
   duration,
+  steps,
+  calories,
   currentSpeed,
   averageSpeed,
   comparison,
@@ -13,6 +15,8 @@ enum RecapItem {
   static const spokenByDefault = {
     distance,
     duration,
+    steps,
+    calories,
     averageSpeed,
     comparison,
     remaining,
@@ -44,7 +48,13 @@ class WalkRecap {
     this.usualKmh,
     this.previousWalks,
     this.ascent,
+    this.steps,
+    this.calories,
   });
+  final int? steps;
+
+  /// Active kcal estimated from the track and the walker's weight.
+  final double? calories;
   final int kilometre;
   final double metres;
   final int activeSeconds;
@@ -60,6 +70,8 @@ class WalkRecap {
   Set<RecapItem> get available => {
     RecapItem.distance,
     RecapItem.duration,
+    if (steps != null) RecapItem.steps,
+    if (calories != null) RecapItem.calories,
     if (splitKmh != null) RecapItem.currentSpeed,
     if (averageKmh != null) RecapItem.averageSpeed,
     if (difference != null) RecapItem.comparison,

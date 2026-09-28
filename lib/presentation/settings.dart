@@ -6,6 +6,7 @@ import '../application/app_controller.dart';
 import '../domain/health_data.dart';
 import '../domain/walk_recap.dart';
 import 'guidance_text.dart';
+import 'walker_profile.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView(this.app, {required this.account, super.key});
@@ -25,6 +26,17 @@ class SettingsView extends StatelessWidget {
             subtitle: Text(context.l10n.voiceGuidanceInfo),
             value: app.voiceGuidance,
             onChanged: app.setVoiceGuidance,
+          ),
+        ),
+      if (app.profiles != null) WalkerProfileCard(app),
+      if (app.health != null)
+        Card(
+          child: SwitchListTile(
+            secondary: const Icon(Icons.ios_share),
+            title: Text(context.l10n.shareHealth),
+            subtitle: Text(context.l10n.shareHealthInfo),
+            value: app.shareWithHealth,
+            onChanged: app.setShareWithHealth,
           ),
         ),
       if (app.recap != null)
@@ -66,7 +78,12 @@ class SettingsView extends StatelessWidget {
           subtitle: Text(context.l10n.healthBridge),
           trailing: const Icon(Icons.chevron_right),
           onTap: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(builder: (_) => HealthSettings(app.health)),
+            MaterialPageRoute<void>(
+              builder: (_) => HealthSettings(
+                app.health,
+                onAuthorized: app.refreshHealthWeight,
+              ),
+            ),
           ),
         ),
       ),
@@ -88,8 +105,11 @@ class SettingsView extends StatelessWidget {
 }
 
 class HealthSettings extends StatefulWidget {
-  const HealthSettings(this.source, {super.key});
+  const HealthSettings(this.source, {this.onAuthorized, super.key});
   final HealthDataSource? source;
+
+  /// Called after access changes, e.g. to pick up the Health Connect weight.
+  final Future<void> Function()? onAuthorized;
   @override
   State<HealthSettings> createState() => _HealthSettingsState();
 }
@@ -190,6 +210,7 @@ class _HealthSettingsState extends State<HealthSettings>
                     await widget.source!.openSettings();
                   } else {
                     status = await widget.source!.authorize();
+                    await widget.onAuthorized?.call();
                   }
                 }),
           icon: const Icon(Icons.favorite_outline),

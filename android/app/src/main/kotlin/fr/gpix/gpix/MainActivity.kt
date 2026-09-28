@@ -31,11 +31,24 @@ class MainActivity : FlutterFragmentActivity() {
         awaiting?.success(if (granted.containsAll(permissions)) "connected" else "needsPermission")
         awaiting = null
     }
+    private var awaitingSharing: MethodChannel.Result? = null
+    private val sharingLauncher = registerForActivityResult(
+        PermissionController.createRequestPermissionResultContract()
+    ) { granted ->
+        awaitingSharing?.success(if (HealthShare.canShare(granted)) "connected" else "needsPermission")
+        awaitingSharing = null
+    }
     private val guidance by lazy { TurnGuidance(this) }
     private var awaitingNotifications: MethodChannel.Result? = null
     private val notificationLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         awaitingNotifications?.success(granted)
         awaitingNotifications = null
+    }
+    private val steps by lazy { StepCounter(this) }
+    private var awaitingSteps: MethodChannel.Result? = null
+    private val stepLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        awaitingSteps?.success(granted && steps.start())
+        awaitingSteps = null
     }
     private fun available(): String = when (HealthConnectClient.getSdkStatus(this)) {
         HealthConnectClient.SDK_AVAILABLE -> "available"
@@ -60,6 +73,24 @@ class MainActivity : FlutterFragmentActivity() {
                 startActivity(Intent(Intent.ACTION_VIEW, uri))
                 result.success(null)
             } catch (e: Exception) { result.error("navigation", "Cannot open navigation", null) }
+        }
+        MethodChannel(engine.dartExecutor.binaryMessenger, "gpix/steps").setMethodCallHandler { call, result ->
+            try {
+                when (call.method) {
+                    "start" -> when {
+                        !steps.available -> result.success(false)
+                        steps.permitted() -> result.success(steps.start())
+                        awaitingSteps != null -> result.error("busy", "Request already open", null)
+                        else -> {
+                            awaitingSteps = result
+                            stepLauncher.launch(android.Manifest.permission.ACTIVITY_RECOGNITION)
+                        }
+                    }
+                    "read" -> result.success(steps.read())
+                    "stop" -> { steps.stop(); result.success(null) }
+                    else -> result.notImplemented()
+                }
+            } catch (e: Exception) { result.error("steps", "Step counter unavailable", null) }
         }
         MethodChannel(engine.dartExecutor.binaryMessenger, "gpix/guidance").setMethodCallHandler { call, result ->
             try {
@@ -102,7 +133,7 @@ class MainActivity : FlutterFragmentActivity() {
                             val status = available()
                             if (status != "available") result.success(status)
                             else if (awaiting != null) result.error("busy", "Request already open", null)
-                            else { awaiting = result; permissionLauncher.launch(permissions) }
+                            else { awaiting = result; permissionLauncher.launch(permissions + HealthShare.weightPermission) }
                         }
                         "settings" -> {
                             val intent = if (available() == "available") Intent(HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS)
@@ -113,6 +144,26 @@ class MainActivity : FlutterFragmentActivity() {
                             val intent = packageManager.getLaunchIntentForPackage("com.huami.watch.hmwatchmanager")
                               ?: Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.huami.watch.hmwatchmanager"))
                             startActivity(intent); result.success(null)
+                        }
+                        "weight" -> {
+                            if (available() != "available") result.success(null)
+                            else result.success(HealthShare.latestWeight(HealthConnectClient.getOrCreate(this@MainActivity)))
+                        }
+                        "sharingStatus" -> {
+                            val status = available()
+                            if (status != "available") result.success(status)
+                            else result.success(if (HealthShare.canShare(HealthConnectClient.getOrCreate(this@MainActivity).permissionController.getGrantedPermissions())) "connected" else "needsPermission")
+                        }
+                        "authorizeSharing" -> {
+                            val status = available()
+                            if (status != "available") result.success(status)
+                            else if (awaitingSharing != null) result.error("busy", "Request already open", null)
+                            else { awaitingSharing = result; sharingLauncher.launch(HealthShare.writePermissions) }
+                        }
+                        "share" -> {
+                            @Suppress("UNCHECKED_CAST")
+                            HealthShare.share(HealthConnectClient.getOrCreate(this@MainActivity), call.arguments as Map<String, Any?>)
+                            result.success(null)
                         }
                         "read" -> {
                             val client = HealthConnectClient.getOrCreate(this@MainActivity)
@@ -139,6 +190,7 @@ class MainActivity : FlutterFragmentActivity() {
                     }
                 } catch (e: Exception) {
                     if (awaiting === result) awaiting = null
+                    if (awaitingSharing === result) awaitingSharing = null
                     result.error("health", e.message ?: "Health Connect indisponible", null)
                 }
             }
@@ -151,8 +203,11 @@ class MainActivity : FlutterFragmentActivity() {
     }
     override fun onDestroy() {
         awaiting?.error("closed", "Request interrupted", null); awaiting = null
+        awaitingSharing?.error("closed", "Request interrupted", null); awaitingSharing = null
         awaitingNotifications?.success(false); awaitingNotifications = null
         guidance.close()
+        awaitingSteps?.success(false); awaitingSteps = null
+        steps.stop()
         scope.cancel()
         super.onDestroy()
     }

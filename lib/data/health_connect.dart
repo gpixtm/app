@@ -34,6 +34,39 @@ class AndroidHealthConnect implements HealthDataSource {
   }
 
   @override
+  Future<double?> latestWeight() async =>
+      (await channel.invokeMethod<num>('weight'))?.toDouble();
+
+  @override
+  Future<HealthAvailability> sharingStatus() => _status('sharingStatus');
+  @override
+  Future<HealthAvailability> authorizeSharing() => _status('authorizeSharing');
+
+  @override
+  Future<void> share(HealthExport export) =>
+      channel.invokeMethod<void>('share', {
+        'id': export.walkId,
+        'title': export.title,
+        'start': export.start.toUtc().toIso8601String(),
+        'end': export.end.toUtc().toIso8601String(),
+        'hiking': export.hiking,
+        'metres': export.metres,
+        'ascent': export.ascent,
+        'steps': export.steps,
+        'activeCalories': export.activeCalories,
+        'route': [
+          for (final s in export.route)
+            [
+              s.time.toUtc().toIso8601String(),
+              s.point.lat,
+              s.point.lon,
+              s.accuracy,
+              s.point.elevation,
+            ],
+        ],
+      });
+
+  @override
   Future<void> openSettings() => channel.invokeMethod('settings');
   @override
   Future<void> openZepp() => channel.invokeMethod('zepp');

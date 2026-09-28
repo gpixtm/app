@@ -1,6 +1,7 @@
 import 'models.dart';
 import 'health_data.dart';
 import 'trail_geometry.dart';
+import 'walk_energy.dart';
 
 class WalkSample {
   const WalkSample(this.time, this.point, this.accuracy, this.segment);
@@ -28,6 +29,8 @@ class WalkDetails {
     this.samples = const [],
     this.health,
     this.reference,
+    this.steps,
+    this.estimatedCalories,
   });
   final DateTime started;
   final DateTime? ended;
@@ -42,6 +45,16 @@ class WalkDetails {
   final HealthSummary? health;
   final WalkReference? reference;
 
+  /// Steps counted by the phone while recording; null when unavailable.
+  final int? steps;
+
+  /// Active kcal estimated from the track and the walker's weight.
+  final double? estimatedCalories;
+
+  /// Watch measurements, once imported, are preferred to the phone's.
+  int? get bestSteps => health?.steps ?? steps;
+  double? get bestCalories => health?.activeCalories ?? estimatedCalories;
+
   /// GPX whose running statistics include this walk.
   String? get statisticsTrailId => routeId ?? sourceTrailId;
   WalkDetails withHealth(HealthSummary summary) => WalkDetails(
@@ -53,7 +66,19 @@ class WalkDetails {
     samples: samples,
     health: summary,
     reference: reference,
+    steps: steps,
+    estimatedCalories: estimatedCalories,
   );
+}
+
+/// The phone's hardware step counter.
+abstract interface class StepCounter {
+  /// Start counting; false when the sensor is missing or access refused.
+  Future<bool> start();
+
+  /// Cumulative counter value, null before the first sensor event.
+  Future<int?> read();
+  Future<void> stop();
 }
 
 abstract interface class RecordingStore {
@@ -69,8 +94,32 @@ class WalkRecording {
     : segments = saved.segments.map((s) => s.toList()).toList(),
       samples = [...saved.walk!.samples],
       health = saved.walk!.health,
+      _savedSteps = saved.walk!.steps,
       metres = TrailGeometry(saved).total;
   final Trail saved;
+
+  /// Total moved mass for the calorie estimate; null leaves it absent.
+  double? massKg;
+
+  // Steps of earlier active periods, and the phone counter at this period's start.
+  int? _savedSteps, _stepBase, _liveSteps;
+  int? get steps => _savedSteps == null && _liveSteps == null
+      ? null
+      : (_savedSteps ?? 0) + (_liveSteps ?? 0);
+
+  /// [counter] is the phone's cumulative step counter. Only active periods
+  /// count; a counter reset (phone restart) continues from the last value.
+  void countSteps(int counter) {
+    if (!active) return;
+    final base = _stepBase;
+    if (base == null || counter < base) {
+      _savedSteps = (_savedSteps ?? 0) + (_liveSteps ?? 0);
+      _liveSteps = 0;
+      _stepBase = counter;
+      return;
+    }
+    _liveSteps = counter - base;
+  }
 
   /// Recorded distance, kept incrementally; pauses and gaps add nothing.
   double metres;
@@ -101,6 +150,9 @@ class WalkRecording {
     }
     _resumed = null;
     _newSegment = true;
+    if (_liveSteps != null) _savedSteps = (_savedSteps ?? 0) + _liveSteps!;
+    _liveSteps = null;
+    _stepBase = null;
   }
 
   bool accept(Fix fix, DateTime now) {
@@ -159,6 +211,9 @@ class WalkRecording {
       samples: List.unmodifiable(samples),
       health: health,
       reference: saved.walk!.reference,
+      steps: steps,
+      estimatedCalories:
+          activeCalories(samples, massKg) ?? saved.walk!.estimatedCalories,
     ),
   );
 }
