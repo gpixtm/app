@@ -23,6 +23,8 @@ Copy `config/dev.example.json` and `config/prod.example.json` to the correspondi
 
 The two launch profiles use `lib/main.dart` and the matching `dev`/`prod` flavor. Both are debug builds: Prod is a server selection, not a release signature. Changing compile-time values requires stopping and restarting F5.
 
+Do not take an F5 session on a walk. The debugger starts every isolate paused and resumes it itself; once the phone is unplugged, nothing resumes new isolates, so any work sent to one waits forever (observed 28 September 2026: the map stopped redrawing when a large GeoJSON source was encoded in the background, and finishing a route hung on its route computation). On the Flutter/Android merged thread a paused main isolate also shows as “not responding”. For field tests run `make install-prod` (add `DEVICE=<id>` when several phones are connected): it builds Prod in release mode, installs it over the current app and starts it, with no debugger attached, so the phone can be unplugged. The release build is still signed with this computer's debug key, so it installs over the F5 build and keeps its local data.
+
 ## API over the LAN
 
 Clone `gpixtm/api` separately. In the full workspace it is the sibling `backend/`; its `make dev` or `dart tools/dev_backend.dart` prepares Docker on the explicit private IPv4 interface from the mobile configuration. See that repository's instructions before installing or changing the API. A standalone app clone can use any compatible separately running API.
