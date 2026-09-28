@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'heading.dart';
 import 'models.dart';
 import 'trail_geometry.dart';
+import 'walk_recap.dart';
 
 enum GuidanceKind {
   slightLeft,
@@ -166,6 +167,14 @@ abstract interface class GuidanceOutput {
   Future<void> announce(
     GuidanceInstruction instruction, {
     required bool speak,
+    required bool notify,
+  });
+
+  /// Kilometre summary: [spoken] selects what the voice reads; the
+  /// notification always shows every available item.
+  Future<void> summarize(
+    WalkRecap recap, {
+    required Set<RecapItem> spoken,
     required bool notify,
   });
   Future<void> clear();

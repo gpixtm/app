@@ -104,6 +104,7 @@ class TrailCodec {
         'ended': walk.ended?.toUtc().toIso8601String(),
         'seconds': walk.seconds,
         'sourceTrailId': walk.sourceTrailId,
+        'routeId': ?walk.routeId,
         'samples': [
           for (final s in walk.samples)
             [
@@ -153,6 +154,7 @@ class TrailCodec {
                 : DateTime.parse(j['walk']['ended']),
             seconds: j['walk']['seconds'] as int,
             sourceTrailId: j['walk']['sourceTrailId'] as String?,
+            routeId: j['walk']['routeId'] as String?,
             samples: [
               for (final s in (j['walk']['samples'] as List? ?? []))
                 WalkSample(

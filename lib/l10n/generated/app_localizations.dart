@@ -2527,6 +2527,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Route of {date}'**
   String walkedRouteName(DateTime date);
+
+  /// No description provided for @recapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Kilometre {kilometre}'**
+  String recapTitle(int kilometre);
+
+  /// No description provided for @recapDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} km walked.'**
+  String recapDistance(String distance);
+
+  /// No description provided for @recapDurationMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes, plural, =1{Walking for 1 minute.} other{Walking for {minutes} minutes.}}'**
+  String recapDurationMinutes(int minutes);
+
+  /// No description provided for @recapDurationHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours, plural, =1{Walking for 1 hour} other{Walking for {hours} hours}} and {minutes, plural, =1{1 minute} other{{minutes} minutes}}.'**
+  String recapDurationHours(int hours, int minutes);
+
+  /// No description provided for @recapCurrentSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Last kilometre at {speed} km/h.'**
+  String recapCurrentSpeed(String speed);
+
+  /// No description provided for @recapAverageSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Average speed {speed} km/h.'**
+  String recapAverageSpeed(String speed);
+
+  /// No description provided for @recapFaster.
+  ///
+  /// In en, this message translates to:
+  /// **'{difference} km/h faster than your usual {usual} km/h.'**
+  String recapFaster(String difference, String usual);
+
+  /// No description provided for @recapSlower.
+  ///
+  /// In en, this message translates to:
+  /// **'{difference} km/h slower than your usual {usual} km/h.'**
+  String recapSlower(String difference, String usual);
+
+  /// No description provided for @recapAsUsual.
+  ///
+  /// In en, this message translates to:
+  /// **'Same speed as usual, {usual} km/h.'**
+  String recapAsUsual(String usual);
+
+  /// No description provided for @recapPreviousWalks.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Walked once before.} other{Walked {count} times before.}}'**
+  String recapPreviousWalks(int count);
+
+  /// No description provided for @recapRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} km to go.'**
+  String recapRemaining(String distance);
+
+  /// No description provided for @recapArrival.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated arrival at {time}.'**
+  String recapArrival(String time);
+
+  /// No description provided for @recapAscent.
+  ///
+  /// In en, this message translates to:
+  /// **'{metres} m climbed.'**
+  String recapAscent(int metres);
+
+  /// No description provided for @recapClock.
+  ///
+  /// In en, this message translates to:
+  /// **'It is {time}.'**
+  String recapClock(String time);
+
+  /// No description provided for @recapSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Kilometre summary'**
+  String get recapSettings;
+
+  /// No description provided for @recapSettingsInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Every kilometre walked, a summary is spoken and, while Gpix is in the background, shown in a notification. Choose what the voice reads. Comparisons need earlier walks on the same trail; remaining distance and arrival need a followed trail.'**
+  String get recapSettingsInfo;
+
+  /// No description provided for @recapItemDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance walked'**
+  String get recapItemDistance;
+
+  /// No description provided for @recapItemDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Walking time'**
+  String get recapItemDuration;
+
+  /// No description provided for @recapItemCurrentSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Current speed (last kilometre)'**
+  String get recapItemCurrentSpeed;
+
+  /// No description provided for @recapItemAverageSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Average speed'**
+  String get recapItemAverageSpeed;
+
+  /// No description provided for @recapItemComparison.
+  ///
+  /// In en, this message translates to:
+  /// **'Comparison with your usual speed'**
+  String get recapItemComparison;
+
+  /// No description provided for @recapItemRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining distance'**
+  String get recapItemRemaining;
+
+  /// No description provided for @recapItemArrival.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated arrival time'**
+  String get recapItemArrival;
+
+  /// No description provided for @recapItemAscent.
+  ///
+  /// In en, this message translates to:
+  /// **'Elevation gain'**
+  String get recapItemAscent;
+
+  /// No description provided for @recapItemClock.
+  ///
+  /// In en, this message translates to:
+  /// **'Current time'**
+  String get recapItemClock;
 }
 
 class _AppLocalizationsDelegate

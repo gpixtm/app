@@ -8,11 +8,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'application/library.dart';
+import 'application/announce_progress.dart';
 import 'application/guide_navigation.dart';
+import 'domain/walk_recap.dart';
 import 'application/record_walk.dart';
 import 'data/recording_store.dart';
 import 'application/prepare_maps.dart';
@@ -35,6 +38,8 @@ import 'presentation/localization.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Kilometre summaries format clock times even while no screen is visible.
+  await initializeDateFormatting();
   final locale = LocaleController(
     store: const SecureCredentials(),
     applyNative: (language) =>
@@ -127,6 +132,15 @@ class _LibraryRuntime {
     // Device preference: speech depends on this phone's audio, not the account.
     const preferences = SecureCredentials();
     final voice = await preferences.read('gpix.voiceGuidance') != 'false';
+    final spokenRecap = RecapItem.parse(
+      await preferences.read('gpix.spokenRecap'),
+    );
+    final statistics = SqliteTrailStatisticsStore(db);
+    final guidance = AndroidGuidance(
+      sentences: (instruction) => describeGuidance(messages, instruction),
+      recapSentences: (recap) => describeRecap(messages, recap),
+      languageCode: () => locale.languageCode,
+    );
     final library = Library(
       SqliteTrailRepository(db),
       XmlGpxDecoder(placesName: (name) => messages.placesName(name)),
@@ -165,19 +179,25 @@ class _LibraryRuntime {
       sync: SynchronizeLibrary(
         SqliteSyncStore(db, localCopyName: (name) => messages.localCopy(name)),
         ApiSyncTransport(scopedServer),
+        statistics: (
+          transport: ApiStatisticsTransport(scopedServer),
+          store: statistics,
+        ),
       ),
       setAwake: (on) => WakelockPlus.toggle(enable: on),
       vibrate: HapticFeedback.heavyImpact,
       connectionDetails: () => server.details,
-      guide: GuideNavigation(
-        AndroidGuidance(
-          sentences: (instruction) => describeGuidance(messages, instruction),
-          languageCode: () => locale.languageCode,
-        ),
-        voice: voice,
-      ),
+      guide: GuideNavigation(guidance, voice: voice),
       saveVoiceGuidance: (enabled) =>
           preferences.write('gpix.voiceGuidance', '$enabled'),
+      statistics: statistics,
+      recap: AnnounceProgress(
+        guidance,
+        statistics: statistics,
+        spoken: spokenRecap,
+      ),
+      saveSpokenRecap: (items) =>
+          preferences.write('gpix.spokenRecap', RecapItem.format(items)),
     );
     _close = () async {
       await controller.shutdown();

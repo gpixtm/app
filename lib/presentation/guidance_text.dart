@@ -1,9 +1,72 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../domain/guidance.dart';
+import '../domain/walk_recap.dart';
 import '../l10n/generated/app_localizations.dart';
 
 typedef GuidanceText = ({String title, String body, String speech});
+
+/// Localized kilometre summary: one whole sentence per available item.
+({String title, Map<RecapItem, String> lines}) describeRecap(
+  AppLocalizations l10n,
+  WalkRecap recap,
+) {
+  final locale = l10n.localeName;
+  final speed = NumberFormat('0.0', locale);
+  String km(double metres) =>
+      NumberFormat('#,##0.#', locale).format(metres / 1000);
+  final time = DateFormat.jm(locale);
+  final minutes = recap.activeSeconds ~/ 60;
+  final difference = recap.difference;
+  final lines = <RecapItem, String>{
+    RecapItem.distance: l10n.recapDistance(km(recap.metres)),
+    RecapItem.duration: minutes < 60
+        ? l10n.recapDurationMinutes(minutes)
+        : l10n.recapDurationHours(minutes ~/ 60, minutes % 60),
+    if (recap.splitKmh case final split?)
+      RecapItem.currentSpeed: l10n.recapCurrentSpeed(speed.format(split)),
+    if (recap.averageKmh case final average?)
+      RecapItem.averageSpeed: l10n.recapAverageSpeed(speed.format(average)),
+    if (difference != null)
+      RecapItem.comparison: [
+        // Compare at the announced precision so "0.0 faster" never occurs.
+        switch (double.parse(difference.toStringAsFixed(1))) {
+          0 => l10n.recapAsUsual(speed.format(recap.usualKmh)),
+          > 0 => l10n.recapFaster(
+            speed.format(difference),
+            speed.format(recap.usualKmh),
+          ),
+          _ => l10n.recapSlower(
+            speed.format(-difference),
+            speed.format(recap.usualKmh),
+          ),
+        },
+        if (recap.previousWalks case final count?)
+          l10n.recapPreviousWalks(count),
+      ].join(' '),
+    if (recap.remainingMetres case final remaining?)
+      RecapItem.remaining: l10n.recapRemaining(km(remaining)),
+    if (recap.arrival case final arrival?)
+      RecapItem.arrival: l10n.recapArrival(time.format(arrival)),
+    if (recap.ascent case final ascent?)
+      RecapItem.ascent: l10n.recapAscent(ascent.round()),
+    RecapItem.clock: l10n.recapClock(time.format(recap.clock)),
+  };
+  return (title: l10n.recapTitle(recap.kilometre), lines: lines);
+}
+
+String recapItemLabel(AppLocalizations l10n, RecapItem item) => switch (item) {
+  RecapItem.distance => l10n.recapItemDistance,
+  RecapItem.duration => l10n.recapItemDuration,
+  RecapItem.currentSpeed => l10n.recapItemCurrentSpeed,
+  RecapItem.averageSpeed => l10n.recapItemAverageSpeed,
+  RecapItem.comparison => l10n.recapItemComparison,
+  RecapItem.remaining => l10n.recapItemRemaining,
+  RecapItem.arrival => l10n.recapItemArrival,
+  RecapItem.ascent => l10n.recapItemAscent,
+  RecapItem.clock => l10n.recapItemClock,
+};
 
 /// Localized notification and speech sentences for one instruction.
 GuidanceText describeGuidance(

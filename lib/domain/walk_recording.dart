@@ -1,5 +1,6 @@
 import 'models.dart';
 import 'health_data.dart';
+import 'trail_geometry.dart';
 
 class WalkSample {
   const WalkSample(this.time, this.point, this.accuracy, this.segment);
@@ -15,20 +16,30 @@ class WalkDetails {
     required this.seconds,
     this.ended,
     this.sourceTrailId,
+    this.routeId,
     this.samples = const [],
     this.health,
   });
   final DateTime started;
   final DateTime? ended;
   final int seconds;
+
+  /// GPX followed during the walk; null for a free walk.
   final String? sourceTrailId;
+
+  /// Route a free walk created or matched; it counts in that route's statistics.
+  final String? routeId;
   final List<WalkSample> samples;
   final HealthSummary? health;
+
+  /// GPX whose running statistics include this walk.
+  String? get statisticsTrailId => routeId ?? sourceTrailId;
   WalkDetails withHealth(HealthSummary summary) => WalkDetails(
     started: started,
     ended: ended,
     seconds: seconds,
     sourceTrailId: sourceTrailId,
+    routeId: routeId,
     samples: samples,
     health: summary,
   );
@@ -46,8 +57,12 @@ class WalkRecording {
   WalkRecording(this.saved)
     : segments = saved.segments.map((s) => s.toList()).toList(),
       samples = [...saved.walk!.samples],
-      health = saved.walk!.health;
+      health = saved.walk!.health,
+      metres = TrailGeometry(saved).total;
   final Trail saved;
+
+  /// Recorded distance, kept incrementally; pauses and gaps add nothing.
+  double metres;
   HealthSummary? health;
   final List<List<GeoPoint>> segments;
   final List<WalkSample> samples;
@@ -103,6 +118,8 @@ class WalkRecording {
     if (_newSegment) {
       segments.add([]);
       _newSegment = false;
+    } else if (segments.last.isNotEmpty) {
+      metres += distance(segments.last.last, fix.point);
     }
     segments.last.add(fix.point);
     samples.add(
@@ -112,18 +129,20 @@ class WalkRecording {
     return true;
   }
 
-  Trail snapshot(DateTime now, {bool finished = false}) => Trail(
-    id: saved.id,
-    name: saved.name,
-    segments: segments,
-    pois: [],
-    walk: WalkDetails(
-      started: saved.walk!.started,
-      ended: finished ? now : null,
-      seconds: seconds(now),
-      sourceTrailId: saved.walk!.sourceTrailId,
-      samples: List.unmodifiable(samples),
-      health: health,
-    ),
-  );
+  Trail snapshot(DateTime now, {bool finished = false, String? routeId}) =>
+      Trail(
+        id: saved.id,
+        name: saved.name,
+        segments: segments,
+        pois: [],
+        walk: WalkDetails(
+          started: saved.walk!.started,
+          ended: finished ? now : null,
+          seconds: seconds(now),
+          sourceTrailId: saved.walk!.sourceTrailId,
+          routeId: routeId ?? saved.walk!.routeId,
+          samples: List.unmodifiable(samples),
+          health: health,
+        ),
+      );
 }

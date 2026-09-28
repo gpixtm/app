@@ -836,5 +836,137 @@
         "format": "yMMMd"
       }
     }
-  }
+  },
+  "recapTitle": "Kilometre {kilometre}",
+  "@recapTitle": {
+    "placeholders": {
+      "kilometre": {
+        "type": "int"
+      }
+    }
+  },
+  "recapDistance": "{distance} km walked.",
+  "@recapDistance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "recapDurationMinutes": "{minutes, plural, =1{Walking for 1 minute.} other{Walking for {minutes} minutes.}}",
+  "@recapDurationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "recapDurationHours": "{hours, plural, =1{Walking for 1 hour} other{Walking for {hours} hours}} and {minutes, plural, =1{1 minute} other{{minutes} minutes}}.",
+  "@recapDurationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "recapCurrentSpeed": "Last kilometre at {speed} km/h.",
+  "@recapCurrentSpeed": {
+    "placeholders": {
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
+  "recapAverageSpeed": "Average speed {speed} km/h.",
+  "@recapAverageSpeed": {
+    "placeholders": {
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
+  "recapFaster": "{difference} km/h faster than your usual {usual} km/h.",
+  "@recapFaster": {
+    "placeholders": {
+      "difference": {
+        "type": "String"
+      },
+      "usual": {
+        "type": "String"
+      }
+    }
+  },
+  "recapSlower": "{difference} km/h slower than your usual {usual} km/h.",
+  "@recapSlower": {
+    "placeholders": {
+      "difference": {
+        "type": "String"
+      },
+      "usual": {
+        "type": "String"
+      }
+    }
+  },
+  "recapAsUsual": "Same speed as usual, {usual} km/h.",
+  "@recapAsUsual": {
+    "placeholders": {
+      "usual": {
+        "type": "String"
+      }
+    }
+  },
+  "recapPreviousWalks": "{count, plural, =1{Walked once before.} other{Walked {count} times before.}}",
+  "@recapPreviousWalks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recapRemaining": "{distance} km to go.",
+  "@recapRemaining": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "recapArrival": "Estimated arrival at {time}.",
+  "@recapArrival": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "recapAscent": "{metres} m climbed.",
+  "@recapAscent": {
+    "placeholders": {
+      "metres": {
+        "type": "int"
+      }
+    }
+  },
+  "recapClock": "It is {time}.",
+  "@recapClock": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "recapSettings": "Kilometre summary",
+  "recapSettingsInfo": "Every kilometre walked, a summary is spoken and, while Gpix is in the background, shown in a notification. Choose what the voice reads. Comparisons need earlier walks on the same trail; remaining distance and arrival need a followed trail.",
+  "recapItemDistance": "Distance walked",
+  "recapItemDuration": "Walking time",
+  "recapItemCurrentSpeed": "Current speed (last kilometre)",
+  "recapItemAverageSpeed": "Average speed",
+  "recapItemComparison": "Comparison with your usual speed",
+  "recapItemRemaining": "Remaining distance",
+  "recapItemArrival": "Estimated arrival time",
+  "recapItemAscent": "Elevation gain",
+  "recapItemClock": "Current time"
 }

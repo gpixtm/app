@@ -10,6 +10,7 @@ import '../application/backend_environment.dart';
 import '../domain/auth.dart';
 import '../domain/connection_settings.dart';
 import '../domain/sync.dart';
+import '../domain/trail_statistics.dart';
 import 'trail_codec.dart';
 
 class ServerConnection implements AuthService {
@@ -336,6 +337,23 @@ class ApiSyncTransport implements SyncTransport {
               r['revision'],
               r['deleted'],
               TrailCodec.decode(r['payload']),
+            ),
+          )
+          .toList();
+}
+
+class ApiStatisticsTransport implements StatisticsTransport {
+  ApiStatisticsTransport(this.server);
+  final ServerConnection server;
+  @override
+  Future<List<TrailStatistics>> fetch() async =>
+      ((await server.request('/api/statistics')) as List)
+          .map(
+            (r) => TrailStatistics(
+              r['trailId'] as String,
+              r['walks'] as int,
+              (r['metres'] as num).toDouble(),
+              r['seconds'] as int,
             ),
           )
           .toList();

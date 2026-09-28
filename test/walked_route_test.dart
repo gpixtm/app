@@ -243,6 +243,9 @@ void main() {
       expect(app.trails, hasLength(1));
       expect(app.history, hasLength(1));
       expect(app.focused!.id, app.trails.single.id);
+      // The walk counts in the new route's statistics from now on.
+      expect(app.history.single.walk!.routeId, app.trails.single.id);
+      expect(app.history.single.walk!.sourceTrailId, isNull);
       expect(
         app.message,
         isA<AppMessage>().having((m) => m.code, 'code', 'routeCreated'),

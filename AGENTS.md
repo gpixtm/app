@@ -41,7 +41,7 @@ Read [product decisions](docs/PRODUCT.md) for map UX, navigation, day planning, 
 - Join the **nearest point on a GPX segment**, including between vertices, rather than the file's start or nearest vertex. Keep internal walking guidance and an explicit Google Maps fallback.
 - Download visible map areas automatically online and prepare the GPX corridor at import. Offline, display only actually downloaded areas and report partial preparation honestly.
 - Keep the map dominant: compact top information, unobstructed compass, collapsible bottom metrics/profile panel, stable camera and responsive direction marker.
-- Announce each direction change about 100 m ahead by offline Android text-to-speech and, while not visible, a notification with a direction icon, in the app language, including screen-off.
+- Announce each direction change about 100 m ahead by offline Android text-to-speech and, while not visible, a notification with a direction icon, in the app language, including screen-off. Summarize progress at each walked kilometre (voice items chosen in Settings) and compare with the usual speed from the API's incremental per-route statistics.
 - Record real walks with or without a GPX, including screen-off recording through the Android foreground location service. Pause, stop GPX tracking and finish recording are different actions.
 - Preparation must be possible from the phone. No mandatory paid map subscription or commercial API key. AllTrails is a UX quality reference; Waze/Google Maps walking navigation inspire legibility, not claimed knowledge of their algorithms.
 

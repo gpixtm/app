@@ -2,6 +2,7 @@ import '../domain/app_message.dart';
 
 import 'dart:async';
 
+import 'announce_progress.dart';
 import 'guide_navigation.dart';
 import 'library.dart';
 import 'prepare_maps.dart';
@@ -15,6 +16,8 @@ import '../domain/day_plan.dart';
 import '../domain/health_data.dart';
 import '../domain/approach.dart';
 import '../domain/place_search.dart';
+import '../domain/trail_statistics.dart';
+import '../domain/walk_recap.dart';
 import '../domain/walked_route.dart';
 
 class AppController {
@@ -34,7 +37,42 @@ class AppController {
     this.guide,
     this.saveVoiceGuidance,
     this.placeSearch,
+    this.recap,
+    this.statistics,
+    this.saveSpokenRecap,
   });
+  final AnnounceProgress? recap;
+  final TrailStatisticsStore? statistics;
+  final Future<void> Function(Set<RecapItem>)? saveSpokenRecap;
+  Set<RecapItem> get spokenRecap => recap?.spoken ?? const {};
+  Future<void> setSpokenRecap(RecapItem item, bool spoken) async {
+    if (recap == null) return;
+    recap!.spoken = {...recap!.spoken}..remove(item);
+    if (spoken) recap!.spoken.add(item);
+    notifyListeners();
+    try {
+      await saveSpokenRecap?.call(recap!.spoken);
+    } catch (_) {
+      message = AppMessage.voiceGuidanceNotSaved;
+      notifyListeners();
+    }
+  }
+
+  void _summarize() {
+    final recording = recorder?.current;
+    if (recap == null || recording == null || !recording.active) return;
+    final s = session;
+    unawaited(
+      recap!.update(
+        recording,
+        now: DateTime.now(),
+        voice: voiceGuidance,
+        foreground: foreground,
+        session: approach == null && s != null && s.active ? s : null,
+      ),
+    );
+  }
+
   final PlaceSearch? placeSearch;
 
   /// Last searched place the map should move to.
@@ -280,13 +318,22 @@ class AppController {
   });
   Future<void> pauseWalk() => run(() async {
     stop();
+    unawaited(recap?.leave());
     await recorder?.pause();
     if (_browsing && foreground) unawaited(browseLocation());
   });
   Future<void> finishWalk() => run(() async {
     stop();
+    unawaited(recap?.leave());
     final route = await recorder?.keepRoute(trails);
-    final walk = await recorder?.finish();
+    final walk = await recorder?.finish(routeId: route?.trail?.id);
+    if (walk != null) {
+      try {
+        await statistics?.addWalk(walk);
+      } catch (_) {
+        // The server totals include the walk after its next sync.
+      }
+    }
     await reload();
     syncStatus = AppMessage.walkSavedPending;
     switch (route) {
@@ -511,6 +558,7 @@ class AppController {
       if (_disposed) return;
       mapFix = fix;
       _track(fix);
+      _summarize();
       notifyListeners();
     });
     await refreshMaps();
@@ -797,6 +845,7 @@ class AppController {
     _recordChanges?.cancel();
     _recordFixes?.cancel();
     unawaited(guide?.leave());
+    unawaited(recap?.leave());
     unawaited(setAwake(false));
     changes.close();
   }

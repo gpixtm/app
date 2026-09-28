@@ -1,11 +1,27 @@
 import '../domain/app_message.dart';
 import '../domain/ports.dart';
 import '../domain/sync.dart';
+import '../domain/trail_statistics.dart';
 
 class SynchronizeLibrary implements Synchronizer {
-  SynchronizeLibrary(this.store, this.transport);
+  SynchronizeLibrary(this.store, this.transport, {this.statistics});
   final SyncStore store;
   final SyncTransport transport;
+
+  /// Refreshes the running GPX statistics once every local walk was pushed.
+  final ({StatisticsTransport transport, TrailStatisticsStore store})?
+  statistics;
+  Future<void> _refreshStatistics() async {
+    final s = statistics;
+    if (s == null) return;
+    try {
+      await s.store.replaceAll(await s.transport.fetch());
+    } catch (_) {
+      // An older API without statistics must not fail the library sync;
+      // the cache and local increments stay in use.
+    }
+  }
+
   bool _running = false;
   @override
   Future<Object> synchronize() async {
@@ -23,6 +39,7 @@ class SynchronizeLibrary implements Synchronizer {
         }
       }
       await store.merge(await transport.pull());
+      await _refreshStatistics();
       final conflicts = await store.conflictsCount();
       return conflicts == 0
           ? AppMessage.librarySynced

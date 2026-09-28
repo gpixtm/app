@@ -127,10 +127,15 @@ class RecordWalk {
     return result;
   }
 
-  Future<Trail?> finish() async {
+  /// [routeId] links a free walk to the route it created or matched.
+  Future<Trail?> finish({String? routeId}) async {
     if (current == null) return null;
     await pause();
-    final result = current!.snapshot(DateTime.now(), finished: true);
+    final result = current!.snapshot(
+      DateTime.now(),
+      finished: true,
+      routeId: routeId,
+    );
     await repository.save(result);
     await store.clear();
     current = null;

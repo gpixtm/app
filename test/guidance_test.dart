@@ -10,6 +10,7 @@ import 'package:gpix/domain/guidance.dart';
 import 'package:gpix/domain/models.dart';
 import 'package:gpix/domain/ports.dart';
 import 'package:gpix/domain/trail_geometry.dart';
+import 'package:gpix/domain/walk_recap.dart';
 import 'package:gpix/l10n/generated/app_localizations.dart';
 import 'package:gpix/presentation/guidance_text.dart';
 
@@ -52,6 +53,13 @@ class RecordingOutput implements GuidanceOutput {
     required bool speak,
     required bool notify,
   }) async => said.add(Announcement(instruction, speak, notify));
+  final recaps = <(WalkRecap, Set<RecapItem>, bool)>[];
+  @override
+  Future<void> summarize(
+    WalkRecap recap, {
+    required Set<RecapItem> spoken,
+    required bool notify,
+  }) async => recaps.add((recap, spoken, notify));
   @override
   Future<void> clear() async => cleared++;
 }

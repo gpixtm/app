@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../application/app_controller.dart';
 import '../domain/health_data.dart';
+import '../domain/walk_recap.dart';
+import 'guidance_text.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView(this.app, {required this.account, super.key});
@@ -23,6 +25,29 @@ class SettingsView extends StatelessWidget {
             subtitle: Text(context.l10n.voiceGuidanceInfo),
             value: app.voiceGuidance,
             onChanged: app.setVoiceGuidance,
+          ),
+        ),
+      if (app.recap != null)
+        Card(
+          child: ExpansionTile(
+            leading: const Icon(Icons.insights_outlined),
+            title: Text(context.l10n.recapSettings),
+            childrenPadding: const EdgeInsets.only(bottom: 8),
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(context.l10n.recapSettingsInfo),
+              ),
+              for (final item in RecapItem.values)
+                CheckboxListTile(
+                  dense: true,
+                  title: Text(recapItemLabel(context.l10n, item)),
+                  value: app.spokenRecap.contains(item),
+                  onChanged: app.voiceGuidance
+                      ? (spoken) => app.setSpokenRecap(item, spoken == true)
+                      : null,
+                ),
+            ],
           ),
         ),
       Card(

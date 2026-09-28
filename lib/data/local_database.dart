@@ -6,12 +6,17 @@ import 'package:uuid/uuid.dart';
 import '../domain/models.dart';
 import '../domain/ports.dart';
 import '../domain/sync.dart';
+import '../domain/trail_statistics.dart';
 import 'trail_codec.dart';
 
 Future<Database> openLocalDatabase(String path) => openDatabase(
   path,
-  version: 1,
+  version: 2,
+  onUpgrade: (db, from, _) async {
+    if (from < 2) await _createStatistics(db);
+  },
   onCreate: (db, _) async {
+    await _createStatistics(db);
     await db.execute(
       'CREATE TABLE trails (id TEXT PRIMARY KEY, payload TEXT NOT NULL, revision INTEGER NOT NULL DEFAULT 0, dirty INTEGER NOT NULL DEFAULT 1, deleted INTEGER NOT NULL DEFAULT 0, mutation TEXT NOT NULL)',
     );
@@ -26,6 +31,68 @@ Future<Database> openLocalDatabase(String path) => openDatabase(
     );
   },
 );
+
+/// Version 2: offline cache of the API's running statistics per followed GPX.
+Future<void> _createStatistics(DatabaseExecutor db) => db.execute(
+  'CREATE TABLE trail_statistics (trail_id TEXT PRIMARY KEY, walks INTEGER NOT NULL, metres REAL NOT NULL, seconds INTEGER NOT NULL)',
+);
+
+class SqliteTrailStatisticsStore implements TrailStatisticsStore {
+  const SqliteTrailStatisticsStore(this.db);
+  final Database db;
+  static TrailStatistics _read(Map<String, Object?> row) => TrailStatistics(
+    row['trail_id'] as String,
+    row['walks'] as int,
+    (row['metres'] as num).toDouble(),
+    row['seconds'] as int,
+  );
+  static Map<String, Object?> _row(TrailStatistics s) => {
+    'trail_id': s.trailId,
+    'walks': s.walks,
+    'metres': s.metres,
+    'seconds': s.seconds,
+  };
+
+  @override
+  Future<TrailStatistics?> find(String trailId) async {
+    final rows = await db.query(
+      'trail_statistics',
+      where: 'trail_id=?',
+      whereArgs: [trailId],
+    );
+    return rows.isEmpty ? null : _read(rows.first);
+  }
+
+  @override
+  Future<void> replaceAll(List<TrailStatistics> statistics) =>
+      db.transaction((txn) async {
+        await txn.delete('trail_statistics');
+        for (final s in statistics) {
+          await txn.insert('trail_statistics', _row(s));
+        }
+      });
+
+  @override
+  Future<void> addWalk(Trail walk) async {
+    final contribution = WalkContribution.of(walk);
+    if (contribution == null) return;
+    await db.transaction((txn) async {
+      final rows = await txn.query(
+        'trail_statistics',
+        where: 'trail_id=?',
+        whereArgs: [contribution.trailId],
+      );
+      final current = rows.isEmpty
+          ? TrailStatistics(contribution.trailId, 0, 0, 0)
+          : _read(rows.first);
+      await txn.insert(
+        'trail_statistics',
+        _row(current.add(contribution)),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    });
+  }
+}
 
 Future<void> enqueue(
   DatabaseExecutor db,

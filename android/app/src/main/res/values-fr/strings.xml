@@ -3,4 +3,6 @@
     <string name="health_privacy">Gpix · Données de santé\n\nGpix lit uniquement les pas, calories actives et fréquences cardiaques que vous autorisez dans Health Connect, pour la période d’une marche choisie.\n\nLa lecture se déclenche lorsque vous touchez « Compléter avec ma montre ». Ces mesures complètent la sortie enregistrée sur votre téléphone et sont synchronisées avec votre API personnelle pour les retrouver sur vos autres téléphones.\n\nAucune donnée de santé n’est utilisée à des fins publicitaires. Gpix n’écrit aucune donnée dans Health Connect.\n\nVous pouvez retirer les autorisations dans Health Connect à tout moment. Cela arrête les nouvelles lectures ; les valeurs déjà importées restent dans les sorties jusqu’à leur suppression dans l’historique Gpix.</string>
     <string name="guidance_channel">Guidage pas à pas</string>
     <string name="guidance_channel_description">Changements de direction annoncés pendant le suivi d’un parcours</string>
+    <string name="recap_channel">Bilan kilométrique</string>
+    <string name="recap_channel_description">Bilan de progression à chaque kilomètre parcouru</string>
 </resources>

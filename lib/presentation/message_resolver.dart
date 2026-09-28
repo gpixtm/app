@@ -469,5 +469,53 @@ String resolveAppMessage(
   ),
   'routeTooShort' => l10n.routeTooShort,
   'walkedRouteName' => l10n.walkedRouteName(message.arguments[0] as DateTime),
+  'recapTitle' => l10n.recapTitle(message.arguments[0] as int),
+  'recapDistance' => l10n.recapDistance(
+    argument(message.arguments[0]).toString(),
+  ),
+  'recapDurationMinutes' => l10n.recapDurationMinutes(
+    message.arguments[0] as int,
+  ),
+  'recapDurationHours' => l10n.recapDurationHours(
+    message.arguments[0] as int,
+    message.arguments[1] as int,
+  ),
+  'recapCurrentSpeed' => l10n.recapCurrentSpeed(
+    argument(message.arguments[0]).toString(),
+  ),
+  'recapAverageSpeed' => l10n.recapAverageSpeed(
+    argument(message.arguments[0]).toString(),
+  ),
+  'recapFaster' => l10n.recapFaster(
+    argument(message.arguments[0]).toString(),
+    argument(message.arguments[1]).toString(),
+  ),
+  'recapSlower' => l10n.recapSlower(
+    argument(message.arguments[0]).toString(),
+    argument(message.arguments[1]).toString(),
+  ),
+  'recapAsUsual' => l10n.recapAsUsual(
+    argument(message.arguments[0]).toString(),
+  ),
+  'recapPreviousWalks' => l10n.recapPreviousWalks(message.arguments[0] as int),
+  'recapRemaining' => l10n.recapRemaining(
+    argument(message.arguments[0]).toString(),
+  ),
+  'recapArrival' => l10n.recapArrival(
+    argument(message.arguments[0]).toString(),
+  ),
+  'recapAscent' => l10n.recapAscent(message.arguments[0] as int),
+  'recapClock' => l10n.recapClock(argument(message.arguments[0]).toString()),
+  'recapSettings' => l10n.recapSettings,
+  'recapSettingsInfo' => l10n.recapSettingsInfo,
+  'recapItemDistance' => l10n.recapItemDistance,
+  'recapItemDuration' => l10n.recapItemDuration,
+  'recapItemCurrentSpeed' => l10n.recapItemCurrentSpeed,
+  'recapItemAverageSpeed' => l10n.recapItemAverageSpeed,
+  'recapItemComparison' => l10n.recapItemComparison,
+  'recapItemRemaining' => l10n.recapItemRemaining,
+  'recapItemArrival' => l10n.recapItemArrival,
+  'recapItemAscent' => l10n.recapItemAscent,
+  'recapItemClock' => l10n.recapItemClock,
   _ => l10n.unexpectedError,
 };

@@ -1515,4 +1515,132 @@ class AppLocalizationsEn extends AppLocalizations {
 
     return 'Route of $dateString';
   }
+
+  @override
+  String recapTitle(int kilometre) {
+    return 'Kilometre $kilometre';
+  }
+
+  @override
+  String recapDistance(String distance) {
+    return '$distance km walked.';
+  }
+
+  @override
+  String recapDurationMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Walking for $minutes minutes.',
+      one: 'Walking for 1 minute.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recapDurationHours(int hours, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'Walking for $hours hours',
+      one: 'Walking for 1 hour',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutes',
+      one: '1 minute',
+    );
+    return '$_temp0 and $_temp1.';
+  }
+
+  @override
+  String recapCurrentSpeed(String speed) {
+    return 'Last kilometre at $speed km/h.';
+  }
+
+  @override
+  String recapAverageSpeed(String speed) {
+    return 'Average speed $speed km/h.';
+  }
+
+  @override
+  String recapFaster(String difference, String usual) {
+    return '$difference km/h faster than your usual $usual km/h.';
+  }
+
+  @override
+  String recapSlower(String difference, String usual) {
+    return '$difference km/h slower than your usual $usual km/h.';
+  }
+
+  @override
+  String recapAsUsual(String usual) {
+    return 'Same speed as usual, $usual km/h.';
+  }
+
+  @override
+  String recapPreviousWalks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Walked $count times before.',
+      one: 'Walked once before.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String recapRemaining(String distance) {
+    return '$distance km to go.';
+  }
+
+  @override
+  String recapArrival(String time) {
+    return 'Estimated arrival at $time.';
+  }
+
+  @override
+  String recapAscent(int metres) {
+    return '$metres m climbed.';
+  }
+
+  @override
+  String recapClock(String time) {
+    return 'It is $time.';
+  }
+
+  @override
+  String get recapSettings => 'Kilometre summary';
+
+  @override
+  String get recapSettingsInfo =>
+      'Every kilometre walked, a summary is spoken and, while Gpix is in the background, shown in a notification. Choose what the voice reads. Comparisons need earlier walks on the same trail; remaining distance and arrival need a followed trail.';
+
+  @override
+  String get recapItemDistance => 'Distance walked';
+
+  @override
+  String get recapItemDuration => 'Walking time';
+
+  @override
+  String get recapItemCurrentSpeed => 'Current speed (last kilometre)';
+
+  @override
+  String get recapItemAverageSpeed => 'Average speed';
+
+  @override
+  String get recapItemComparison => 'Comparison with your usual speed';
+
+  @override
+  String get recapItemRemaining => 'Remaining distance';
+
+  @override
+  String get recapItemArrival => 'Estimated arrival time';
+
+  @override
+  String get recapItemAscent => 'Elevation gain';
+
+  @override
+  String get recapItemClock => 'Current time';
 }
