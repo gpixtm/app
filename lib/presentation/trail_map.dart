@@ -12,6 +12,7 @@ import 'package:maplibre_gl/maplibre_gl.dart';
 
 import '../domain/models.dart';
 import '../domain/place_search.dart';
+import '../domain/point_attachment.dart';
 import '../domain/heading.dart';
 import '../domain/trail_geometry.dart';
 import '../application/app_controller.dart';
@@ -20,6 +21,7 @@ import 'position_arrow.dart';
 import 'pin_images.dart';
 import 'trail_pins.dart';
 import 'trail_places.dart';
+import 'attach_points.dart' show attachHex;
 
 const dayColors = ['#c66a25', '#7956b2', '#087e8b', '#b03c68'];
 
@@ -56,6 +58,8 @@ class _TrailMapState extends State<TrailMap> {
   int focusRevision = 0;
   late int placeRevision = app.placeRevision;
   Object? renderedTrails;
+  Object? renderedPlaces;
+  Object? renderedAttach;
   String? renderedSelection;
   Object? renderedDays;
   Object? renderedHistory;
@@ -421,7 +425,22 @@ class _TrailMapState extends State<TrailMap> {
           renderedSamples = recording?.samples.length;
         }
         final selected = app.focused?.id;
+        if (!identical(renderedAttach, app.attaching)) {
+          await c.setGeoJsonSource(
+            'attach',
+            collection([
+              for (final p in app.attaching?.points ?? const <PlannedPoint>[])
+                feature(
+                  'Point',
+                  [p.poi.point.lon, p.poi.point.lat],
+                  {'color': attachHex(p.fate)},
+                ),
+            ]),
+          );
+          renderedAttach = app.attaching;
+        }
         if (!identical(renderedTrails, app.trails) ||
+            !identical(renderedPlaces, app.places) ||
             renderedSelection != selected) {
           final focused = app.focused;
           await c.setGeoJsonSource(
@@ -453,6 +472,7 @@ class _TrailMapState extends State<TrailMap> {
             ]),
           );
           renderedTrails = app.trails;
+          renderedPlaces = app.places;
           renderedSelection = selected;
           renderedDays = null;
         }
@@ -610,6 +630,7 @@ class _TrailMapState extends State<TrailMap> {
   Future<void> styleLoaded() async {
     loaded = false;
     renderedTrails = renderedDays = null;
+    renderedPlaces = renderedAttach = null;
     anchoredTrails = anchoredPins = anchoredFocus = null;
     renderedHistory = null;
     renderedApproach = null;
@@ -621,6 +642,7 @@ class _TrailMapState extends State<TrailMap> {
       'days',
       'ends',
       'pois',
+      'attach',
       'position',
       'heading',
       'history',
@@ -695,6 +717,18 @@ class _TrailMapState extends State<TrailMap> {
       const CircleLayerProperties(
         circleRadius: 7,
         circleColor: '#d47b37',
+        circleStrokeWidth: 2,
+        circleStrokeColor: '#ffffff',
+      ),
+      enableInteraction: false,
+    );
+    // Points being attached to a trail, coloured by what becomes of them.
+    await c.addCircleLayer(
+      'attach',
+      'attach-dots',
+      const CircleLayerProperties(
+        circleRadius: 7,
+        circleColor: ['get', 'color'],
         circleStrokeWidth: 2,
         circleStrokeColor: '#ffffff',
       ),

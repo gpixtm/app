@@ -139,6 +139,27 @@ Future<void> showTrailPlace(
             '${l10n.placeAddedBy(author)} · ${DateFormat.yMMMd(l10n.localeName).format(place.updatedAt.toLocal())}',
             style: const TextStyle(fontSize: 12, color: Color(0xff627068)),
           ),
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Row(
+              children: [
+                Icon(
+                  place.origin == PlaceOrigin.onSite
+                      ? Icons.verified_outlined
+                      : Icons.upload_file_outlined,
+                  size: 16,
+                  color: forest,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  place.origin == PlaceOrigin.onSite
+                      ? l10n.placeSeenOnSite
+                      : l10n.placeImported,
+                  style: const TextStyle(fontSize: 12, color: forest),
+                ),
+              ],
+            ),
+          ),
           if (place.pending)
             Text(l10n.placePending, style: const TextStyle(fontSize: 12)),
           if (place.mine)

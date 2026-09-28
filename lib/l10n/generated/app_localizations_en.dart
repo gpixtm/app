@@ -2202,4 +2202,178 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get healthShareFailed =>
       'Could not add the walk to Health Connect. You can send it again from its history page.';
+
+  @override
+  String get pointsFileNotAttached => 'Not attached to a trail';
+
+  @override
+  String pointsFilesBanner(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count points files are not attached to a trail',
+      one: '1 points file is not attached to a trail',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get showPointsFiles => 'Show them';
+
+  @override
+  String get showAllItems => 'Show all';
+
+  @override
+  String get attachToTrail => 'Attach to a trail';
+
+  @override
+  String get addPoints => 'Add points';
+
+  @override
+  String get addPointsFromPhone => 'From a GPX file on this phone';
+
+  @override
+  String get addPointsFromLibrary => 'Points files in my library';
+
+  @override
+  String get attachPointsTitle => 'Attach points to a trail';
+
+  @override
+  String attachPointsFrom(int count, String files) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count points from $files',
+      one: '1 point from $files',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String attachPointsTo(String trail) {
+    return 'Trail: $trail';
+  }
+
+  @override
+  String get changeTrail => 'Change trail';
+
+  @override
+  String get chooseAttachTrail => 'Choose the trail';
+
+  @override
+  String pointsWithinReach(int inRange, int total) {
+    return '$inRange of $total points within 5 km';
+  }
+
+  @override
+  String get recommendedTrail => 'Recommended';
+
+  @override
+  String get catalogueTrailChoice => 'Shared trail, not on this phone';
+
+  @override
+  String attachAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new places',
+      one: '1 new place',
+      zero: 'No new place',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String attachKnown(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count points already on the trail',
+      one: '1 point already on the trail',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String attachTooFar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count points more than 5 km away stay in the file',
+      one: '1 point more than 5 km away stays in the file',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String attachUnnamed(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count points without a name stay in the file',
+      one: '1 point without a name stays in the file',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get attachShareConfirm =>
+      'These places will be visible to every walker. I confirm I may share them.';
+
+  @override
+  String get attach => 'Attach';
+
+  @override
+  String get undo => 'Undo';
+
+  @override
+  String get noTrailNearPoints =>
+      'No trail in your library or around these points passes within 5 km of them.';
+
+  @override
+  String pointsAttached(int added, int known, int left) {
+    String _temp0 = intl.Intl.pluralLogic(
+      added,
+      locale: localeName,
+      other: '$added new places',
+      one: '1 new place',
+      zero: 'No new place',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      known,
+      locale: localeName,
+      other: '$known already there',
+      one: '1 already there',
+      zero: 'none already there',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      left,
+      locale: localeName,
+      other: '$left points stay in the file.',
+      one: '1 point stays in the file.',
+      zero: 'Nothing left in the file.',
+    );
+    return '$_temp0 on the trail, $_temp1. $_temp2';
+  }
+
+  @override
+  String get attachmentUndone =>
+      'Attachment undone: the points file is back in your library.';
+
+  @override
+  String get placeSeenOnSite => 'Seen on site';
+
+  @override
+  String get placeImported => 'Imported from a GPX file';
+
+  @override
+  String trailPlaceCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count places',
+      one: '1 place',
+    );
+    return '$_temp0';
+  }
 }

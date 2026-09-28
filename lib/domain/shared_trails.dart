@@ -92,8 +92,18 @@ class TrailReviews {
 
 const maximumReviewLength = 2000;
 
-/// A place a walker added on a shared trail from where they stood, such as a
-/// viewpoint or a spring. Shared with everyone; only its author changes it.
+/// How a place came onto its trail.
+enum PlaceOrigin {
+  /// A walker added it where they stood.
+  onSite,
+
+  /// Imported from a GPX file's waypoints and attached to the trail.
+  imported,
+}
+
+/// A place on a shared trail, such as a viewpoint, a spring or a hostel: added
+/// by a walker where they stood, or imported from a GPX file. Shared with
+/// everyone; only its author changes it.
 class TrailPlace {
   const TrailPlace({
     required this.id,
@@ -107,6 +117,7 @@ class TrailPlace {
     this.deleted = false,
     this.change = 0,
     this.pending = false,
+    this.origin = PlaceOrigin.onSite,
   });
   final String id, trailId, name, comment;
   final GeoPoint point;
@@ -114,6 +125,7 @@ class TrailPlace {
   final bool mine, deleted;
   final DateTime updatedAt;
   final int change;
+  final PlaceOrigin origin;
 
   /// Saved on this phone, waiting for a connection to be shared.
   final bool pending;
@@ -129,11 +141,21 @@ class TrailPlace {
     author: author,
     change: change,
     pending: true,
+    origin: origin,
   );
 }
 
-/// A place belongs to the trail it is added on: the walker stands this close.
+/// A place added on site belongs to the trail it is added on: the walker
+/// stands this close.
 const maximumPlaceDistance = 100.0;
+
+/// An imported place may lie off the path, such as a hostel in the village,
+/// but not beyond this.
+const maximumImportedPlaceDistance = 5000.0;
+
+/// An imported place this close to a place of the same name on the same trail
+/// is that place. The API applies the same rule when it receives it.
+const duplicatePlaceDistance = 30.0;
 const maximumPlaceNameLength = 200;
 
 class TrailPlacePage {
@@ -170,6 +192,19 @@ abstract interface class SharedTrailStore {
   /// Queue a new or edited place of this walker, durably, even offline.
   Future<void> savePlace(TrailPlace place);
   Future<void> removePlace(TrailPlace place);
+
+  /// Queue [places] imported from points files and update those files in the
+  /// same transaction: [remaining] keep the points left out, the files in
+  /// [emptied] leave the library.
+  Future<void> attachPoints(
+    List<TrailPlace> places, {
+    required List<Trail> remaining,
+    required List<String> emptied,
+  });
+
+  /// Undo [attachPoints]: withdraw [places] and restore the files as they
+  /// were, in one transaction.
+  Future<void> detachPoints(List<TrailPlace> places, List<Trail> originals);
 
   /// Queued changes, their trail resolved to the shared trail it now links to.
   Future<List<PendingPlace>> pendingPlaces();

@@ -12,6 +12,7 @@ import '../application/app_controller.dart';
 import 'design.dart';
 import 'auth.dart';
 import '../application/auth_controller.dart';
+import 'attach_points.dart';
 import 'catalogue_view.dart';
 import 'map_workspace.dart';
 import 'history.dart';
@@ -43,6 +44,9 @@ enum Screen { map, catalogue, trails, history, offline, settings }
 class _HomeState extends State<Home> with WidgetsBindingObserver {
   Screen page = Screen.map;
   String trailQuery = '';
+
+  /// The library lists only the points files not attached to a trail.
+  bool onlyPointsFiles = false;
   AppController get app => widget.app;
   void open(Screen value) => setState(() => page = value);
   void showOnMap(Trail trail) {
@@ -65,12 +69,16 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) =>
       app.lifecycle(state == AppLifecycleState.resumed);
-  Future<void> import() async {
+
+  /// Import the GPX files chosen together. Points files among them are
+  /// previewed on the map, attached to [attachTo] or to the best trail.
+  Future<void> import({Trail? attachTo}) async {
     try {
       final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['gpx'],
       );
+      final files = <(String, String)>[];
       for (final file in result) {
         if ((await file.length() ?? 0) > 50 * 1024 * 1024) {
           throw MessageFormatException(AppMessage.gpxSizeLimit);
@@ -89,11 +97,30 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
           if (corrected == null) continue;
           name = corrected;
         }
-        await app.import(text, name);
+        files.add((text, name));
       }
+      if (files.isEmpty) return;
+      await app.importFiles(files, attachTo: attachTo);
+      if (app.attaching != null) open(Screen.map);
     } catch (e) {
       await app.run(() async => throw e);
     }
+  }
+
+  /// Preview attaching a points file of the library to its best trail.
+  Future<void> attach(Trail file) async {
+    await app.beginAttachment([file]);
+    if (app.attaching != null) open(Screen.map);
+  }
+
+  Future<void> addPoints(Trail trail) async {
+    final started = await addPointsTo(
+      context,
+      app,
+      trail,
+      importFromPhone: (target) => import(attachTo: target),
+    );
+    if (started) open(Screen.map);
   }
 
   void settings() => open(Screen.settings);
@@ -249,6 +276,12 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                             maxLines: 4,
                           ),
                         ),
+                        if (app.message case AppMessage(code: 'pointsAttached')
+                            when app.lastAttachment != null)
+                          TextButton(
+                            onPressed: app.busy ? null : app.undoAttachment,
+                            child: Text(context.l10n.undo),
+                          ),
                         IconButton(
                           onPressed: () => setState(() => app.message = null),
                           icon: const Icon(Icons.close),
@@ -289,8 +322,10 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   Widget libraryView(BuildContext context) {
     final query = foldForSearch(trailQuery.trim());
+    final pointsFiles = app.pointsFiles;
+    final onlyPoints = onlyPointsFiles && pointsFiles.isNotEmpty;
     final shown = [
-      for (final trail in app.trails)
+      for (final trail in onlyPoints ? pointsFiles : app.trails)
         if (query.isEmpty || foldForSearch(trail.name).contains(query)) trail,
     ];
     return ListView(
@@ -330,6 +365,30 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
           style: const TextStyle(fontSize: 12, color: Color(0xff627068)),
         ),
         const SizedBox(height: 12),
+        // Points files are not shown with any trail until they are attached.
+        if (pointsFiles.isNotEmpty && app.collaborative != null)
+          Card(
+            color: const Color(0xffffedcd),
+            margin: const EdgeInsets.only(bottom: 12),
+            child: ListTile(
+              leading: const Icon(
+                Icons.wrong_location_outlined,
+                color: Color(0xff6b4b14),
+              ),
+              title: Text(
+                context.l10n.pointsFilesBanner(pointsFiles.length),
+                style: const TextStyle(fontSize: 14),
+              ),
+              trailing: TextButton(
+                onPressed: () => setState(() => onlyPointsFiles = !onlyPoints),
+                child: Text(
+                  onlyPoints
+                      ? context.l10n.showAllItems
+                      : context.l10n.showPointsFiles,
+                ),
+              ),
+            ),
+          ),
         if (app.trails.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
@@ -375,8 +434,15 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   ),
                 ),
                 PopupMenuButton<String>(
-                  onSelected: (_) => confirmDelete(trail),
+                  onSelected: (choice) => choice == 'points'
+                      ? addPoints(trail)
+                      : confirmDelete(trail),
                   itemBuilder: (_) => [
+                    if (trail.followable && app.collaborative != null)
+                      PopupMenuItem(
+                        value: 'points',
+                        child: Text(context.l10n.addPoints),
+                      ),
                     PopupMenuItem(
                       value: 'delete',
                       child: Text(context.l10n.delete),
@@ -387,10 +453,14 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
             ),
             Text(
               trail.followable
-                  ? context.l10n.segmentCount(
-                      kilometers(TrailGeometry(trail).total),
-                      trail.segments.length,
-                    )
+                  ? [
+                      context.l10n.segmentCount(
+                        kilometers(TrailGeometry(trail).total),
+                        trail.segments.length,
+                      ),
+                      if (app.placeCount(trail) case final count when count > 0)
+                        context.l10n.trailPlaceCount(count),
+                    ].join(' · ')
                   : context.l10n.pointCount(trail.pois.length),
             ),
             const SizedBox(height: 8),
@@ -399,8 +469,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   ? (app.covers(trail)
                         ? context.l10n.mapReady
                         : context.l10n.mapNeedsPreparation)
-                  : context.l10n.savedPlaces,
-              good: !trail.followable || app.covers(trail),
+                  : context.l10n.pointsFileNotAttached,
+              good: trail.followable && app.covers(trail),
             ),
             if (app.isOfflineCopy(trail))
               Padding(
@@ -418,6 +488,12 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   icon: const Icon(Icons.center_focus_strong),
                   label: Text(context.l10n.view),
                 ),
+                if (!trail.followable && app.collaborative != null)
+                  TextButton.icon(
+                    onPressed: app.busy ? null : () => attach(trail),
+                    icon: const Icon(Icons.add_location_alt_outlined),
+                    label: Text(context.l10n.attachToTrail),
+                  ),
                 if (trail.followable) ...[
                   TextButton.icon(
                     onPressed: app.busy

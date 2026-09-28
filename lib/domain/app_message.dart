@@ -131,6 +131,10 @@ class AppMessage {
   static const placeTooFar = AppMessage('placeTooFar');
   static const placeSaved = AppMessage('placeSaved');
   static const placeDeleted = AppMessage('placeDeleted');
+  static const noTrailNearPoints = AppMessage('noTrailNearPoints');
+  static AppMessage pointsAttached(Object? arg1, Object? arg2, Object? arg3) =>
+      AppMessage('pointsAttached', [arg1, arg2, arg3]);
+  static const attachmentUndone = AppMessage('attachmentUndone');
   static AppMessage trailsAlreadyShared(Object? arg1) =>
       AppMessage('trailsAlreadyShared', [arg1]);
   static const catalogueUnavailable = AppMessage('catalogueUnavailable');

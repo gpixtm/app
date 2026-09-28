@@ -66,6 +66,17 @@ class Trail {
     walk: walk,
     publicId: value,
   );
+  Trail withPois(List<Poi> value) => Trail(
+    id: id,
+    name: name,
+    segments: segments,
+    pois: value,
+    description: description,
+    estimated: estimated,
+    days: days,
+    walk: walk,
+    publicId: publicId,
+  );
 
   /// Shared trail this library entry published or reused. It is kept beside
   /// the synced payload, never inside it. A line added on a phone usually
