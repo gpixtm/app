@@ -129,6 +129,16 @@ class AppMessage {
   static const placeDeleted = AppMessage('placeDeleted');
   static AppMessage trailsAlreadyShared(Object? arg1) =>
       AppMessage('trailsAlreadyShared', [arg1]);
+  static const catalogueUnavailable = AppMessage('catalogueUnavailable');
+  static const invalidGroup = AppMessage('invalidGroup');
+  static const availableOffline = AppMessage('availableOffline');
+  static const offlineRemoved = AppMessage('offlineRemoved');
+  static const groupSaved = AppMessage('groupSaved');
+  static const groupDeleted = AppMessage('groupDeleted');
+  static AppMessage addedToGroup(Object? arg1) =>
+      AppMessage('addedToGroup', [arg1]);
+  static AppMessage groupAvailableOffline(Object? arg1) =>
+      AppMessage('groupAvailableOffline', [arg1]);
 }
 
 /// Preserve the failure category while exposing a translatable payload.

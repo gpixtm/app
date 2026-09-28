@@ -2941,6 +2941,450 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Place deleted'**
   String get placeDeleted;
+
+  /// No description provided for @allTrails.
+  ///
+  /// In en, this message translates to:
+  /// **'All trails'**
+  String get allTrails;
+
+  /// No description provided for @searchAllTrails.
+  ///
+  /// In en, this message translates to:
+  /// **'Search trails, GR 20, Compostela…'**
+  String get searchAllTrails;
+
+  /// No description provided for @catalogueNeedsConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'The catalogue needs a connection. Your trails and those made available offline stay usable.'**
+  String get catalogueNeedsConnection;
+
+  /// No description provided for @catalogueEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No trails in the catalogue yet.'**
+  String get catalogueEmpty;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @myGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'My groups'**
+  String get myGroups;
+
+  /// No description provided for @ownTrailsLegend.
+  ///
+  /// In en, this message translates to:
+  /// **'My trails (on this phone)'**
+  String get ownTrailsLegend;
+
+  /// No description provided for @catalogueTrailsLegend.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalogue trails'**
+  String get catalogueTrailsLegend;
+
+  /// No description provided for @ownTrailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'your trail'**
+  String get ownTrailLabel;
+
+  /// No description provided for @catalogueTrailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'catalogue trail'**
+  String get catalogueTrailLabel;
+
+  /// No description provided for @itinerary.
+  ///
+  /// In en, this message translates to:
+  /// **'Itinerary'**
+  String get itinerary;
+
+  /// No description provided for @collection.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection'**
+  String get collection;
+
+  /// No description provided for @itineraryInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Trails in order, as stages walked one after another.'**
+  String get itineraryInfo;
+
+  /// No description provided for @collectionInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Trails gathered by theme, in no particular order.'**
+  String get collectionInfo;
+
+  /// No description provided for @stJamesCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'Ways of St James (Camino de Santiago)'**
+  String get stJamesCollection;
+
+  /// No description provided for @stJamesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Every pilgrim route to Santiago de Compostela in the catalogue, with its stages and variants.'**
+  String get stJamesDescription;
+
+  /// No description provided for @mainRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Main route'**
+  String get mainRoute;
+
+  /// No description provided for @variantRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Variant'**
+  String get variantRoute;
+
+  /// No description provided for @linkRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Link'**
+  String get linkRoute;
+
+  /// No description provided for @excursionRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Excursion'**
+  String get excursionRoute;
+
+  /// No description provided for @approachRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Access route'**
+  String get approachRoute;
+
+  /// No description provided for @stageNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage {stage}'**
+  String stageNumber(int stage);
+
+  /// No description provided for @stageOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage {stage} of'**
+  String stageOf(int stage);
+
+  /// No description provided for @partOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Part of'**
+  String get partOf;
+
+  /// No description provided for @waymarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Waymarks'**
+  String get waymarks;
+
+  /// No description provided for @internationalNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'International trail'**
+  String get internationalNetwork;
+
+  /// No description provided for @nationalNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'National trail'**
+  String get nationalNetwork;
+
+  /// No description provided for @regionalNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Regional trail'**
+  String get regionalNetwork;
+
+  /// No description provided for @localNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Local trail'**
+  String get localNetwork;
+
+  /// No description provided for @fromTo.
+  ///
+  /// In en, this message translates to:
+  /// **'From {from} to {to}'**
+  String fromTo(String from, String to);
+
+  /// No description provided for @loopTrail.
+  ///
+  /// In en, this message translates to:
+  /// **'Loop'**
+  String get loopTrail;
+
+  /// No description provided for @showMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Show more'**
+  String get showMore;
+
+  /// No description provided for @showLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get showLess;
+
+  /// No description provided for @trailWithdrawn.
+  ///
+  /// In en, this message translates to:
+  /// **'This trail is no longer in its source; it stays available for your walks.'**
+  String get trailWithdrawn;
+
+  /// No description provided for @website.
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get website;
+
+  /// No description provided for @wikipedia.
+  ///
+  /// In en, this message translates to:
+  /// **'Wikipedia'**
+  String get wikipedia;
+
+  /// No description provided for @openStreetMapAttribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Trail data © OpenStreetMap contributors, ODbL licence'**
+  String get openStreetMapAttribution;
+
+  /// No description provided for @openDataAttribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Trail data: {source}'**
+  String openDataAttribution(String source);
+
+  /// No description provided for @viewOnOpenStreetMap.
+  ///
+  /// In en, this message translates to:
+  /// **'View on OpenStreetMap'**
+  String get viewOnOpenStreetMap;
+
+  /// No description provided for @makeAvailableOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Make available offline'**
+  String get makeAvailableOffline;
+
+  /// No description provided for @availableOfflineLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Available offline on this phone'**
+  String get availableOfflineLabel;
+
+  /// No description provided for @removeFromPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get removeFromPhone;
+
+  /// No description provided for @addToGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to a group'**
+  String get addToGroup;
+
+  /// No description provided for @byAuthor.
+  ///
+  /// In en, this message translates to:
+  /// **'By {author}'**
+  String byAuthor(String author);
+
+  /// No description provided for @editGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit the group'**
+  String get editGroup;
+
+  /// No description provided for @deleteGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the group'**
+  String get deleteGroup;
+
+  /// No description provided for @deleteGroupQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this group?'**
+  String get deleteGroupQuestion;
+
+  /// No description provided for @deleteGroupInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'The group disappears for every walker. Its trails stay in the catalogue.'**
+  String get deleteGroupInfo;
+
+  /// No description provided for @emptyGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'No trails in this group yet.'**
+  String get emptyGroup;
+
+  /// No description provided for @makeGroupAvailableOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Make all its trails available offline'**
+  String get makeGroupAvailableOffline;
+
+  /// No description provided for @groupTooLargeOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many trails to keep them all offline: open them one by one'**
+  String get groupTooLargeOffline;
+
+  /// No description provided for @memberActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Trail actions'**
+  String get memberActions;
+
+  /// No description provided for @moveUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Move up'**
+  String get moveUp;
+
+  /// No description provided for @moveDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Move down'**
+  String get moveDown;
+
+  /// No description provided for @removeFromGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from the group'**
+  String get removeFromGroup;
+
+  /// No description provided for @newGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'New group'**
+  String get newGroup;
+
+  /// No description provided for @groupName.
+  ///
+  /// In en, this message translates to:
+  /// **'Group name'**
+  String get groupName;
+
+  /// No description provided for @groupDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
+  String get groupDescription;
+
+  /// No description provided for @groupsArePublic.
+  ///
+  /// In en, this message translates to:
+  /// **'Groups are shared with every walker, like trails.'**
+  String get groupsArePublic;
+
+  /// No description provided for @noGroupsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no groups yet.'**
+  String get noGroupsYet;
+
+  /// No description provided for @catalogueUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The catalogue is unavailable. Check your connection.'**
+  String get catalogueUnavailable;
+
+  /// No description provided for @invalidGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Give the group a name (200 characters maximum).'**
+  String get invalidGroup;
+
+  /// No description provided for @availableOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Trail available offline; its maps are being prepared.'**
+  String get availableOffline;
+
+  /// No description provided for @offlineRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Trail removed from this phone'**
+  String get offlineRemoved;
+
+  /// No description provided for @groupSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Group saved'**
+  String get groupSaved;
+
+  /// No description provided for @groupDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Group deleted'**
+  String get groupDeleted;
+
+  /// No description provided for @addedToGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to “{arg1}”'**
+  String addedToGroup(String arg1);
+
+  /// No description provided for @groupAvailableOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'{arg1, plural, =1{1 trail of the group is available offline} other{{arg1} trails of the group are available offline}}'**
+  String groupAvailableOffline(int arg1);
+
+  /// No description provided for @unknownGroupMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync your trails before adding them to a group.'**
+  String get unknownGroupMember;
+
+  /// No description provided for @groupContainsItself.
+  ///
+  /// In en, this message translates to:
+  /// **'A group cannot contain itself.'**
+  String get groupContainsItself;
+
+  /// No description provided for @groupNotYours.
+  ///
+  /// In en, this message translates to:
+  /// **'Only its author can change this group.'**
+  String get groupNotYours;
+
+  /// No description provided for @searchTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Search too long (200 characters maximum).'**
+  String get searchTooLong;
+
+  /// No description provided for @invalidRecordingReference.
+  ///
+  /// In en, this message translates to:
+  /// **'The trail this walk followed could not be saved with it.'**
+  String get invalidRecordingReference;
+
+  /// No description provided for @catalogueTrailKeptOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalogue trail kept offline on this phone'**
+  String get catalogueTrailKeptOffline;
 }
 
 class _AppLocalizationsDelegate

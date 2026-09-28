@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 const forest = Color(0xff174b38);
+
+/// Trails of the catalogue that are not on the phone. The walker's own trails
+/// (imported, created or made available offline) keep [forest].
+const catalogueColor = Color(0xff6b3fa0);
+const catalogueHex = '#6b3fa0';
+const ownTrailHex = '#184f36';
 const paper = Color(0xfff7f8f2);
 const ink = Color(0xff172a22);
 String decimal(num value, [int digits = 1]) =>

@@ -3,6 +3,7 @@ import '../domain/app_message.dart';
 import 'dart:async';
 import 'dart:isolate';
 
+import '../domain/line_simplify.dart';
 import '../domain/models.dart';
 import '../domain/ports.dart';
 import '../domain/trail_identity.dart';
@@ -66,7 +67,14 @@ class RecordWalk {
         name: source?.name ?? freeWalkName?.call() ?? 'Walk',
         segments: [],
         pois: [],
-        walk: WalkDetails(started: now, seconds: 0, sourceTrailId: source?.id),
+        walk: WalkDetails(
+          started: now,
+          seconds: 0,
+          sourceTrailId: source?.id,
+          reference: source == null
+              ? null
+              : WalkReference(source.name, simplifyLines(source.segments)),
+        ),
       ),
     );
     current!.resume(now);

@@ -11,6 +11,7 @@ import 'package:gpix/data/shared_trail_api.dart';
 import 'package:gpix/data/trail_codec.dart';
 import 'package:gpix/data/trail_identity_hash.dart';
 import 'package:gpix/domain/app_message.dart';
+import 'package:gpix/domain/catalogue.dart';
 import 'package:gpix/domain/connection_settings.dart';
 import 'package:gpix/domain/models.dart';
 import 'package:gpix/domain/walk_recording.dart';
@@ -59,7 +60,6 @@ class _Phone {
       repository,
       XmlGpxDecoder(),
       Elevation(),
-      shared: shared,
       identity: const HashedTrailIdentity(),
     );
     sync = SynchronizeLibrary(
@@ -72,6 +72,7 @@ class _Phone {
       transport,
       repository,
       newId: const Uuid().v4,
+      catalogue: transport,
     );
   }
   final Database db;
@@ -128,18 +129,25 @@ ${[for (var i = 0; i < 12; i++) '<trkpt lat="${origin + i * .0009}" lon="5.5"><e
         await a.sync.synchronize();
         expect((await a.repository.all()).single.publicId, id);
 
-        await b.sync.synchronize();
-        final listed = (await b.shared.all()).singleWhere((t) => t.id == id);
+        // The other walker finds it on the server, by area and by name.
+        final area = await b.trails.area(
+          Bounds(5.49, origin - .001, 5.51, origin + .011),
+        );
+        final listed = area.trails.singleWhere((t) => t.id == id);
         expect(listed.name, 'Sentier des crêtes 🥾');
         expect(listed.author, startsWith('it_a_'));
+        final found = await b.trails.search('Sentier des crêtes');
+        expect(
+          found.items.whereType<CatalogueTrailItem>().map((i) => i.trail.id),
+          contains(id),
+        );
 
         final copy = await b.library.import(gpx('Renamed export'), 'b');
-        expect(copy.reused, 1, reason: 'no duplicate');
-        expect(copy.trails.single.id, id);
+        expect(copy.trails.single.id, id, reason: 'same line, same trail');
         await b.sync.synchronize();
         expect((await b.repository.all()).single.publicId, id);
 
-        final downloaded = await b.trails.open(id);
+        final downloaded = (await b.trails.open(id)).trail;
         expect(downloaded.segments.single, hasLength(12));
 
         await expectLater(
@@ -175,8 +183,7 @@ ${[for (var i = 0; i < 12; i++) '<trkpt lat="${origin + i * .0009}" lon="5.5"><e
         expect(reviewed.canReview, isTrue);
         expect(reviewed.mine!.comment, 'Magnifique 🌄');
 
-        await a.sync.synchronize();
-        final rated = (await a.shared.all()).singleWhere((t) => t.id == id);
+        final rated = (await a.trails.open(id)).details;
         expect(rated.reviews, 1);
         expect(rated.average, 5);
         // A place added on the trail reaches the other walker.

@@ -24,6 +24,9 @@ class Repository implements TrailRepository {
   Future<void> keep(Trail t) async {
     if (!list.any((known) => known.id == t.id)) list.add(t);
   }
+
+  @override
+  Future<Set<String>> offlineCopies() async => {};
 }
 
 class Maps implements MapRepository {

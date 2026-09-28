@@ -6,6 +6,10 @@ abstract interface class TrailRepository {
 
   /// Keep a downloaded shared trail on this phone without queuing a change.
   Future<void> keep(Trail trail);
+
+  /// Shared trails only kept on this phone, never changed by the walker: the
+  /// trails they made available offline.
+  Future<Set<String>> offlineCopies();
   Future<void> delete(String id);
 }
 

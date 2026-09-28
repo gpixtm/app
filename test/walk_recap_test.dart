@@ -383,7 +383,7 @@ void main() {
       await SqliteTrailRepository(v1).save(finishedWalk(source: usualTrail));
       await v1.close();
       final upgraded = await openLocalDatabase(path);
-      expect(await upgraded.getVersion(), 3);
+      expect(await upgraded.getVersion(), 4);
       final trails = await SqliteTrailRepository(upgraded).all();
       expect(trails.single.walk!.sourceTrailId, usualTrail);
       expect(await SqliteSyncStore(upgraded).next(), isNotNull);

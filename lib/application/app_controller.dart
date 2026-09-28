@@ -16,6 +16,7 @@ import '../domain/connection_settings.dart';
 import '../domain/day_plan.dart';
 import '../domain/health_data.dart';
 import '../domain/approach.dart';
+import '../domain/catalogue.dart';
 import '../domain/place_search.dart';
 import '../domain/shared_trails.dart';
 import '../domain/trail_statistics.dart';
@@ -45,42 +46,299 @@ class AppController {
     this.collaborative,
   });
 
-  /// Trails every walker shared; absent in tests and older setups.
+  /// Trails every walker shared and the open-data catalogue; absent in tests
+  /// and older setups.
   final CollaborativeTrails? collaborative;
 
-  /// Offline catalogue of shared trails.
-  List<SharedTrail> shared = [];
-  Map<String, SharedTrail> _sharedById = {};
+  /// Catalogue trails in the visible map area, loaded from the server and
+  /// never stored on the phone. Offline, the last area stays until closing.
+  List<SharedTrail> area = [];
+  bool areaTruncated = false;
+  int _areaRequest = 0;
 
-  /// Every trail marked by a pin: the library, then shared trails not in it.
-  /// A shared trail appears as a light preview until opened.
+  /// Summaries of catalogue trails seen in areas and searches this session.
+  final Map<String, SharedTrail> _summaries = {};
+
+  /// Catalogue trails opened this session, kept in memory only.
+  final Map<String, Trail> _browsed = {};
+
+  /// Trails made available offline: kept on the phone, not the walker's own.
+  Set<String> offlineCopies = {};
+
+  /// Every trail marked by a pin: the phone's trails (imported, created, made
+  /// available offline), then catalogue trails of the area not among them.
+  /// A catalogue trail appears as a light preview until opened.
   List<Trail> pinned = [];
   Set<String> _previews = {};
-  bool isPreview(Trail trail) => _previews.contains(trail.id);
-  SharedTrail? sharedFor(Trail trail) => _sharedById[trail.sharedId];
+  Set<String> _storedIds = {};
 
-  /// Show a pinned trail: a shared preview is downloaded once, then kept.
+  /// A pinned catalogue trail not downloaded yet; once opened it is full.
+  bool isPreview(Trail trail) =>
+      _previews.contains(trail.id) && !_browsed.containsKey(trail.id);
+  SharedTrail? sharedFor(Trail trail) => _summaries[trail.sharedId];
+
+  /// On this phone: imported, created or made available offline. Other
+  /// trails come from the catalogue and are drawn in its colour.
+  bool stored(Trail trail) => _storedIds.contains(trail.id);
+  bool isOfflineCopy(Trail trail) => offlineCopies.contains(trail.id);
+
+  /// Load the catalogue trails of the visible map area. Only the latest
+  /// request counts; a failure keeps the previous area.
+  Future<void> browseArea(Bounds view) async {
+    final catalogue = collaborative;
+    if (catalogue?.catalogue == null || _disposed) return;
+    final request = ++_areaRequest;
+    try {
+      final result = await catalogue!.area(view);
+      if (_disposed || request != _areaRequest) return;
+      area = result.trails;
+      areaTruncated = result.truncated;
+      if (_summaries.length > 3000) _summaries.clear();
+      for (final t in area) {
+        _summaries[t.id] = t;
+      }
+      _pin();
+      notifyListeners();
+    } catch (_) {
+      // Offline or an older API: the phone's own trails stay pinned.
+    }
+  }
+
+  void _pin() {
+    final known = {
+      for (final t in trails) ...[t.id, ?t.publicId],
+    };
+    final previews = [
+      for (final s in area)
+        if (!known.contains(s.id)) s.preview,
+    ];
+    _previews = {for (final t in previews) t.id};
+    pinned = [...trails, ...previews];
+  }
+
+  /// Show a pinned trail: a catalogue preview is downloaded, then shown from
+  /// memory until the walker makes it available offline or starts it.
   Future<void> open(Trail trail) async {
+    if (_browsed[trail.id] case final full?) {
+      focus(full);
+      return;
+    }
     if (!isPreview(trail) || collaborative == null) {
       focus(trail);
       return;
     }
-    await run(() async {
-      final full = await collaborative!.open(trail.id);
-      await reload();
-      if (_disposed) return;
-      focus(trails.firstWhere((t) => t.id == full.id, orElse: () => full));
-      unawaited(prepareTrailMaps([full]));
-    });
+    await openShared(trail.id);
   }
+
+  /// Open a trail of the catalogue by identifier, from a search or a group.
+  Future<void> openShared(String id) => run(() async {
+    final local = trails
+        .where((t) => t.id == id || t.publicId == id)
+        .firstOrNull;
+    if (local != null) {
+      focus(local);
+      return;
+    }
+    final full = await collaborative!.open(id);
+    if (_disposed) return;
+    _browsed[full.trail.id] = full.trail;
+    _details[full.trail.sharedId] = full.details;
+    focus(full.trail);
+  });
+
+  /// Details of the focused trail: source, description, reference, groups.
+  TrailDetails? details;
+  final Map<String, TrailDetails> _details = {};
+  String? _detailsFor;
+  Future<void> refreshDetails() async {
+    final trail = focused;
+    final id = trail == null || trail.walk != null || isPreview(trail)
+        ? null
+        : trail.sharedId;
+    _detailsFor = id;
+    details = id == null ? null : _details[id];
+    final catalogue = collaborative;
+    if (id == null || catalogue == null || details != null) return;
+    TrailDetails? result;
+    try {
+      result = (await catalogue.open(id)).details;
+    } catch (_) {
+      try {
+        result = await catalogue.localDetails(id);
+      } catch (_) {
+        // The library closed meanwhile (account change): nothing to show.
+      }
+    }
+    if (_disposed || _detailsFor != id || result == null) return;
+    _details[id] = details = result;
+    notifyListeners();
+  }
+
+  /// Keep [trail] and its details on the phone, with its maps.
+  Future<void> makeAvailableOffline(Trail trail) => run(() async {
+    await _keepOffline(trail);
+    message = AppMessage.availableOffline;
+  });
+
+  Future<void> _keepOffline(Trail trail) async {
+    final catalogue = collaborative;
+    if (catalogue == null || stored(trail)) return;
+    var details = _details[trail.sharedId];
+    if (details == null) {
+      try {
+        details = (await catalogue.open(trail.sharedId)).details;
+      } catch (_) {
+        // Offline: the trail is kept without its details.
+      }
+    }
+    await catalogue.keepOffline(
+      CatalogueTrail(trail, details ?? TrailDetails.walker),
+    );
+    _browsed.remove(trail.id);
+    await reload();
+    unawaited(prepareTrailMaps([trail]));
+  }
+
+  /// Remove a trail made available offline; it stays open until closed.
+  Future<void> removeOffline(Trail trail) => run(() async {
+    if (!isOfflineCopy(trail) || collaborative == null) return;
+    if (session?.active == true && selected?.id == trail.id) return;
+    _browsed[trail.id] = trail;
+    await collaborative!.forget(trail);
+    await reload();
+    message = AppMessage.offlineRemoved;
+  });
+
+  Future<CataloguePage> searchCatalogue(String query, {String? cursor}) =>
+      collaborative?.search(query, cursor: cursor) ??
+      Future.error(MessageFailure(AppMessage.catalogueUnavailable));
+
+  /// Remember summaries of searched trails for their rating and length.
+  void noteSearchResults(CataloguePage page) {
+    for (final item in page.items) {
+      if (item case CatalogueTrailItem(:final trail)) {
+        _summaries[trail.id] = trail;
+      }
+    }
+  }
+
+  Future<TrailGroup> group(String id) =>
+      collaborative?.group(id) ??
+      Future.error(MessageFailure(AppMessage.catalogueUnavailable));
+
+  Future<List<TrailGroupSummary>> myGroups() =>
+      collaborative?.myGroups() ??
+      Future.error(MessageFailure(AppMessage.catalogueUnavailable));
+
+  /// Create or change the walker's group. Trails not synced yet are sent
+  /// first: a group only holds trails the server knows.
+  Future<TrailGroup?> saveGroup(String id, GroupDraft draft) async {
+    TrailGroup? saved;
+    await run(() async {
+      if (collaborative == null) return;
+      try {
+        syncStatus = await sync.synchronize();
+      } catch (_) {
+        // Offline: saving the group reports it.
+      }
+      saved = await collaborative!.saveGroup(id, draft);
+      message = AppMessage.groupSaved;
+    });
+    return saved;
+  }
+
+  /// Create a group; the phone chooses its identifier so a retry is harmless.
+  Future<TrailGroup?> createGroup(GroupDraft draft) async {
+    final catalogue = collaborative;
+    if (catalogue == null) return null;
+    return saveGroup(catalogue.newId(), draft);
+  }
+
+  /// Add [trail] at the end of the walker's [group].
+  Future<void> addToGroup(TrailGroupSummary group, Trail trail) async {
+    final TrailGroup current;
+    try {
+      current = await this.group(group.id);
+    } catch (e) {
+      message = e;
+      notifyListeners();
+      return;
+    }
+    if (current.trails.any((t) => t.id == trail.sharedId)) {
+      message = AppMessage.addedToGroup(group.name);
+      notifyListeners();
+      return;
+    }
+    final saved = await saveGroup(
+      group.id,
+      GroupDraft(
+        kind: current.summary.kind,
+        name: current.summary.name,
+        description: current.description,
+        members: [
+          for (final m in current.members)
+            GroupMemberRef(
+              trailId: m.trail?.id,
+              groupId: m.group?.id,
+              role: m.role,
+            ),
+          GroupMemberRef(trailId: trail.sharedId),
+        ],
+      ),
+    );
+    if (saved != null) message = AppMessage.addedToGroup(group.name);
+    notifyListeners();
+  }
+
+  Future<bool> removeGroup(String id) async {
+    var removed = false;
+    await run(() async {
+      await collaborative?.removeGroup(id);
+      removed = true;
+      message = AppMessage.groupDeleted;
+    });
+    return removed;
+  }
+
+  /// Make every trail of [group] available offline, with the trails of its
+  /// nested groups one level down.
+  Future<void> makeGroupAvailableOffline(TrailGroup group) => run(() async {
+    final catalogue = collaborative;
+    if (catalogue == null) return;
+    final ids = <String>{for (final t in group.trails) t.id};
+    for (final m in group.members) {
+      if (m.group case final nested?) {
+        ids.addAll((await catalogue.group(nested.id)).trails.map((t) => t.id));
+      }
+    }
+    var done = 0;
+    for (final id in ids) {
+      done++;
+      if (trails.any((t) => t.id == id || t.publicId == id)) continue;
+      final full = await catalogue.open(id);
+      _details[full.trail.sharedId] = full.details;
+      await catalogue.keepOffline(full);
+      _browsed.remove(full.trail.id);
+      progress = done / ids.length;
+      notifyListeners();
+    }
+    await reload();
+    unawaited(
+      prepareTrailMaps([
+        for (final t in trails)
+          if (ids.contains(t.sharedId)) t,
+      ]),
+    );
+    message = AppMessage.groupAvailableOffline(ids.length);
+  });
 
   /// Places walkers added on shared trails, this phone's pending ones included.
   List<TrailPlace> places = [];
 
-  /// Places of the trails on this phone, shown with their GPX points.
+  /// Places of the trails on this phone and of the open trail.
   List<TrailPlace> get visiblePlaces {
     final ids = {
-      for (final t in trails) ...[t.id, t.sharedId],
+      for (final t in [...trails, ?focused]) ...[t.id, t.sharedId],
     };
     return [
       for (final p in places)
@@ -313,6 +571,19 @@ class AppController {
   /// already on it, otherwise walk the internal approach to its nearest point.
   Future<void> launch(Trail trail) async {
     if (busy || !trail.followable || _disposed) return;
+    // A catalogue trail being walked stays on the phone, maps included, so
+    // guidance survives a lost connection or the app being closed.
+    if (!stored(trail) && collaborative != null) {
+      try {
+        await _keepOffline(trail);
+      } catch (e) {
+        message = e;
+        notifyListeners();
+        return;
+      }
+      final id = trail.id;
+      trail = trails.firstWhere((t) => t.id == id, orElse: () => trail);
+    }
     final backwards =
         selected?.id == trail.id &&
         (approach != null ? approachReverse : session?.reverse == true);
@@ -508,6 +779,7 @@ class AppController {
     if (session?.active != true) select(trail);
     notifyListeners();
     unawaited(refreshReviews());
+    unawaited(refreshDetails());
   }
 
   void beginPlanning(Trail trail) {
@@ -714,25 +986,19 @@ class AppController {
     trails = all.where((t) => t.walk == null).toList();
     history = all.where((t) => t.walk != null).toList()
       ..sort((a, b) => b.walk!.started.compareTo(a.walk!.started));
-    shared = await collaborative?.catalogue() ?? const [];
     places = await collaborative?.places() ?? const [];
+    offlineCopies = await library.repository.offlineCopies();
     if (_disposed) return;
-    _sharedById = {for (final s in shared) s.id: s};
-    final known = {
-      for (final t in trails) ...[t.id, ?t.publicId],
-    };
-    final previews = [
-      for (final s in shared)
-        if (!known.contains(s.id)) s.preview,
-    ];
-    _previews = {for (final t in previews) t.id};
-    pinned = [...trails, ...previews];
+    _storedIds = {for (final t in trails) t.id};
+    _pin();
     if (focused != null) {
-      focused = all.where((t) => t.id == focused!.id).firstOrNull;
+      final id = focused!.id;
+      focused = all.where((t) => t.id == id).firstOrNull ?? _browsed[id];
     }
     if (focused == null && planning) finishPlanning();
     if (selected != null && session?.active != true && approach == null) {
-      selected = trails.where((t) => t.id == selected!.id).firstOrNull;
+      final id = selected!.id;
+      selected = trails.where((t) => t.id == id).firstOrNull ?? _browsed[id];
       final reverse = session?.reverse ?? false;
       session = selected?.followable == true
           ? TrackingSession(TrailGeometry(selected!))

@@ -1810,4 +1810,261 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get placeDeleted => 'Place deleted';
+
+  @override
+  String get allTrails => 'All trails';
+
+  @override
+  String get searchAllTrails => 'Search trails, GR 20, Compostela…';
+
+  @override
+  String get catalogueNeedsConnection =>
+      'The catalogue needs a connection. Your trails and those made available offline stay usable.';
+
+  @override
+  String get catalogueEmpty => 'No trails in the catalogue yet.';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get myGroups => 'My groups';
+
+  @override
+  String get ownTrailsLegend => 'My trails (on this phone)';
+
+  @override
+  String get catalogueTrailsLegend => 'Catalogue trails';
+
+  @override
+  String get ownTrailLabel => 'your trail';
+
+  @override
+  String get catalogueTrailLabel => 'catalogue trail';
+
+  @override
+  String get itinerary => 'Itinerary';
+
+  @override
+  String get collection => 'Collection';
+
+  @override
+  String get itineraryInfo =>
+      'Trails in order, as stages walked one after another.';
+
+  @override
+  String get collectionInfo =>
+      'Trails gathered by theme, in no particular order.';
+
+  @override
+  String get stJamesCollection => 'Ways of St James (Camino de Santiago)';
+
+  @override
+  String get stJamesDescription =>
+      'Every pilgrim route to Santiago de Compostela in the catalogue, with its stages and variants.';
+
+  @override
+  String get mainRoute => 'Main route';
+
+  @override
+  String get variantRoute => 'Variant';
+
+  @override
+  String get linkRoute => 'Link';
+
+  @override
+  String get excursionRoute => 'Excursion';
+
+  @override
+  String get approachRoute => 'Access route';
+
+  @override
+  String stageNumber(int stage) {
+    return 'Stage $stage';
+  }
+
+  @override
+  String stageOf(int stage) {
+    return 'Stage $stage of';
+  }
+
+  @override
+  String get partOf => 'Part of';
+
+  @override
+  String get waymarks => 'Waymarks';
+
+  @override
+  String get internationalNetwork => 'International trail';
+
+  @override
+  String get nationalNetwork => 'National trail';
+
+  @override
+  String get regionalNetwork => 'Regional trail';
+
+  @override
+  String get localNetwork => 'Local trail';
+
+  @override
+  String fromTo(String from, String to) {
+    return 'From $from to $to';
+  }
+
+  @override
+  String get loopTrail => 'Loop';
+
+  @override
+  String get showMore => 'Show more';
+
+  @override
+  String get showLess => 'Show less';
+
+  @override
+  String get trailWithdrawn =>
+      'This trail is no longer in its source; it stays available for your walks.';
+
+  @override
+  String get website => 'Website';
+
+  @override
+  String get wikipedia => 'Wikipedia';
+
+  @override
+  String get openStreetMapAttribution =>
+      'Trail data © OpenStreetMap contributors, ODbL licence';
+
+  @override
+  String openDataAttribution(String source) {
+    return 'Trail data: $source';
+  }
+
+  @override
+  String get viewOnOpenStreetMap => 'View on OpenStreetMap';
+
+  @override
+  String get makeAvailableOffline => 'Make available offline';
+
+  @override
+  String get availableOfflineLabel => 'Available offline on this phone';
+
+  @override
+  String get removeFromPhone => 'Remove';
+
+  @override
+  String get addToGroup => 'Add to a group';
+
+  @override
+  String byAuthor(String author) {
+    return 'By $author';
+  }
+
+  @override
+  String get editGroup => 'Edit the group';
+
+  @override
+  String get deleteGroup => 'Delete the group';
+
+  @override
+  String get deleteGroupQuestion => 'Delete this group?';
+
+  @override
+  String get deleteGroupInfo =>
+      'The group disappears for every walker. Its trails stay in the catalogue.';
+
+  @override
+  String get emptyGroup => 'No trails in this group yet.';
+
+  @override
+  String get makeGroupAvailableOffline =>
+      'Make all its trails available offline';
+
+  @override
+  String get groupTooLargeOffline =>
+      'Too many trails to keep them all offline: open them one by one';
+
+  @override
+  String get memberActions => 'Trail actions';
+
+  @override
+  String get moveUp => 'Move up';
+
+  @override
+  String get moveDown => 'Move down';
+
+  @override
+  String get removeFromGroup => 'Remove from the group';
+
+  @override
+  String get newGroup => 'New group';
+
+  @override
+  String get groupName => 'Group name';
+
+  @override
+  String get groupDescription => 'Description (optional)';
+
+  @override
+  String get groupsArePublic =>
+      'Groups are shared with every walker, like trails.';
+
+  @override
+  String get noGroupsYet => 'You have no groups yet.';
+
+  @override
+  String get catalogueUnavailable =>
+      'The catalogue is unavailable. Check your connection.';
+
+  @override
+  String get invalidGroup => 'Give the group a name (200 characters maximum).';
+
+  @override
+  String get availableOffline =>
+      'Trail available offline; its maps are being prepared.';
+
+  @override
+  String get offlineRemoved => 'Trail removed from this phone';
+
+  @override
+  String get groupSaved => 'Group saved';
+
+  @override
+  String get groupDeleted => 'Group deleted';
+
+  @override
+  String addedToGroup(String arg1) {
+    return 'Added to “$arg1”';
+  }
+
+  @override
+  String groupAvailableOffline(int arg1) {
+    String _temp0 = intl.Intl.pluralLogic(
+      arg1,
+      locale: localeName,
+      other: '$arg1 trails of the group are available offline',
+      one: '1 trail of the group is available offline',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get unknownGroupMember =>
+      'Sync your trails before adding them to a group.';
+
+  @override
+  String get groupContainsItself => 'A group cannot contain itself.';
+
+  @override
+  String get groupNotYours => 'Only its author can change this group.';
+
+  @override
+  String get searchTooLong => 'Search too long (200 characters maximum).';
+
+  @override
+  String get invalidRecordingReference =>
+      'The trail this walk followed could not be saved with it.';
+
+  @override
+  String get catalogueTrailKeptOffline =>
+      'Catalogue trail kept offline on this phone';
 }

@@ -28,26 +28,15 @@ class SynchronizeLibrary implements Synchronizer {
     }
   }
 
-  /// Offline catalogue of the trails every walker shared.
+  /// Places walkers add on shared trails. The catalogue itself is browsed
+  /// on the server and never copied here.
   final ({SharedTrailTransport transport, SharedTrailStore store})? shared;
 
-  /// Pull catalogue changes since the last stored cursor, page by page. Each
-  /// page and its cursor are stored together, so an interruption resumes
-  /// without gaps. An older API without the catalogue leaves it empty.
+  /// Send this phone's place changes, then pull other walkers' places since
+  /// the last stored cursor, page by page.
   Future<void> refreshShared() async {
     final s = shared;
     if (s == null) return;
-    try {
-      var since = await s.store.cursor();
-      while (true) {
-        final page = await s.transport.index(since);
-        await s.store.apply(page);
-        if (!page.more || page.next <= since) break;
-        since = page.next;
-      }
-    } catch (_) {
-      // Offline or older API: the cached catalogue stays in use.
-    }
     try {
       await _sendPlaces(s.transport, s.store);
       var since = await s.store.placeCursor();

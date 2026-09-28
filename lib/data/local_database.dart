@@ -3,23 +3,26 @@ import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
 
+import '../domain/catalogue.dart';
 import '../domain/models.dart';
 import '../domain/ports.dart';
 import '../domain/shared_trails.dart';
 import '../domain/sync.dart';
 import '../domain/trail_statistics.dart';
+import 'catalogue_codec.dart';
 import 'shared_trail_codec.dart';
 import 'trail_codec.dart';
 
 Future<Database> openLocalDatabase(String path) => openDatabase(
   path,
-  version: 3,
+  version: 4,
   onUpgrade: (db, from, _) async {
     if (from < 2) await _createStatistics(db);
     if (from < 3) {
       await db.execute('ALTER TABLE trails ADD COLUMN public_id TEXT');
       await _createSharing(db);
     }
+    if (from < 4) await _browseCatalogue(db);
   },
   onCreate: (db, _) async {
     await _createStatistics(db);
@@ -36,6 +39,7 @@ Future<Database> openLocalDatabase(String path) => openDatabase(
     await db.execute(
       'CREATE TABLE settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)',
     );
+    await _browseCatalogue(db);
   },
 );
 
@@ -44,16 +48,10 @@ Future<void> _createStatistics(DatabaseExecutor db) => db.execute(
   'CREATE TABLE trail_statistics (trail_id TEXT PRIMARY KEY, walks INTEGER NOT NULL, metres REAL NOT NULL, seconds INTEGER NOT NULL)',
 );
 
-/// Version 3: offline catalogue of shared trails and the last reviews read.
+/// Version 3: the last reviews read and places added on shared trails.
 /// `trails.public_id` links a library entry to the shared trail it published
-/// or reused.
+/// or reused. (Version 3 also cached the whole catalogue; version 4 drops it.)
 Future<void> _createSharing(DatabaseExecutor db) async {
-  await db.execute(
-    'CREATE TABLE shared_trails (id TEXT PRIMARY KEY, fingerprint TEXT NOT NULL, change INTEGER NOT NULL, summary TEXT NOT NULL)',
-  );
-  await db.execute(
-    'CREATE INDEX shared_trails_fingerprint ON shared_trails(fingerprint)',
-  );
   await db.execute(
     'CREATE TABLE trail_reviews (trail_id TEXT PRIMARY KEY, payload TEXT NOT NULL)',
   );
@@ -64,47 +62,48 @@ Future<void> _createSharing(DatabaseExecutor db) async {
   );
 }
 
-const _sharedCursor = 'shared-trails-cursor';
+/// Version 4: the catalogue is browsed on the server, never copied. Only the
+/// details of trails made available offline are kept, beside their copy.
+Future<void> _browseCatalogue(DatabaseExecutor db) async {
+  await db.execute('DROP TABLE IF EXISTS shared_trails');
+  await db.delete(
+    'settings',
+    where: 'key=?',
+    whereArgs: ['shared-trails-cursor'],
+  );
+  await db.execute(
+    'CREATE TABLE catalogue_details (trail_id TEXT PRIMARY KEY, payload TEXT NOT NULL)',
+  );
+}
+
 const _placeCursor = 'trail-places-cursor';
 
 class SqliteSharedTrailStore implements SharedTrailStore {
   const SqliteSharedTrailStore(this.db);
   final Database db;
+
   @override
-  Future<int> cursor() async {
+  Future<void> keepDetails(String trailId, TrailDetails details) =>
+      db.insert('catalogue_details', {
+        'trail_id': trailId,
+        'payload': jsonEncode(CatalogueCodec.encodeDetails(details)),
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
+
+  @override
+  Future<TrailDetails?> details(String trailId) async {
     final rows = await db.query(
-      'settings',
-      where: 'key=?',
-      whereArgs: [_sharedCursor],
+      'catalogue_details',
+      where: 'trail_id=?',
+      whereArgs: [trailId],
     );
-    return rows.isEmpty ? 0 : int.parse(rows.first['value'] as String);
+    return rows.isEmpty
+        ? null
+        : CatalogueCodec.details(jsonDecode(rows.first['payload'] as String));
   }
 
   @override
-  Future<void> apply(SharedTrailPage page) => db.transaction((txn) async {
-    for (final trail in page.trails) {
-      await txn.insert('shared_trails', {
-        'id': trail.id,
-        'fingerprint': trail.fingerprint,
-        'change': trail.change,
-        'summary': jsonEncode(SharedTrailCodec.encode(trail)),
-      }, conflictAlgorithm: ConflictAlgorithm.replace);
-    }
-    await txn.insert('settings', {
-      'key': _sharedCursor,
-      'value': '${page.next}',
-    }, conflictAlgorithm: ConflictAlgorithm.replace);
-  });
-
-  @override
-  Future<List<SharedTrail>> all() async =>
-      (await db.query('shared_trails', orderBy: 'change'))
-          .map(
-            (r) => SharedTrailCodec.decode(
-              jsonDecode(r['summary'] as String) as Map<String, dynamic>,
-            ),
-          )
-          .toList();
+  Future<void> forgetDetails(String trailId) =>
+      db.delete('catalogue_details', where: 'trail_id=?', whereArgs: [trailId]);
 
   @override
   Future<TrailReviews?> reviews(String trailId) async {
@@ -335,6 +334,14 @@ class SqliteTrailRepository implements TrailRepository {
                     .withPublicId(r['public_id'] as String?),
           )
           .toList();
+  @override
+  Future<Set<String>> offlineCopies() async => {
+    for (final r in await db.rawQuery(
+      'SELECT id FROM trails t WHERE deleted = 0 AND revision = 0 AND dirty = 0 AND public_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM outbox o WHERE o.id = t.id)',
+    ))
+      r['id'] as String,
+  };
+
   @override
   Future<void> save(Trail trail) => db.transaction(
     (txn) =>

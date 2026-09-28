@@ -2,7 +2,6 @@ import 'dart:isolate';
 
 import '../domain/models.dart';
 import '../domain/ports.dart';
-import '../domain/shared_trails.dart';
 import '../domain/trail_identity.dart';
 
 /// Imported trails, and how many of them already existed.
@@ -13,19 +12,10 @@ class ImportResult {
 }
 
 class Library {
-  const Library(
-    this.repository,
-    this.decoder,
-    this.elevation, {
-    this.shared,
-    this.identity,
-  });
+  const Library(this.repository, this.decoder, this.elevation, {this.identity});
   final TrailRepository repository;
   final GpxDecoder decoder;
   final ElevationSource elevation;
-
-  /// Offline catalogue used to recognise a line another walker already shared.
-  final SharedTrailStore? shared;
 
   /// Without it (tests, demo), trails keep the decoder identifiers.
   final TrailIdentity? identity;
@@ -42,10 +32,6 @@ class Library {
       final fingerprint = identity?.fingerprint(t.segments);
       if (fingerprint != null) known[fingerprint] = t;
     }
-    final catalogue = {
-      for (final s in await shared?.all() ?? const <SharedTrail>[])
-        s.fingerprint: s,
-    };
     final result = <Trail>[];
     var reused = 0;
     for (final trail in decoded) {
@@ -60,13 +46,7 @@ class Library {
         result.add(existing);
         continue;
       }
-      final Trail kept;
-      if (catalogue[fingerprint] case final shared?) {
-        reused++;
-        kept = _identified(trail, shared.id, name: shared.name);
-      } else {
-        kept = _identified(trail, identity!.sharedId(fingerprint));
-      }
+      final kept = _identified(trail, identity!.sharedId(fingerprint));
       await repository.save(kept);
       known[fingerprint] = kept;
       result.add(kept);
@@ -74,9 +54,9 @@ class Library {
     return ImportResult(result, reused);
   }
 
-  static Trail _identified(Trail trail, String id, {String? name}) => Trail(
+  static Trail _identified(Trail trail, String id) => Trail(
     id: id,
-    name: name ?? trail.name,
+    name: trail.name,
     segments: trail.segments,
     pois: trail.pois,
     description: trail.description,

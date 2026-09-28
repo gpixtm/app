@@ -10,6 +10,14 @@ class WalkSample {
   final int segment;
 }
 
+/// The trail a guided walk followed, simplified, so history still shows it
+/// once that trail is no longer on the phone.
+class WalkReference {
+  const WalkReference(this.name, this.segments);
+  final String name;
+  final List<List<GeoPoint>> segments;
+}
+
 class WalkDetails {
   const WalkDetails({
     required this.started,
@@ -19,6 +27,7 @@ class WalkDetails {
     this.routeId,
     this.samples = const [],
     this.health,
+    this.reference,
   });
   final DateTime started;
   final DateTime? ended;
@@ -31,6 +40,7 @@ class WalkDetails {
   final String? routeId;
   final List<WalkSample> samples;
   final HealthSummary? health;
+  final WalkReference? reference;
 
   /// GPX whose running statistics include this walk.
   String? get statisticsTrailId => routeId ?? sourceTrailId;
@@ -42,6 +52,7 @@ class WalkDetails {
     routeId: routeId,
     samples: samples,
     health: summary,
+    reference: reference,
   );
 }
 
@@ -143,6 +154,7 @@ class WalkRecording {
           routeId: routeId ?? saved.walk!.routeId,
           samples: List.unmodifiable(samples),
           health: health,
+          reference: saved.walk!.reference,
         ),
       );
 }

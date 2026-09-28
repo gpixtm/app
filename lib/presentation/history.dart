@@ -241,7 +241,9 @@ class WalkThumbnail extends CustomPainter {
   final Trail walk;
   @override
   void paint(Canvas canvas, Size size) {
-    final points = walk.points.toList();
+    // The trail a guided walk followed is drawn faintly beneath the walk.
+    final reference = walk.walk?.reference?.segments ?? const [];
+    final points = [...walk.points, ...reference.expand((s) => s)];
     if (points.isEmpty) return;
     final latScale = math.cos(points.first.lat * math.pi / 180);
     final xs = points.map((p) => p.lon * latScale),
@@ -259,7 +261,43 @@ class WalkThumbnail extends CustomPainter {
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
-    for (final segment in walk.segments) {
+    final faint = Paint()
+      ..color = const Color(0xff8fa89c)
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    for (final (segments, pen) in [
+      (reference, faint),
+      (walk.segments, paint),
+    ]) {
+      _draw(
+        canvas,
+        size,
+        segments,
+        pen,
+        latScale,
+        west,
+        east,
+        south,
+        north,
+        scale,
+      );
+    }
+  }
+
+  static void _draw(
+    Canvas canvas,
+    Size size,
+    List<List<GeoPoint>> segments,
+    Paint paint,
+    double latScale,
+    double west,
+    double east,
+    double south,
+    double north,
+    double scale,
+  ) {
+    for (final segment in segments) {
       final path = Path();
       for (var i = 0; i < segment.length; i++) {
         final p = segment[i],

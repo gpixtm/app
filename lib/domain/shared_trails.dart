@@ -1,38 +1,41 @@
+import 'catalogue.dart';
 import 'models.dart';
 
-/// Offline catalogue entry of a trail any walker shared. It carries a light
-/// outline so the map can pin it before the full trail is downloaded.
+/// Summary of a shared trail, from the map area or a search. It carries a
+/// light outline so the map can pin it before the full trail is downloaded.
+/// Catalogue summaries are never stored on the phone.
 class SharedTrail {
   const SharedTrail({
     required this.id,
-    required this.fingerprint,
     required this.name,
     required this.metres,
     required this.outline,
-    required this.change,
+    this.change = 0,
+    this.fingerprint,
     this.author,
     this.reviews = 0,
     this.average,
+    this.source = walkerSource,
+    this.ref,
+    this.bounds,
   });
-  final String id, fingerprint, name;
+  final String id, name, source;
+  final String? fingerprint, ref;
 
-  /// Username of the walker who shared it; null once that account is gone.
+  /// Username of the walker who shared it; null once that account is gone,
+  /// and for trails from open data.
   final String? author;
   final double metres;
   final List<List<GeoPoint>> outline;
   final int reviews, change;
   final double? average;
+  final Bounds? bounds;
+
+  bool get openData => source != walkerSource;
 
   /// Map preview: pinned like any trail, replaced by the full trail on open.
   Trail get preview =>
       Trail(id: id, name: name, segments: outline, pois: const []);
-}
-
-class SharedTrailPage {
-  const SharedTrailPage(this.trails, this.next, this.more);
-  final List<SharedTrail> trails;
-  final int next;
-  final bool more;
 }
 
 class TrailReview {
@@ -149,11 +152,10 @@ class PendingPlace {
 }
 
 abstract interface class SharedTrailStore {
-  Future<int> cursor();
-
-  /// Store one index page and its cursor together.
-  Future<void> apply(SharedTrailPage page);
-  Future<List<SharedTrail>> all();
+  /// Details of a trail made available offline, kept beside its copy.
+  Future<void> keepDetails(String trailId, TrailDetails details);
+  Future<TrailDetails?> details(String trailId);
+  Future<void> forgetDetails(String trailId);
   Future<TrailReviews?> reviews(String trailId);
   Future<void> keepReviews(TrailReviews reviews);
 
@@ -177,10 +179,6 @@ abstract interface class SharedTrailStore {
 }
 
 abstract interface class SharedTrailTransport {
-  Future<SharedTrailPage> index(int since);
-
-  /// The full shared trail, kept on the phone once downloaded.
-  Future<Trail> download(String id);
   Future<TrailReviews> reviews(String id);
   Future<TrailReviews> review(String id, int rating, String comment);
   Future<TrailReviews> removeReview(String id);

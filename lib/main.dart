@@ -150,7 +150,6 @@ class _LibraryRuntime {
       SqliteTrailRepository(db),
       XmlGpxDecoder(placesName: (name) => messages.placesName(name)),
       ApiElevationSource(scopedServer),
-      shared: sharedTrails,
       identity: const HashedTrailIdentity(),
     );
     final placesClient = http.Client();
@@ -212,6 +211,7 @@ class _LibraryRuntime {
         sharedTransport,
         library.repository,
         newId: const Uuid().v4,
+        catalogue: sharedTransport,
       ),
     );
     _close = () async {

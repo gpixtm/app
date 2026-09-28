@@ -12,6 +12,7 @@ import '../application/app_controller.dart';
 import 'design.dart';
 import 'auth.dart';
 import '../application/auth_controller.dart';
+import 'catalogue_view.dart';
 import 'map_workspace.dart';
 import 'history.dart';
 import 'settings.dart';
@@ -37,7 +38,7 @@ class Home extends StatefulWidget {
 }
 
 /// The map is the home screen; the menu opens every other page over it.
-enum Screen { map, trails, history, offline, settings }
+enum Screen { map, catalogue, trails, history, offline, settings }
 
 class _HomeState extends State<Home> with WidgetsBindingObserver {
   Screen page = Screen.map;
@@ -116,6 +117,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   String title(BuildContext context) => switch (page) {
     Screen.map => context.l10n.map,
+    Screen.catalogue => context.l10n.allTrails,
     Screen.trails => context.l10n.myTrails,
     Screen.history => context.l10n.history,
     Screen.offline => context.l10n.offline,
@@ -150,6 +152,11 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         icon: const Icon(Icons.map_outlined),
         selectedIcon: const Icon(Icons.map),
         label: Text(context.l10n.map),
+      ),
+      NavigationDrawerDestination(
+        icon: const Icon(Icons.travel_explore_outlined),
+        selectedIcon: const Icon(Icons.travel_explore),
+        label: Text(context.l10n.allTrails),
       ),
       NavigationDrawerDestination(
         icon: const Icon(Icons.route_outlined),
@@ -261,6 +268,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                       openLibrary: () => open(Screen.trails),
                       importTrails: import,
                     ),
+                    CatalogueView(app, showMap: () => open(Screen.map)),
                     libraryView(context),
                     HistoryView(
                       app,
@@ -394,6 +402,14 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   : context.l10n.savedPlaces,
               good: !trail.followable || app.covers(trail),
             ),
+            if (app.isOfflineCopy(trail))
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  context.l10n.catalogueTrailKeptOffline,
+                  style: const TextStyle(fontSize: 12, color: catalogueColor),
+                ),
+              ),
             Wrap(
               spacing: 4,
               children: [

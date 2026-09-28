@@ -10,6 +10,7 @@ import '../domain/trail_geometry.dart';
 import 'guidance_text.dart';
 import 'place_search_bar.dart';
 import 'trail_map.dart';
+import 'trail_details.dart';
 import 'trail_places.dart';
 import 'trail_reviews.dart';
 import 'walk_controls.dart';
@@ -523,9 +524,14 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                   for (final t in cluster!)
                     ListTile(
                       contentPadding: EdgeInsets.zero,
-                      leading: const CircleAvatar(
-                        backgroundColor: Color(0xffedf1e7),
-                        child: Icon(Icons.hiking, color: forest),
+                      leading: CircleAvatar(
+                        backgroundColor: app.stored(t)
+                            ? const Color(0xffedf1e7)
+                            : const Color(0xffefe8f6),
+                        child: Icon(
+                          app.stored(t) ? Icons.hiking : Icons.travel_explore,
+                          color: app.stored(t) ? forest : catalogueColor,
+                        ),
                       ),
                       title: Text(t.name),
                       subtitle: Wrap(
@@ -740,6 +746,12 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                         ),
                       ),
                   ],
+                  if (trail.followable &&
+                      trail.walk == null &&
+                      app.collaborative != null &&
+                      approach == null &&
+                      s?.active != true)
+                    TrailKeepActions(app, trail),
                   // Where the walker stands: a viewpoint, a spring…
                   if (trail.followable &&
                       trail.walk == null &&
@@ -755,6 +767,11 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                         label: Text(context.l10n.addPlaceHere),
                       ),
                     ),
+                  if (trail.walk == null &&
+                      s?.active != true &&
+                      approach == null &&
+                      app.collaborative != null)
+                    TrailDetailsSection(app, trail),
                   if (trail.followable &&
                       trail.walk == null &&
                       s?.active != true &&

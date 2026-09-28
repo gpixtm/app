@@ -1,53 +1,9 @@
 import '../domain/models.dart';
 import '../domain/shared_trails.dart';
 
-/// JSON of the API's shared trail catalogue and reviews. The phone stores the
-/// same shape so its offline copy reads exactly like a server response.
+/// JSON of the API's reviews and places. The phone stores the same shape so
+/// its offline copy reads exactly like a server response.
 class SharedTrailCodec {
-  static SharedTrail decode(Map<String, dynamic> j) => SharedTrail(
-    id: j['id'] as String,
-    fingerprint: j['fingerprint'] as String,
-    name: j['name'] as String,
-    author: j['author'] as String?,
-    metres: (j['metres'] as num).toDouble(),
-    outline: [
-      for (final line in j['outline'] as List)
-        [
-          for (final p in line as List)
-            GeoPoint((p[0] as num).toDouble(), (p[1] as num).toDouble()),
-        ],
-    ],
-    reviews: j['reviews'] as int? ?? 0,
-    average: (j['average'] as num?)?.toDouble(),
-    change: j['change'] as int,
-  );
-
-  static Map<String, dynamic> encode(SharedTrail t) => {
-    'id': t.id,
-    'fingerprint': t.fingerprint,
-    'name': t.name,
-    'author': t.author,
-    'metres': t.metres,
-    'outline': [
-      for (final line in t.outline)
-        [
-          for (final p in line) [p.lat, p.lon],
-        ],
-    ],
-    'reviews': t.reviews,
-    'average': t.average,
-    'change': t.change,
-  };
-
-  static SharedTrailPage decodePage(Map<String, dynamic> j) => SharedTrailPage(
-    [
-      for (final t in j['trails'] as List)
-        decode((t as Map).cast<String, dynamic>()),
-    ],
-    j['next'] as int,
-    j['more'] as bool,
-  );
-
   static TrailPlace decodePlace(
     Map<String, dynamic> j, {
     bool pending = false,

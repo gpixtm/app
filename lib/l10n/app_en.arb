@@ -1061,5 +1061,131 @@
   "placeTooFar": "Move within 100 m of the trail to add a place here.",
   "placeNotYours": "Only its author can change this place.",
   "placeSaved": "Place saved on the trail",
-  "placeDeleted": "Place deleted"
+  "placeDeleted": "Place deleted",
+  "allTrails": "All trails",
+  "searchAllTrails": "Search trails, GR 20, Compostela…",
+  "catalogueNeedsConnection": "The catalogue needs a connection. Your trails and those made available offline stay usable.",
+  "catalogueEmpty": "No trails in the catalogue yet.",
+  "retry": "Retry",
+  "myGroups": "My groups",
+  "ownTrailsLegend": "My trails (on this phone)",
+  "catalogueTrailsLegend": "Catalogue trails",
+  "ownTrailLabel": "your trail",
+  "catalogueTrailLabel": "catalogue trail",
+  "itinerary": "Itinerary",
+  "collection": "Collection",
+  "itineraryInfo": "Trails in order, as stages walked one after another.",
+  "collectionInfo": "Trails gathered by theme, in no particular order.",
+  "stJamesCollection": "Ways of St James (Camino de Santiago)",
+  "stJamesDescription": "Every pilgrim route to Santiago de Compostela in the catalogue, with its stages and variants.",
+  "mainRoute": "Main route",
+  "variantRoute": "Variant",
+  "linkRoute": "Link",
+  "excursionRoute": "Excursion",
+  "approachRoute": "Access route",
+  "stageNumber": "Stage {stage}",
+  "@stageNumber": {
+    "placeholders": {
+      "stage": {
+        "type": "int"
+      }
+    }
+  },
+  "stageOf": "Stage {stage} of",
+  "@stageOf": {
+    "placeholders": {
+      "stage": {
+        "type": "int"
+      }
+    }
+  },
+  "partOf": "Part of",
+  "waymarks": "Waymarks",
+  "internationalNetwork": "International trail",
+  "nationalNetwork": "National trail",
+  "regionalNetwork": "Regional trail",
+  "localNetwork": "Local trail",
+  "fromTo": "From {from} to {to}",
+  "@fromTo": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "loopTrail": "Loop",
+  "showMore": "Show more",
+  "showLess": "Show less",
+  "trailWithdrawn": "This trail is no longer in its source; it stays available for your walks.",
+  "website": "Website",
+  "wikipedia": "Wikipedia",
+  "openStreetMapAttribution": "Trail data © OpenStreetMap contributors, ODbL licence",
+  "openDataAttribution": "Trail data: {source}",
+  "@openDataAttribution": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "viewOnOpenStreetMap": "View on OpenStreetMap",
+  "makeAvailableOffline": "Make available offline",
+  "availableOfflineLabel": "Available offline on this phone",
+  "removeFromPhone": "Remove",
+  "addToGroup": "Add to a group",
+  "byAuthor": "By {author}",
+  "@byAuthor": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "editGroup": "Edit the group",
+  "deleteGroup": "Delete the group",
+  "deleteGroupQuestion": "Delete this group?",
+  "deleteGroupInfo": "The group disappears for every walker. Its trails stay in the catalogue.",
+  "emptyGroup": "No trails in this group yet.",
+  "makeGroupAvailableOffline": "Make all its trails available offline",
+  "groupTooLargeOffline": "Too many trails to keep them all offline: open them one by one",
+  "memberActions": "Trail actions",
+  "moveUp": "Move up",
+  "moveDown": "Move down",
+  "removeFromGroup": "Remove from the group",
+  "newGroup": "New group",
+  "groupName": "Group name",
+  "groupDescription": "Description (optional)",
+  "groupsArePublic": "Groups are shared with every walker, like trails.",
+  "noGroupsYet": "You have no groups yet.",
+  "catalogueUnavailable": "The catalogue is unavailable. Check your connection.",
+  "invalidGroup": "Give the group a name (200 characters maximum).",
+  "availableOffline": "Trail available offline; its maps are being prepared.",
+  "offlineRemoved": "Trail removed from this phone",
+  "groupSaved": "Group saved",
+  "groupDeleted": "Group deleted",
+  "addedToGroup": "Added to “{arg1}”",
+  "@addedToGroup": {
+    "placeholders": {
+      "arg1": {
+        "type": "String"
+      }
+    }
+  },
+  "groupAvailableOffline": "{arg1, plural, =1{1 trail of the group is available offline} other{{arg1} trails of the group are available offline}}",
+  "@groupAvailableOffline": {
+    "placeholders": {
+      "arg1": {
+        "type": "int"
+      }
+    }
+  },
+  "unknownGroupMember": "Sync your trails before adding them to a group.",
+  "groupContainsItself": "A group cannot contain itself.",
+  "groupNotYours": "Only its author can change this group.",
+  "searchTooLong": "Search too long (200 characters maximum).",
+  "invalidRecordingReference": "The trail this walk followed could not be saved with it.",
+  "catalogueTrailKeptOffline": "Catalogue trail kept offline on this phone"
 }

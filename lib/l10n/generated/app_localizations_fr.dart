@@ -1837,4 +1837,264 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get placeDeleted => 'Lieu supprimé';
+
+  @override
+  String get allTrails => 'Parcours';
+
+  @override
+  String get searchAllTrails => 'Rechercher un parcours, GR 20, Compostelle…';
+
+  @override
+  String get catalogueNeedsConnection =>
+      'Le catalogue demande une connexion. Vos parcours et ceux rendus disponibles hors ligne restent utilisables.';
+
+  @override
+  String get catalogueEmpty =>
+      'Aucun parcours dans le catalogue pour l’instant.';
+
+  @override
+  String get retry => 'Réessayer';
+
+  @override
+  String get myGroups => 'Mes groupes';
+
+  @override
+  String get ownTrailsLegend => 'Mes parcours (sur ce téléphone)';
+
+  @override
+  String get catalogueTrailsLegend => 'Parcours du catalogue';
+
+  @override
+  String get ownTrailLabel => 'votre parcours';
+
+  @override
+  String get catalogueTrailLabel => 'parcours du catalogue';
+
+  @override
+  String get itinerary => 'Itinéraire';
+
+  @override
+  String get collection => 'Collection';
+
+  @override
+  String get itineraryInfo =>
+      'Des parcours dans l’ordre, comme des étapes à enchaîner.';
+
+  @override
+  String get collectionInfo =>
+      'Des parcours réunis par thème, sans ordre particulier.';
+
+  @override
+  String get stJamesCollection => 'Chemins de Saint-Jacques-de-Compostelle';
+
+  @override
+  String get stJamesDescription =>
+      'Toutes les voies vers Saint-Jacques-de-Compostelle présentes dans le catalogue, avec leurs étapes et variantes.';
+
+  @override
+  String get mainRoute => 'Tracé principal';
+
+  @override
+  String get variantRoute => 'Variante';
+
+  @override
+  String get linkRoute => 'Liaison';
+
+  @override
+  String get excursionRoute => 'Excursion';
+
+  @override
+  String get approachRoute => 'Accès';
+
+  @override
+  String stageNumber(int stage) {
+    return 'Étape $stage';
+  }
+
+  @override
+  String stageOf(int stage) {
+    return 'Étape $stage de';
+  }
+
+  @override
+  String get partOf => 'Fait partie de';
+
+  @override
+  String get waymarks => 'Balisage';
+
+  @override
+  String get internationalNetwork => 'Itinéraire international';
+
+  @override
+  String get nationalNetwork => 'Itinéraire national';
+
+  @override
+  String get regionalNetwork => 'Itinéraire régional';
+
+  @override
+  String get localNetwork => 'Itinéraire local';
+
+  @override
+  String fromTo(String from, String to) {
+    return 'De $from à $to';
+  }
+
+  @override
+  String get loopTrail => 'Boucle';
+
+  @override
+  String get showMore => 'Afficher plus';
+
+  @override
+  String get showLess => 'Afficher moins';
+
+  @override
+  String get trailWithdrawn =>
+      'Ce parcours n’est plus dans sa source ; il reste disponible pour vos marches.';
+
+  @override
+  String get website => 'Site web';
+
+  @override
+  String get wikipedia => 'Wikipédia';
+
+  @override
+  String get openStreetMapAttribution =>
+      'Données du parcours © contributeurs OpenStreetMap, licence ODbL';
+
+  @override
+  String openDataAttribution(String source) {
+    return 'Données du parcours : $source';
+  }
+
+  @override
+  String get viewOnOpenStreetMap => 'Voir sur OpenStreetMap';
+
+  @override
+  String get makeAvailableOffline => 'Rendre disponible hors ligne';
+
+  @override
+  String get availableOfflineLabel => 'Disponible hors ligne sur ce téléphone';
+
+  @override
+  String get removeFromPhone => 'Retirer';
+
+  @override
+  String get addToGroup => 'Ajouter à un groupe';
+
+  @override
+  String byAuthor(String author) {
+    return 'Par $author';
+  }
+
+  @override
+  String get editGroup => 'Modifier le groupe';
+
+  @override
+  String get deleteGroup => 'Supprimer le groupe';
+
+  @override
+  String get deleteGroupQuestion => 'Supprimer ce groupe ?';
+
+  @override
+  String get deleteGroupInfo =>
+      'Le groupe disparaît pour tous les marcheurs. Ses parcours restent dans le catalogue.';
+
+  @override
+  String get emptyGroup => 'Aucun parcours dans ce groupe pour l’instant.';
+
+  @override
+  String get makeGroupAvailableOffline =>
+      'Rendre tous ses parcours disponibles hors ligne';
+
+  @override
+  String get groupTooLargeOffline =>
+      'Trop de parcours pour tout garder hors ligne : ouvrez-les un par un';
+
+  @override
+  String get memberActions => 'Actions sur le parcours';
+
+  @override
+  String get moveUp => 'Monter';
+
+  @override
+  String get moveDown => 'Descendre';
+
+  @override
+  String get removeFromGroup => 'Retirer du groupe';
+
+  @override
+  String get newGroup => 'Nouveau groupe';
+
+  @override
+  String get groupName => 'Nom du groupe';
+
+  @override
+  String get groupDescription => 'Description (facultative)';
+
+  @override
+  String get groupsArePublic =>
+      'Les groupes sont partagés avec tous les marcheurs, comme les parcours.';
+
+  @override
+  String get noGroupsYet => 'Vous n’avez pas encore de groupe.';
+
+  @override
+  String get catalogueUnavailable =>
+      'Le catalogue est indisponible. Vérifiez votre connexion.';
+
+  @override
+  String get invalidGroup =>
+      'Donnez un nom au groupe (200 caractères maximum).';
+
+  @override
+  String get availableOffline =>
+      'Parcours disponible hors ligne ; ses cartes sont en préparation.';
+
+  @override
+  String get offlineRemoved => 'Parcours retiré de ce téléphone';
+
+  @override
+  String get groupSaved => 'Groupe enregistré';
+
+  @override
+  String get groupDeleted => 'Groupe supprimé';
+
+  @override
+  String addedToGroup(String arg1) {
+    return 'Ajouté à « $arg1 »';
+  }
+
+  @override
+  String groupAvailableOffline(int arg1) {
+    String _temp0 = intl.Intl.pluralLogic(
+      arg1,
+      locale: localeName,
+      other: '$arg1 parcours du groupe sont disponibles hors ligne',
+      one: '1 parcours du groupe est disponible hors ligne',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get unknownGroupMember =>
+      'Synchronisez vos parcours avant de les ajouter à un groupe.';
+
+  @override
+  String get groupContainsItself =>
+      'Un groupe ne peut pas se contenir lui-même.';
+
+  @override
+  String get groupNotYours => 'Seul son auteur peut modifier ce groupe.';
+
+  @override
+  String get searchTooLong => 'Recherche trop longue (200 caractères maximum).';
+
+  @override
+  String get invalidRecordingReference =>
+      'Le parcours suivi par cette marche n’a pas pu être enregistré avec elle.';
+
+  @override
+  String get catalogueTrailKeptOffline =>
+      'Parcours du catalogue gardé hors ligne sur ce téléphone';
 }

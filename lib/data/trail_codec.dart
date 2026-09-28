@@ -116,6 +116,14 @@ class TrailCodec {
               s.segment,
             ],
         ],
+        if (walk.reference case final reference?)
+          'reference': {
+            'name': reference.name,
+            'segments': [
+              for (final segment in reference.segments)
+                segment.map(_point).toList(),
+            ],
+          },
         if (walk.health case final health?)
           'health': {
             'readAt': health.readAt.toUtc().toIso8601String(),
@@ -169,6 +177,7 @@ class TrailCodec {
                 ),
             ],
             health: _health(j['walk']['health']),
+            reference: _reference(j['walk']['reference']),
           ),
     days: [
       for (final day in (j['days'] as List? ?? []))
@@ -181,6 +190,12 @@ class TrailCodec {
         .map((p) => Poi(_read(p['point']), p['name'], p['description']))
         .toList(),
   );
+  static WalkReference? _reference(dynamic value) => value == null
+      ? null
+      : WalkReference(value['name'] as String, [
+          for (final segment in value['segments'] as List)
+            [for (final p in segment as List) _read(p)],
+        ]);
   static HealthSummary? _health(dynamic value) => value == null
       ? null
       : HealthSummary(

@@ -1,5 +1,5 @@
 import 'localization.dart';
-import 'design.dart' show decimal;
+import 'design.dart' show decimal, catalogueHex, ownTrailHex;
 
 import 'dart:async';
 import 'dart:convert';
@@ -21,6 +21,9 @@ import 'trail_pins.dart';
 import 'trail_places.dart';
 
 const dayColors = ['#c66a25', '#7956b2', '#087e8b', '#b03c68'];
+
+/// The trail a walk followed, shown faintly beneath the walk in history.
+const referenceHex = '#8fa89c';
 const navigationZoom = 16.0;
 
 class TrailMap extends StatefulWidget {
@@ -140,7 +143,7 @@ class _TrailMapState extends State<TrailMap> {
                   locations[snapshot.length + i].y / ratio,
                 ),
               ),
-          ]);
+          ], catalogue: (trail) => !app.stored(trail));
         });
       }
     } catch (_) {
@@ -326,9 +329,23 @@ class _TrailMapState extends State<TrailMap> {
         final selected = app.focused?.id;
         if (!identical(renderedTrails, app.trails) ||
             renderedSelection != selected) {
+          final focused = app.focused;
           await c.setGeoJsonSource(
             'selected',
-            collection(lines(app.focused?.segments ?? [])),
+            collection([
+              // A walk shows the trail it followed beneath its own line.
+              if (focused?.walk?.reference case final reference?)
+                ...lines(reference.segments, color: referenceHex),
+              ...lines(
+                focused?.segments ?? [],
+                color:
+                    focused == null ||
+                        focused.walk != null ||
+                        app.stored(focused)
+                    ? ownTrailHex
+                    : catalogueHex,
+              ),
+            ]),
           );
           await c.setGeoJsonSource(
             'pois',
@@ -531,7 +548,7 @@ class _TrailMapState extends State<TrailMap> {
       'selected',
       'selected-line',
       const LineLayerProperties(
-        lineColor: '#184f36',
+        lineColor: ['get', 'color'],
         lineWidth: 5,
         lineJoin: 'round',
         lineCap: 'round',
@@ -740,6 +757,17 @@ class _TrailMapState extends State<TrailMap> {
               if (c == null || !mounted) return;
               final bounds = await c.getVisibleRegion();
               if (!mounted) return;
+              // Catalogue trails of the new view, loaded from the server.
+              unawaited(
+                app.browseArea(
+                  Bounds(
+                    bounds.southwest.longitude,
+                    bounds.southwest.latitude,
+                    bounds.northeast.longitude,
+                    bounds.northeast.latitude,
+                  ),
+                ),
+              );
               try {
                 await app.automaticMaps?.viewport(
                   Bounds(
