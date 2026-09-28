@@ -74,12 +74,32 @@ final itinerary = TrailGroup(
   ],
 );
 
-TrailDetails stageDetails(int stage) => TrailDetails(
+TrailDetails stageDetails(int stage, {List<TrailGroupPath> also = const []}) =>
+    TrailDetails(
+      source: 'osm',
+      fields: const {'ref': 'GR 15'},
+      paths: [
+        ...also,
+        TrailGroupPath(const [gr15], MemberRole.stage, stage: stage),
+      ],
+    );
+
+/// Another itinerary where stage 7 of the GR 15 is its sixth stage.
+const tour = TrailGroupSummary(
+  id: 'tour',
+  kind: TrailGroupKind.itinerary,
+  name: 'Tour du massif',
+  metres: 6000,
+  trailCount: 6,
   source: 'osm',
-  fields: const {'ref': 'GR 15'},
-  paths: [
-    TrailGroupPath(const [gr15], MemberRole.stage, stage: stage),
-  ],
+);
+const walkerCollection = TrailGroupSummary(
+  id: 'mine',
+  kind: TrailGroupKind.collection,
+  name: 'Mes étapes',
+  metres: 0,
+  trailCount: 1,
+  source: walkerSource,
 );
 
 Trail full(SharedTrail t) => Trail(
@@ -127,9 +147,21 @@ void main() {
       expect(StageLinks.of(itinerary, 'stage-5')!.previous, isNull);
       expect(StageLinks.of(itinerary, 'stage-7')!.next, isNull);
       expect(StageLinks.of(itinerary, 'variant'), isNull);
-      expect(StageLinks.itinerary(stageDetails(2))!.id, 'gr15');
+      expect(StageLinks.holding(stageDetails(2))!.id, 'gr15');
       expect(
-        StageLinks.itinerary(
+        StageLinks.holding(
+          stageDetails(
+            2,
+            also: [
+              TrailGroupPath(const [walkerCollection], MemberRole.stage),
+            ],
+          ),
+        )!.id,
+        'gr15',
+        reason: 'an itinerary before a collection',
+      );
+      expect(
+        StageLinks.holding(
           const TrailDetails(
             source: 'osm',
             paths: [
@@ -413,6 +445,39 @@ void main() {
       expect(app.selected, same(followed), reason: 'the walk goes on');
       expect(app.session!.active, isTrue);
       expect((await stages()).previous!.trail!.id, 'stage-6');
+    });
+
+    test('the next stage stays in the itinerary walked, even when it is '
+        'also a stage of another one', () async {
+      transport.details['stage-7'] = stageDetails(
+        3,
+        also: [
+          TrailGroupPath(const [tour], MemberRole.stage, stage: 6),
+        ],
+      );
+      transport.groups['tour'] = TrailGroup(
+        summary: tour,
+        members: [
+          for (var i = 1; i <= 5; i++)
+            TrailGroupMember(
+              MemberRole.stage,
+              stage: i,
+              trail: stageTrail(
+                'tour-$i',
+                north(46 + i / 100, 46.005 + i / 100),
+              ),
+            ),
+          TrailGroupMember(MemberRole.stage, stage: 6, trail: stage7),
+        ],
+      );
+      await app.openShared('stage-6');
+      final links = await stages();
+      await app.openStage(links.next!, from: links);
+      final after = await stages();
+      expect(app.focused!.id, 'stage-7');
+      expect(after.group.id, 'gr15');
+      expect(after.stage, 3);
+      expect(after.previous!.trail!.id, 'stage-6');
     });
 
     test('offline, a walked stage still knows its neighbours', () async {
