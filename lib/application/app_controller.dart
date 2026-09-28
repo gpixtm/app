@@ -1462,6 +1462,16 @@ class AppController {
     await library.repository.delete(trail.id);
     await reload();
   });
+
+  /// Delete every finished walk of [walks] with a single refresh. The route
+  /// they followed stays, and a walk still recording is kept.
+  Future<void> removeWalks(Iterable<Trail> walks) => run(() async {
+    for (final walk in walks) {
+      if (walk.walk?.ended == null) continue;
+      await library.repository.delete(walk.id);
+    }
+    await reload();
+  });
   Future<void> start() async {
     if (session == null || busy) return;
     _resume = false;

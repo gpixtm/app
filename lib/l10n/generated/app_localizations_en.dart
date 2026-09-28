@@ -2376,4 +2376,198 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String routeHistoryCount(int routes, int walks, String distance) {
+    String _temp0 = intl.Intl.pluralLogic(
+      routes,
+      locale: localeName,
+      other: '$routes routes',
+      one: '1 route',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      walks,
+      locale: localeName,
+      other: '$walks walks',
+      one: '1 walk',
+    );
+    return '$_temp0 · $_temp1 · $distance';
+  }
+
+  @override
+  String get searchRoutes => 'Search a route';
+
+  @override
+  String get noMatchingRoutes => 'No route matches this search.';
+
+  @override
+  String routeLastWalked(String date, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'walked $count times',
+      one: 'walked once',
+    );
+    return '$date · $_temp0';
+  }
+
+  @override
+  String latestPerformance(String distance, String duration, String speed) {
+    return 'Last: $distance · $duration · $speed';
+  }
+
+  @override
+  String bestPerformance(String speed, String date) {
+    return 'Record: $speed on $date';
+  }
+
+  @override
+  String speedVsUsual(String difference, String usual) {
+    return '$difference vs your usual $usual';
+  }
+
+  @override
+  String partialWalk(int percent) {
+    return 'Partial · $percent%';
+  }
+
+  @override
+  String get partialWalkInfo =>
+      'Walks covering less than 90% of the route are left out of records and of the usual speed.';
+
+  @override
+  String get walkReversed => 'Reverse direction';
+
+  @override
+  String get walkInProgress => 'In progress';
+
+  @override
+  String get recordFastest => 'Fastest';
+
+  @override
+  String get recordLongest => 'Longest';
+
+  @override
+  String get recordHighest => 'Most climbing';
+
+  @override
+  String get records => 'Records';
+
+  @override
+  String get walkTab => 'Walk';
+
+  @override
+  String get compareTab => 'Compare';
+
+  @override
+  String get progressTab => 'Progress';
+
+  @override
+  String get previousWalk => 'Previous walk';
+
+  @override
+  String get nextWalk => 'Next walk';
+
+  @override
+  String routeSince(String date) {
+    return 'Since $date';
+  }
+
+  @override
+  String get deleteAllWalks => 'Delete all walks';
+
+  @override
+  String deleteAllWalksQuestion(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Delete these $count walks?',
+      one: 'Delete this walk?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get deleteAllWalksInfo =>
+      'The route itself is kept, and so are shared trails. The deletion will be synced with your account.';
+
+  @override
+  String get walkA => 'Walk A';
+
+  @override
+  String get walkB => 'Walk B';
+
+  @override
+  String get difference => 'Difference';
+
+  @override
+  String get pickTwoWalks => 'Pick two different walks.';
+
+  @override
+  String get aheadBehindTitle => 'Ahead or behind along the route';
+
+  @override
+  String get aheadBehindInfo =>
+      'Above the line, walk A is ahead of walk B; below it, A is behind. Pauses are not counted.';
+
+  @override
+  String gapAhead(String distance, String time) {
+    return 'At $distance, A is $time ahead';
+  }
+
+  @override
+  String gapBehind(String distance, String time) {
+    return 'At $distance, A is $time behind';
+  }
+
+  @override
+  String gapLevel(String distance) {
+    return 'At $distance, A and B are level';
+  }
+
+  @override
+  String get gapOppositeDirections =>
+      'These walks went in opposite directions. Pick two walks in the same direction to follow the gap.';
+
+  @override
+  String get gapUnavailable =>
+      'These walks do not share enough of the route, with times, to follow the gap.';
+
+  @override
+  String minutesSeconds(int minutes, int seconds) {
+    return '$minutes min $seconds s';
+  }
+
+  @override
+  String signedMinutes(String minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get speedProgressTitle => 'Average speed, walk after walk';
+
+  @override
+  String get speedProgressInfo =>
+      'Complete walks only. The dashed line is your usual speed on this route.';
+
+  @override
+  String speedOnDate(String date, String speed) {
+    return '$date · $speed';
+  }
+
+  @override
+  String get progressNeedsTwo =>
+      'Walk this route completely once more to see your progress.';
+
+  @override
+  String get totalActiveTime => 'Total active time';
+
+  @override
+  String get usualSpeed => 'Usual speed';
+
+  @override
+  String get walkALetter => 'A';
+
+  @override
+  String get walkBLetter => 'B';
 }

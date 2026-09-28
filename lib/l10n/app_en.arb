@@ -1374,5 +1374,181 @@
         "type": "int"
       }
     }
-  }
+  },
+  "routeHistoryCount": "{routes, plural, =1{1 route} other{{routes} routes}} · {walks, plural, =1{1 walk} other{{walks} walks}} · {distance}",
+  "@routeHistoryCount": {
+    "placeholders": {
+      "routes": {
+        "type": "int"
+      },
+      "walks": {
+        "type": "int"
+      },
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "searchRoutes": "Search a route",
+  "noMatchingRoutes": "No route matches this search.",
+  "routeLastWalked": "{date} · {count, plural, =1{walked once} other{walked {count} times}}",
+  "@routeLastWalked": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "latestPerformance": "Last: {distance} · {duration} · {speed}",
+  "@latestPerformance": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      },
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
+  "bestPerformance": "Record: {speed} on {date}",
+  "@bestPerformance": {
+    "placeholders": {
+      "speed": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "speedVsUsual": "{difference} vs your usual {usual}",
+  "@speedVsUsual": {
+    "placeholders": {
+      "difference": {
+        "type": "String"
+      },
+      "usual": {
+        "type": "String"
+      }
+    }
+  },
+  "partialWalk": "Partial · {percent}%",
+  "@partialWalk": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "partialWalkInfo": "Walks covering less than 90% of the route are left out of records and of the usual speed.",
+  "walkReversed": "Reverse direction",
+  "walkInProgress": "In progress",
+  "recordFastest": "Fastest",
+  "recordLongest": "Longest",
+  "recordHighest": "Most climbing",
+  "records": "Records",
+  "walkTab": "Walk",
+  "compareTab": "Compare",
+  "progressTab": "Progress",
+  "previousWalk": "Previous walk",
+  "nextWalk": "Next walk",
+  "routeSince": "Since {date}",
+  "@routeSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAllWalks": "Delete all walks",
+  "deleteAllWalksQuestion": "{count, plural, =1{Delete this walk?} other{Delete these {count} walks?}}",
+  "@deleteAllWalksQuestion": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteAllWalksInfo": "The route itself is kept, and so are shared trails. The deletion will be synced with your account.",
+  "walkA": "Walk A",
+  "walkB": "Walk B",
+  "difference": "Difference",
+  "pickTwoWalks": "Pick two different walks.",
+  "aheadBehindTitle": "Ahead or behind along the route",
+  "aheadBehindInfo": "Above the line, walk A is ahead of walk B; below it, A is behind. Pauses are not counted.",
+  "gapAhead": "At {distance}, A is {time} ahead",
+  "@gapAhead": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "gapBehind": "At {distance}, A is {time} behind",
+  "@gapBehind": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "gapLevel": "At {distance}, A and B are level",
+  "@gapLevel": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "gapOppositeDirections": "These walks went in opposite directions. Pick two walks in the same direction to follow the gap.",
+  "gapUnavailable": "These walks do not share enough of the route, with times, to follow the gap.",
+  "minutesSeconds": "{minutes} min {seconds} s",
+  "@minutesSeconds": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "signedMinutes": "{minutes} min",
+  "@signedMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "speedProgressTitle": "Average speed, walk after walk",
+  "speedProgressInfo": "Complete walks only. The dashed line is your usual speed on this route.",
+  "speedOnDate": "{date} · {speed}",
+  "@speedOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "speed": {
+        "type": "String"
+      }
+    }
+  },
+  "progressNeedsTwo": "Walk this route completely once more to see your progress.",
+  "totalActiveTime": "Total active time",
+  "usualSpeed": "Usual speed",
+  "walkALetter": "A",
+  "walkBLetter": "B"
 }
