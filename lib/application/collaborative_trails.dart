@@ -1,8 +1,16 @@
 import '../domain/app_message.dart';
 import '../domain/catalogue.dart';
 import '../domain/models.dart';
+import '../domain/point_attachment.dart';
 import '../domain/ports.dart';
 import '../domain/shared_trails.dart';
+
+/// Places shared by attaching points files, and those files as they were.
+class AttachedPoints {
+  const AttachedPoints(this.places, this.sources);
+  final List<TrailPlace> places;
+  final List<Trail> sources;
+}
 
 /// Trails every walker shared and trails from open data, browsed from the map
 /// and the catalogue, opened, reviewed and grouped. Personal walks, speeds and
@@ -61,6 +69,38 @@ class CollaborativeTrails {
   }
 
   Future<void> removePlace(TrailPlace place) => store.removePlace(place);
+
+  /// Share the points of [plan] as places of their trails, offline included.
+  /// The points left out stay in their file; a file left empty leaves the
+  /// library. Returns what [detachPoints] needs to undo it.
+  Future<AttachedPoints> attachPoints(PointAttachment plan) async {
+    final now = DateTime.now().toUtc();
+    final places = [
+      for (final p in plan.added)
+        TrailPlace(
+          id: newId(),
+          trailId: p.trail!.sharedId,
+          point: p.poi.point,
+          name: p.name,
+          comment: p.comment,
+          mine: true,
+          updatedAt: now,
+          pending: true,
+          origin: PlaceOrigin.imported,
+        ),
+    ];
+    places.forEach(_validate);
+    await store.attachPoints(
+      places,
+      remaining: plan.remaining,
+      emptied: plan.emptied,
+    );
+    return AttachedPoints(places, plan.sources);
+  }
+
+  /// Withdraw the places [attached] shared and restore their files.
+  Future<void> detachPoints(AttachedPoints attached) =>
+      store.detachPoints(attached.places, attached.sources);
 
   static void _validate(TrailPlace place) {
     if (!place.mine ||

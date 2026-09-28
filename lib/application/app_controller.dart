@@ -1,6 +1,8 @@
 import '../domain/app_message.dart';
 
 import 'dart:async';
+import 'dart:isolate';
+import 'dart:math' as math;
 
 import 'announce_progress.dart';
 import 'collaborative_trails.dart';
@@ -18,6 +20,7 @@ import '../domain/health_data.dart';
 import '../domain/approach.dart';
 import '../domain/catalogue.dart';
 import '../domain/place_search.dart';
+import '../domain/point_attachment.dart';
 import '../domain/shared_trails.dart';
 import '../domain/trail_statistics.dart';
 import '../domain/walk_energy.dart';
@@ -466,6 +469,11 @@ class AppController {
     ];
   }
 
+  /// How many places [trail] has, this phone's pending ones included.
+  int placeCount(Trail trail) => places
+      .where((p) => p.trailId == trail.id || p.trailId == trail.sharedId)
+      .length;
+
   /// Add a place on [trail] where the walker stands: a fresh, precise fix
   /// within [maximumPlaceDistance] of the line, between vertices included.
   Future<void> addPlace(Trail trail, String name, String comment) =>
@@ -496,6 +504,171 @@ class AppController {
     await collaborative?.removePlace(place);
     places = await collaborative?.places() ?? const [];
     message = AppMessage.placeDeleted;
+    _scheduleSync();
+  });
+
+  /// Points files of the library: waypoints not attached to any trail yet.
+  List<Trail> get pointsFiles => [
+    for (final t in trails)
+      if (!t.followable && t.pois.isNotEmpty) t,
+  ];
+
+  /// Points files being attached to a trail, previewed on the map.
+  PointAttachment? attaching;
+
+  /// Trails the points being attached may go to, most points within reach
+  /// first: the library's, then shared trails around the points.
+  List<AttachTarget> attachTargets = const [];
+
+  /// The last attachment, which the walker may still undo.
+  AttachedPoints? lastAttachment;
+
+  /// Preview attaching [sources] on the map: to [targets] when given, else to
+  /// the trail with most of their points within reach.
+  Future<void> beginAttachment(
+    List<Trail> sources, {
+    List<Trail> targets = const [],
+  }) => run(() => _beginAttachment(sources, targets, report: true));
+
+  /// [targets] the walker chose are kept; [suggested] ones only when some
+  /// points lie within their reach.
+  Future<void> _beginAttachment(
+    List<Trail> sources,
+    List<Trail> targets, {
+    List<Trail> suggested = const [],
+    bool report = false,
+  }) async {
+    if (collaborative == null || sources.isEmpty) return;
+    final points = [for (final s in sources) ...s.pois.map((p) => p.point)];
+    final candidates = await _attachTargets(points);
+    if (_disposed) return;
+    final reachable = {for (final c in candidates) c.trail.sharedId};
+    var chosen = targets.isNotEmpty
+        ? targets
+        : [
+            for (final t in suggested)
+              if (reachable.contains(t.sharedId)) t,
+          ];
+    if (chosen.isEmpty) {
+      final best = candidates.firstOrNull;
+      if (best == null) {
+        if (report) message = AppMessage.noTrailNearPoints;
+        return;
+      }
+      chosen = [await _fullTrail(best)];
+    }
+    attachTargets = candidates;
+    await _planAttachment(sources, chosen);
+  }
+
+  /// Library trails, then catalogue trails around [points], ranked by how
+  /// many points lie within reach; trails out of reach are left out.
+  Future<List<AttachTarget>> _attachTargets(List<GeoPoint> points) async {
+    final library = [
+      for (final t in trails)
+        if (t.followable && t.walk == null) t,
+    ];
+    final known = {
+      for (final t in library) ...[t.id, t.sharedId],
+    };
+    final shared = <Trail>[];
+    try {
+      final area = await collaborative!.area(_around(points));
+      shared.addAll([
+        for (final s in area.trails)
+          if (!known.contains(s.id)) s.preview,
+      ]);
+    } catch (_) {
+      // Offline: the library's trails remain.
+    }
+    final ranked = await Isolate.run<List<AttachTarget>>(
+      () => [
+        for (final t in library) AttachTarget(t, pointsInRange(points, t)),
+        for (final t in shared)
+          AttachTarget(t, pointsInRange(points, t), catalogue: true),
+      ],
+    );
+    return ranked.where((t) => t.inRange > 0).toList()
+      ..sort((a, b) => b.inRange.compareTo(a.inRange));
+  }
+
+  /// The area within reach of [points].
+  static Bounds _around(List<GeoPoint> points) {
+    final margin = maximumImportedPlaceDistance / 110574;
+    final south = points.map((p) => p.lat).reduce(math.min) - margin;
+    final north = points.map((p) => p.lat).reduce(math.max) + margin;
+    final lonMargin =
+        margin /
+        math.max(
+          .01,
+          math.cos(math.max(south.abs(), north.abs()) * math.pi / 180),
+        );
+    return Bounds(
+      points.map((p) => p.lon).reduce(math.min) - lonMargin,
+      south,
+      points.map((p) => p.lon).reduce(math.max) + lonMargin,
+      north,
+    );
+  }
+
+  /// A catalogue trail is downloaded: points attach to its whole line.
+  Future<Trail> _fullTrail(AttachTarget target) async {
+    if (!target.catalogue) return target.trail;
+    if (_browsed[target.trail.id] case final full?) return full;
+    final full = await collaborative!.open(target.trail.id);
+    _browsed[full.trail.id] = full.trail;
+    _details[full.trail.sharedId] = full.details;
+    return full.trail;
+  }
+
+  Future<void> _planAttachment(List<Trail> sources, List<Trail> targets) async {
+    final known = places;
+    final plan = await Isolate.run(
+      () => PointAttachment.plan(sources, targets, known),
+    );
+    if (_disposed) return;
+    attaching = plan;
+    focus(targets.first);
+  }
+
+  /// Attach the points being previewed to [target] instead.
+  Future<void> chooseAttachTarget(AttachTarget target) => run(() async {
+    final sources = attaching?.sources;
+    if (sources == null) return;
+    await _planAttachment(sources, [await _fullTrail(target)]);
+  });
+
+  void cancelAttachment() {
+    attaching = null;
+    attachTargets = const [];
+    notifyListeners();
+  }
+
+  /// Share the previewed points as places of their trail, offline included.
+  /// The points left out stay in their file.
+  Future<void> confirmAttachment() => run(() async {
+    final plan = attaching;
+    if (plan == null || collaborative == null) return;
+    lastAttachment = await collaborative!.attachPoints(plan);
+    attaching = null;
+    attachTargets = const [];
+    await reload();
+    message = AppMessage.pointsAttached(
+      plan.count(PointFate.added),
+      plan.count(PointFate.known),
+      plan.count(PointFate.tooFar) + plan.count(PointFate.unnamed),
+    );
+    _scheduleSync();
+  });
+
+  /// Withdraw the places the last attachment shared and restore its files.
+  Future<void> undoAttachment() => run(() async {
+    final last = lastAttachment;
+    if (last == null || collaborative == null) return;
+    await collaborative!.detachPoints(last);
+    lastAttachment = null;
+    await reload();
+    message = AppMessage.attachmentUndone;
     _scheduleSync();
   });
 
@@ -1188,17 +1361,53 @@ class AppController {
     }
   }
 
-  Future<void> import(String xml, String filename) => run(() async {
-    final imported = await library.import(xml, filename);
-    final added = imported.trails;
-    await reload();
-    focus(added.first);
-    unawaited(prepareTrailMaps(added));
-    message = imported.reused == added.length
-        ? AppMessage.trailsAlreadyShared(added.length)
-        : AppMessage.itemsSaved(added.length);
-    _scheduleSync();
-  });
+  Future<void> import(String xml, String filename) =>
+      importFiles([(xml, filename)]);
+
+  /// Import GPX files chosen together. When they bring points files,
+  /// attaching them is proposed at once: to [attachTo] when given, else to
+  /// the tracks imported with them, else to the trail with most points within
+  /// reach. A file that fails does not stop the others.
+  Future<void> importFiles(List<(String, String)> files, {Trail? attachTo}) =>
+      run(() async {
+        final added = <Trail>[];
+        var reused = 0;
+        Object? failure;
+        for (final (xml, filename) in files) {
+          try {
+            final imported = await library.import(xml, filename);
+            added.addAll(imported.trails);
+            reused += imported.reused;
+          } catch (e) {
+            failure ??= e;
+          }
+        }
+        if (added.isEmpty) {
+          if (failure != null) throw failure;
+          return;
+        }
+        await reload();
+        focus(added.first);
+        unawaited(prepareTrailMaps(added));
+        message =
+            failure ??
+            (reused == added.length
+                ? AppMessage.trailsAlreadyShared(added.length)
+                : AppMessage.itemsSaved(added.length));
+        _scheduleSync();
+        final sources = [
+          for (final t in added)
+            if (!t.followable && t.pois.isNotEmpty) t,
+        ];
+        await _beginAttachment(
+          sources,
+          [?attachTo],
+          suggested: [
+            for (final t in added)
+              if (t.followable) t,
+          ],
+        );
+      });
   void select(Trail trail) {
     stop();
     approach = null;

@@ -94,6 +94,20 @@ The trail panel shows the average rating (1 to 5 stars), the reviews and who sha
 
 Decision of 28 September 2026: from where they stand on a trail, a walker adds a place (a viewpoint, a spring, a shelter…) with a name and an optional comment, from the trail panel, including while following the trail. The place takes a fresh precise GPS fix, its real position (never snapped to the line), and must be within 100 m of the trail. Places are shared with every walker like the trail itself, shown on the map with the trail's points, and touching one shows its comment, author and date. Only its author edits or deletes it. Adding, editing and deleting work offline: the change is kept on the phone and sent on the next sync, after the trail itself is shared; a refused change (too far, invalid) is dropped. The API contract is in the API repository's `docs/PUBLIC_TRAILS.md`.
 
+## Points imported onto a trail
+
+Decision of 28 September 2026: a GPX file holding only waypoints (hostels, springs, churches along a Way of St James) becomes a "points file" in the library. Attaching it to a trail turns its points into public places of that trail, shared and synced like the places added on site, so the trail and its points appear together. There is no private grouping of files.
+
+- **Origin.** Every place records whether it was added on site or imported. The place sheet says "Seen on site" or "Imported from a GPX file". An imported place may lie up to 5 km from the line, since a hostel in the village can be off the path; a place added on site stays within 100 m.
+- **No duplicates.** A point within 30 m of a place the trail already has, with an equivalent name (case, accents and punctuation ignored), is not added again. The phone checks what it knows; the API checks again and returns the existing place, which replaces the phone's pending copy.
+- **Nothing lost.** Points more than 5 km from the trail, or without a name or description, stay in their file, which stays in the library with only those points. A file entirely attached leaves the library. The places and the file change in one local transaction.
+- **Importing.** Files chosen together are imported together. When they include points files, the map previews attaching them to the tracks imported with them, or else to the trail with most points within reach. Each point goes to the nearest of these trails.
+- **Library.** A points file shows "Not attached to a trail". A banner counts these files and filters the list to them. "Attach to a trail" previews the file on the best trail. A trail's menu offers "Add points", from a GPX file on the phone or from a points file of the library. A trail card shows how many places it has.
+- **Preview.** A panel over the map shows the trail, the points that become places (green), those already on the trail (blue) and those that stay in the file (grey). "Change trail" lists the library's trails and the shared trails around the points, ranked by points within reach; a shared trail is downloaded before attaching. Nothing is shared before the walker confirms that the places will be visible to everyone and that they may share them. After attaching, "Undo" withdraws the places and restores the file.
+- **Walking.** Imported places are only shown on the map; they are not announced.
+
+A route made of several tracks (stages, variants) uses the existing itinerary groups; the points of a file imported with several tracks go to the nearest one. Creating the group from the import is not automated yet.
+
 ## Trail catalogue
 
 Decision of 28 September 2026: besides the trails walkers share, the API acquires trails from open data country by country, starting with the whole of France (OpenStreetMap walking routes, ODbL), then neighbouring countries and the world. Commercial sites are never scraped. The acquisition, groups and search are described in the API repository's `docs/CATALOGUE.md`.

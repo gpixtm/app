@@ -174,18 +174,27 @@ class SqliteSharedTrailStore implements SharedTrailStore {
           .toList();
 
   @override
-  Future<void> savePlace(TrailPlace place) => db.rawInsert(
-    "INSERT INTO trail_places(id, trail_id, change, payload, pending, version) VALUES(?, ?, ?, ?, 'save', 1) ON CONFLICT(id) DO UPDATE SET trail_id=excluded.trail_id, payload=excluded.payload, pending='save', version=trail_places.version+1",
-    [
-      place.id,
-      place.trailId,
-      place.change,
-      jsonEncode(SharedTrailCodec.encodePlace(place)),
-    ],
-  );
+  Future<void> savePlace(TrailPlace place) => _savePlace(db, place);
+
+  static Future<void> _savePlace(DatabaseExecutor db, TrailPlace place) =>
+      db.rawInsert(
+        "INSERT INTO trail_places(id, trail_id, change, payload, pending, version) VALUES(?, ?, ?, ?, 'save', 1) ON CONFLICT(id) DO UPDATE SET trail_id=excluded.trail_id, payload=excluded.payload, pending='save', version=trail_places.version+1",
+        [
+          place.id,
+          place.trailId,
+          place.change,
+          jsonEncode(SharedTrailCodec.encodePlace(place)),
+        ],
+      );
 
   @override
-  Future<void> removePlace(TrailPlace place) => db.transaction((txn) async {
+  Future<void> removePlace(TrailPlace place) =>
+      db.transaction((txn) => _removePlace(txn, place));
+
+  static Future<void> _removePlace(
+    DatabaseExecutor txn,
+    TrailPlace place,
+  ) async {
     // A place never received by the server simply disappears.
     final unsent = await txn.delete(
       'trail_places',
@@ -198,7 +207,40 @@ class SqliteSharedTrailStore implements SharedTrailStore {
         [place.id],
       );
     }
+  }
+
+  @override
+  Future<void> attachPoints(
+    List<TrailPlace> places, {
+    required List<Trail> remaining,
+    required List<String> emptied,
+  }) => db.transaction((txn) async {
+    for (final place in places) {
+      await _savePlace(txn, place);
+    }
+    for (final file in remaining) {
+      await enqueue(txn, file.id, jsonEncode(TrailCodec.encode(file)), false);
+    }
+    for (final id in emptied) {
+      await deleteTrail(txn, id);
+    }
   });
+
+  @override
+  Future<void> detachPoints(List<TrailPlace> places, List<Trail> originals) =>
+      db.transaction((txn) async {
+        for (final place in places) {
+          await _removePlace(txn, place);
+        }
+        for (final file in originals) {
+          await enqueue(
+            txn,
+            file.id,
+            jsonEncode(TrailCodec.encode(file)),
+            false,
+          );
+        }
+      });
 
   @override
   Future<List<PendingPlace>> pendingPlaces() async {
@@ -220,6 +262,26 @@ class SqliteSharedTrailStore implements SharedTrailStore {
 
   @override
   Future<void> placeSent(PendingPlace sent, TrailPlace? result) async {
+    if (result != null && !sent.delete && result.id != sent.place.id) {
+      // The server already had this imported place: keep its copy, not ours.
+      await db.transaction((txn) async {
+        await txn.delete(
+          'trail_places',
+          where: 'id=? AND version=?',
+          whereArgs: [sent.place.id, sent.version],
+        );
+        await txn.rawInsert(
+          'INSERT INTO trail_places(id, trail_id, change, payload) VALUES(?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET trail_id=excluded.trail_id, change=excluded.change, payload=excluded.payload WHERE trail_places.pending IS NULL',
+          [
+            result.id,
+            result.trailId,
+            result.change,
+            jsonEncode(SharedTrailCodec.encodePlace(result)),
+          ],
+        );
+      });
+      return;
+    }
     if (result == null || sent.delete || result.deleted) {
       await db.delete(
         'trail_places',
@@ -436,22 +498,26 @@ class SqliteTrailRepository implements TrailRepository {
   });
 
   @override
-  Future<void> delete(String id) => db.transaction((txn) async {
-    final rows = await txn.query('trails', where: 'id=?', whereArgs: [id]);
-    if (rows.isEmpty) return;
-    final queued = await txn.query(
-      'outbox',
-      where: 'id=?',
-      whereArgs: [id],
-      limit: 1,
-    );
-    // A shared trail only kept on this phone was never in the account.
-    if (rows.first['revision'] == 0 && queued.isEmpty) {
-      await txn.delete('trails', where: 'id=?', whereArgs: [id]);
-      return;
-    }
-    await enqueue(txn, id, rows.first['payload'] as String, true);
-  });
+  Future<void> delete(String id) =>
+      db.transaction((txn) => deleteTrail(txn, id));
+}
+
+/// Delete a library entry: a tombstone is queued for the account, except for
+/// a shared trail only kept on this phone, which was never in the account.
+Future<void> deleteTrail(DatabaseExecutor txn, String id) async {
+  final rows = await txn.query('trails', where: 'id=?', whereArgs: [id]);
+  if (rows.isEmpty) return;
+  final queued = await txn.query(
+    'outbox',
+    where: 'id=?',
+    whereArgs: [id],
+    limit: 1,
+  );
+  if (rows.first['revision'] == 0 && queued.isEmpty) {
+    await txn.delete('trails', where: 'id=?', whereArgs: [id]);
+    return;
+  }
+  await enqueue(txn, id, rows.first['payload'] as String, true);
 }
 
 class SqliteSyncStore implements SyncStore {

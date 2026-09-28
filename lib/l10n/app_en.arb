@@ -1263,5 +1263,116 @@
   "shareToHealth": "Send to Health Connect",
   "healthShared": "Walk added to Health Connect",
   "healthSharePermission": "Allow Gpix to write exercises in Health Connect to share your walks.",
-  "healthShareFailed": "Could not add the walk to Health Connect. You can send it again from its history page."
+  "healthShareFailed": "Could not add the walk to Health Connect. You can send it again from its history page.",
+  "pointsFileNotAttached": "Not attached to a trail",
+  "pointsFilesBanner": "{count, plural, =1{1 points file is not attached to a trail} other{{count} points files are not attached to a trail}}",
+  "@pointsFilesBanner": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "showPointsFiles": "Show them",
+  "showAllItems": "Show all",
+  "attachToTrail": "Attach to a trail",
+  "addPoints": "Add points",
+  "addPointsFromPhone": "From a GPX file on this phone",
+  "addPointsFromLibrary": "Points files in my library",
+  "attachPointsTitle": "Attach points to a trail",
+  "attachPointsFrom": "{count, plural, =1{1 point from {files}} other{{count} points from {files}}}",
+  "@attachPointsFrom": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "files": {
+        "type": "String"
+      }
+    }
+  },
+  "attachPointsTo": "Trail: {trail}",
+  "@attachPointsTo": {
+    "placeholders": {
+      "trail": {
+        "type": "String"
+      }
+    }
+  },
+  "changeTrail": "Change trail",
+  "chooseAttachTrail": "Choose the trail",
+  "pointsWithinReach": "{inRange} of {total} points within 5 km",
+  "@pointsWithinReach": {
+    "placeholders": {
+      "inRange": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "recommendedTrail": "Recommended",
+  "catalogueTrailChoice": "Shared trail, not on this phone",
+  "attachAdded": "{count, plural, =0{No new place} =1{1 new place} other{{count} new places}}",
+  "@attachAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "attachKnown": "{count, plural, =1{1 point already on the trail} other{{count} points already on the trail}}",
+  "@attachKnown": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "attachTooFar": "{count, plural, =1{1 point more than 5 km away stays in the file} other{{count} points more than 5 km away stay in the file}}",
+  "@attachTooFar": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "attachUnnamed": "{count, plural, =1{1 point without a name stays in the file} other{{count} points without a name stay in the file}}",
+  "@attachUnnamed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "attachShareConfirm": "These places will be visible to every walker. I confirm I may share them.",
+  "attach": "Attach",
+  "undo": "Undo",
+  "noTrailNearPoints": "No trail in your library or around these points passes within 5 km of them.",
+  "pointsAttached": "{added, plural, =0{No new place} =1{1 new place} other{{added} new places}} on the trail, {known, plural, =0{none already there} =1{1 already there} other{{known} already there}}. {left, plural, =0{Nothing left in the file.} =1{1 point stays in the file.} other{{left} points stay in the file.}}",
+  "@pointsAttached": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "known": {
+        "type": "int"
+      },
+      "left": {
+        "type": "int"
+      }
+    }
+  },
+  "attachmentUndone": "Attachment undone: the points file is back in your library.",
+  "placeSeenOnSite": "Seen on site",
+  "placeImported": "Imported from a GPX file",
+  "trailPlaceCount": "{count, plural, =1{1 place} other{{count} places}}",
+  "@trailPlaceCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

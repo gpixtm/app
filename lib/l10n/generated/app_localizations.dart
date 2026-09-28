@@ -3571,6 +3571,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not add the walk to Health Connect. You can send it again from its history page.'**
   String get healthShareFailed;
+
+  /// No description provided for @pointsFileNotAttached.
+  ///
+  /// In en, this message translates to:
+  /// **'Not attached to a trail'**
+  String get pointsFileNotAttached;
+
+  /// No description provided for @pointsFilesBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 points file is not attached to a trail} other{{count} points files are not attached to a trail}}'**
+  String pointsFilesBanner(int count);
+
+  /// No description provided for @showPointsFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Show them'**
+  String get showPointsFiles;
+
+  /// No description provided for @showAllItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all'**
+  String get showAllItems;
+
+  /// No description provided for @attachToTrail.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach to a trail'**
+  String get attachToTrail;
+
+  /// No description provided for @addPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'Add points'**
+  String get addPoints;
+
+  /// No description provided for @addPointsFromPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'From a GPX file on this phone'**
+  String get addPointsFromPhone;
+
+  /// No description provided for @addPointsFromLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Points files in my library'**
+  String get addPointsFromLibrary;
+
+  /// No description provided for @attachPointsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach points to a trail'**
+  String get attachPointsTitle;
+
+  /// No description provided for @attachPointsFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 point from {files}} other{{count} points from {files}}}'**
+  String attachPointsFrom(int count, String files);
+
+  /// No description provided for @attachPointsTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Trail: {trail}'**
+  String attachPointsTo(String trail);
+
+  /// No description provided for @changeTrail.
+  ///
+  /// In en, this message translates to:
+  /// **'Change trail'**
+  String get changeTrail;
+
+  /// No description provided for @chooseAttachTrail.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the trail'**
+  String get chooseAttachTrail;
+
+  /// No description provided for @pointsWithinReach.
+  ///
+  /// In en, this message translates to:
+  /// **'{inRange} of {total} points within 5 km'**
+  String pointsWithinReach(int inRange, int total);
+
+  /// No description provided for @recommendedTrail.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get recommendedTrail;
+
+  /// No description provided for @catalogueTrailChoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared trail, not on this phone'**
+  String get catalogueTrailChoice;
+
+  /// No description provided for @attachAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No new place} =1{1 new place} other{{count} new places}}'**
+  String attachAdded(int count);
+
+  /// No description provided for @attachKnown.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 point already on the trail} other{{count} points already on the trail}}'**
+  String attachKnown(int count);
+
+  /// No description provided for @attachTooFar.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 point more than 5 km away stays in the file} other{{count} points more than 5 km away stay in the file}}'**
+  String attachTooFar(int count);
+
+  /// No description provided for @attachUnnamed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 point without a name stays in the file} other{{count} points without a name stay in the file}}'**
+  String attachUnnamed(int count);
+
+  /// No description provided for @attachShareConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'These places will be visible to every walker. I confirm I may share them.'**
+  String get attachShareConfirm;
+
+  /// No description provided for @attach.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach'**
+  String get attach;
+
+  /// No description provided for @undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// No description provided for @noTrailNearPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'No trail in your library or around these points passes within 5 km of them.'**
+  String get noTrailNearPoints;
+
+  /// No description provided for @pointsAttached.
+  ///
+  /// In en, this message translates to:
+  /// **'{added, plural, =0{No new place} =1{1 new place} other{{added} new places}} on the trail, {known, plural, =0{none already there} =1{1 already there} other{{known} already there}}. {left, plural, =0{Nothing left in the file.} =1{1 point stays in the file.} other{{left} points stay in the file.}}'**
+  String pointsAttached(int added, int known, int left);
+
+  /// No description provided for @attachmentUndone.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachment undone: the points file is back in your library.'**
+  String get attachmentUndone;
+
+  /// No description provided for @placeSeenOnSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Seen on site'**
+  String get placeSeenOnSite;
+
+  /// No description provided for @placeImported.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported from a GPX file'**
+  String get placeImported;
+
+  /// No description provided for @trailPlaceCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 place} other{{count} places}}'**
+  String trailPlaceCount(int count);
 }
 
 class _AppLocalizationsDelegate

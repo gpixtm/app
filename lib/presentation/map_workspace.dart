@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../application/app_controller.dart';
 import '../domain/models.dart';
+import 'attach_points.dart';
 import 'design.dart';
 import 'elevation_chart.dart';
 import '../domain/trail_geometry.dart';
@@ -502,6 +503,15 @@ class _MapWorkspaceState extends State<MapWorkspace> {
                 ],
               ),
             ),
+          )
+        else if (app.attaching != null)
+          DraggableScrollableSheet(
+            key: const ValueKey('attach'),
+            initialChildSize: .42,
+            minChildSize: .2,
+            maxChildSize: .8,
+            builder: (context, scroll) =>
+                panel(AttachPointsPanel(app, scroll: scroll, handle: handle())),
           )
         else if (cluster != null)
           DraggableScrollableSheet(

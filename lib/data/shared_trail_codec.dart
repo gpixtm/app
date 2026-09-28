@@ -23,6 +23,8 @@ class SharedTrailCodec {
     updatedAt: DateTime.parse(j['updatedAt'] as String),
     change: j['change'] as int? ?? 0,
     pending: pending,
+    // Places stored or sent before origins existed were all added on site.
+    origin: PlaceOrigin.values.asNameMap()[j['origin']] ?? PlaceOrigin.onSite,
   );
 
   static Map<String, dynamic> encodePlace(TrailPlace p) => {
@@ -33,6 +35,7 @@ class SharedTrailCodec {
     'elevation': p.point.elevation,
     'name': p.name,
     'comment': p.comment,
+    'origin': p.origin.name,
     'author': p.author,
     'mine': p.mine,
     'deleted': p.deleted,

@@ -108,6 +108,7 @@ class ApiSharedTrailTransport
             'elevation': place.point.elevation,
             'name': place.name,
             'comment': place.comment,
+            'origin': place.origin.name,
           },
           method: 'PUT',
         ),
