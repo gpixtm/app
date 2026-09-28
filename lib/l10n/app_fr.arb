@@ -321,6 +321,7 @@
   "tapSelectedTrail": "Touchez le parcours sélectionné. Zoomez pour placer la limite précisément.",
   "northUp": "Passer au nord en haut",
   "headingUp": "Orienter selon le téléphone",
+  "compassNorthUp": "Boussole : la pointe rouge indique le nord. Touchez pour remettre la carte nord en haut.",
   "recenter": "Recentrer sur ma position",
   "distanceWalked": "Distance parcourue",
   "activeDuration": "Durée active",
