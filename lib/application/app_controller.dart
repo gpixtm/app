@@ -458,10 +458,18 @@ class AppController {
   /// Places walkers added on shared trails, this phone's pending ones included.
   List<TrailPlace> places = [];
 
-  /// Places of the trails on this phone and of the open trail.
+  /// The trails whose points and places the map shows: the open trail, and
+  /// the trail being followed while another one is browsed. Points of other
+  /// trails and points files stay hidden until they are opened.
+  List<Trail> get _shownTrails => [
+    ?focused,
+    if (selected case final followed? when followed.id != focused?.id) followed,
+  ];
+
+  /// Places of the trails the map shows.
   List<TrailPlace> get visiblePlaces {
     final ids = {
-      for (final t in [...trails, ?focused]) ...[t.id, t.sharedId],
+      for (final t in _shownTrails) ...[t.id, t.sharedId],
     };
     return [
       for (final p in places)
@@ -1419,7 +1427,7 @@ class AppController {
   }
 
   List<Poi> get pois => [
-    ...trails.expand((t) => t.pois),
+    ..._shownTrails.expand((t) => t.pois),
     for (final p in visiblePlaces) p.poi,
   ];
   Coverage get coverage => Coverage(localMaps.map((m) => m.region.bounds));

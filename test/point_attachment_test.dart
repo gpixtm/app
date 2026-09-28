@@ -491,6 +491,35 @@ void main() {
       },
     );
 
+    test('points only show with the trail that is open', () async {
+      await app.importFiles([
+        (gpx('Chemin du Puy', camino), 'Chemin du Puy'),
+        (
+          waypoints([
+            (45.205, 6.2005, 'Fontaine', ''),
+            (45.215, 6.28, 'Château lointain', ''),
+          ]),
+          'Hébergements',
+        ),
+      ]);
+      await app.confirmAttachment();
+      final trail = app.trails.firstWhere((t) => t.followable);
+      final file = app.pointsFiles.single;
+
+      app.closeTrail();
+      expect(app.pois, isEmpty, reason: 'no trail selected');
+      expect(app.visiblePlaces, isEmpty);
+
+      app.focus(trail);
+      expect(app.pois.map((p) => p.name), ['Fontaine']);
+      expect(app.visiblePlaces.single.name, 'Fontaine');
+
+      app.focus(file);
+      expect(app.pois.map((p) => p.name), [
+        'Château lointain',
+      ], reason: 'a points file shows its own points once opened');
+    });
+
     test('a track imported far from the points is not proposed', () async {
       await app.importFiles([(gpx('Chemin du Puy', camino), 'Chemin du Puy')]);
       await app.importFiles([
