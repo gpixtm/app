@@ -27,7 +27,7 @@ The published APK connects to the project's public server; create an account fro
 
 ## Build from source
 
-Requirements: [Puro](https://puro.dev) (Flutter version manager), the Android SDK with Java 17, and an Android device or emulator. Flutter is pinned to **3.47.5** stable.
+Requirements: [Puro](https://puro.dev) (Flutter version manager), the Android SDK with Java 21 (Android Studio's bundled JDK works), and an Android device or emulator. Flutter is pinned to **3.47.5** stable.
 
 ```sh
 git clone https://github.com/gpixtm/app.git gpix-app
