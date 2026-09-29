@@ -366,9 +366,9 @@ void main() {
       recap,
     ).lines;
     expect(fr[RecapItem.steps], matches(RegExp(r'^5\s234 pas\.$')));
-    expect(fr[RecapItem.calories], '140 kcal actives brûlées, estimation.');
+    expect(fr[RecapItem.calories], 'Environ 140 kcal actives brûlées.');
     expect(en[RecapItem.steps], '5,234 steps.');
-    expect(en[RecapItem.calories], '140 active kcal burned, estimated.');
+    expect(en[RecapItem.calories], 'About 140 active kcal burned.');
     expect(recap.available, containsAll([RecapItem.steps, RecapItem.calories]));
     expect(
       RecapItem.spokenByDefault,

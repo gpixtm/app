@@ -73,9 +73,6 @@ No graphics program, Python, Node, paid service, API key or sibling repository
 is needed. It overwrites only its named generated outputs. Do not edit those
 outputs by hand.
 
-The [validation record](branding/VALIDATION.md) lists the automated checks,
-native builds and remaining device checks for this delivery.
-
 To verify that the committed exports match the masters without writing files:
 
 ```sh

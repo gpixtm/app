@@ -17,7 +17,7 @@ private_values = []
 for config in (root / 'config').glob('*.local.json'):
     for key, value in json.loads(config.read_text(encoding='utf-8')).items():
         if key != 'API_URL' and isinstance(value, str) and len(value) >= 6:
-            # A username can legitimately be part of the public server hostname.
+            # API_URL is skipped: the server address is configuration, not a credential.
             private_values.append((value if any(part in key for part in ('PASSWORD', 'TOKEN', 'SECRET')) else json.dumps(value)).encode('utf-8'))
 
 patterns = [

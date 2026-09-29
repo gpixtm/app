@@ -25,9 +25,10 @@ endif
 build-prod: check-prod-config
 	$(PUROFLUTTER) build apk --release --flavor prod --dart-define-from-file=$(PROD_CONFIG)
 
-# -r replaces the installed app and keeps its data. The release build is signed
-# with this computer's debug key, like F5 builds; a phone holding a build signed
-# by another key refuses the update instead of losing its data.
+# -r replaces the installed app and keeps its data. Without android/key.properties
+# the release build is signed with this computer's debug key, like F5 builds; a
+# phone holding a build signed by another key refuses the update instead of
+# losing its data.
 install-prod: build-prod
 	$(ADB) install -r $(PROD_APK)
 	$(ADB) shell am start -n $(PROD_PACKAGE)/.MainActivity

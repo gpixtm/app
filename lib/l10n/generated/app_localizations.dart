@@ -200,16 +200,10 @@ abstract class AppLocalizations {
   /// **'Cannot open the saved session. Please sign in again.'**
   String get sessionRestoreFailed;
 
-  /// No description provided for @localDev.
-  ///
-  /// In en, this message translates to:
-  /// **'Local Dev (Docker)'**
-  String get localDev;
-
   /// No description provided for @missingApiUrl.
   ///
   /// In en, this message translates to:
-  /// **'{arg1}: set API_URL in {arg2}, then restart F5. Offline access requires a successful first sign-in.'**
+  /// **'{arg1}: set API_URL in {arg2}, then rebuild the app. Offline access requires a successful first sign-in.'**
   String missingApiUrl(Object arg1, Object arg2);
 
   /// No description provided for @invalidApiUrl.
@@ -362,18 +356,6 @@ abstract class AppLocalizations {
   /// **'Towards the trail · {arg1}'**
   String towardsTrail(Object arg1);
 
-  /// No description provided for @demo.
-  ///
-  /// In en, this message translates to:
-  /// **'Demo'**
-  String get demo;
-
-  /// No description provided for @demoFlorence.
-  ///
-  /// In en, this message translates to:
-  /// **'Demo · Florence'**
-  String get demoFlorence;
-
   /// No description provided for @damagedGpx.
   ///
   /// In en, this message translates to:
@@ -416,16 +398,10 @@ abstract class AppLocalizations {
   /// **'Library closed'**
   String get libraryClosed;
 
-  /// No description provided for @downloadStalled.
-  ///
-  /// In en, this message translates to:
-  /// **'Download stalled'**
-  String get downloadStalled;
-
   /// No description provided for @invalidMapCatalog.
   ///
   /// In en, this message translates to:
-  /// **'Invalid map catalog.'**
+  /// **'Invalid map catalogue.'**
   String get invalidMapCatalog;
 
   /// No description provided for @downloadRunning.
@@ -782,12 +758,6 @@ abstract class AppLocalizations {
   /// **'Map needs preparation'**
   String get mapNeedsPreparation;
 
-  /// No description provided for @savedPlaces.
-  ///
-  /// In en, this message translates to:
-  /// **'Places saved on this phone'**
-  String get savedPlaces;
-
   /// No description provided for @days.
   ///
   /// In en, this message translates to:
@@ -839,7 +809,7 @@ abstract class AppLocalizations {
   /// No description provided for @loadCatalog.
   ///
   /// In en, this message translates to:
-  /// **'Load my server\'s catalog'**
+  /// **'Load my server\'s catalogue'**
   String get loadCatalog;
 
   /// No description provided for @prepareTrails.
@@ -863,7 +833,7 @@ abstract class AppLocalizations {
   /// No description provided for @noInstalledMaps.
   ///
   /// In en, this message translates to:
-  /// **'No map installed. Configure your server and its catalog in settings. Trails remain viewable.'**
+  /// **'No map installed. Configure your server and its catalogue in settings. Trails remain viewable.'**
   String get noInstalledMaps;
 
   /// No description provided for @deleteMap.
@@ -1175,7 +1145,7 @@ abstract class AppLocalizations {
   /// No description provided for @apiConfigurationInfo.
   ///
   /// In en, this message translates to:
-  /// **'Set the API address in the launch profile\'s local file, then restart F5.'**
+  /// **'Set the API address in the build\'s local configuration file, then rebuild the app.'**
   String get apiConfigurationInfo;
 
   /// No description provided for @resolveConflicts.
@@ -1345,12 +1315,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Finish'**
   String get finish;
-
-  /// No description provided for @liveStats.
-  ///
-  /// In en, this message translates to:
-  /// **'My live data'**
-  String get liveStats;
 
   /// No description provided for @startRoute.
   ///
@@ -1807,12 +1771,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'My current walk'**
   String get currentWalk;
-
-  /// No description provided for @walkControls.
-  ///
-  /// In en, this message translates to:
-  /// **'Pause, finish and history'**
-  String get walkControls;
 
   /// No description provided for @planDays.
   ///
@@ -2423,7 +2381,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchPlaces.
   ///
   /// In en, this message translates to:
-  /// **'Search a town, an address…'**
+  /// **'Search for a town, an address…'**
   String get searchPlaces;
 
   /// No description provided for @clearSearch.
@@ -2455,12 +2413,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 trail here} other{{count} trails here}}'**
   String trailsHere(int count);
-
-  /// No description provided for @showTrail.
-  ///
-  /// In en, this message translates to:
-  /// **'Show {name}'**
-  String showTrail(String name);
 
   /// No description provided for @closeTrail.
   ///
@@ -3002,18 +2954,6 @@ abstract class AppLocalizations {
   /// **'Catalogue'**
   String get catalogueTrailsLegend;
 
-  /// No description provided for @ownTrailLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'your trail'**
-  String get ownTrailLabel;
-
-  /// No description provided for @catalogueTrailLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'catalogue trail'**
-  String get catalogueTrailLabel;
-
   /// No description provided for @itinerary.
   ///
   /// In en, this message translates to:
@@ -3467,7 +3407,7 @@ abstract class AppLocalizations {
   /// No description provided for @recapCalories.
   ///
   /// In en, this message translates to:
-  /// **'{calories} active kcal burned, estimated.'**
+  /// **'About {calories} active kcal burned.'**
   String recapCalories(int calories);
 
   /// No description provided for @recapItemSteps.
@@ -3761,7 +3701,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchRoutes.
   ///
   /// In en, this message translates to:
-  /// **'Search a route'**
+  /// **'Search for a route'**
   String get searchRoutes;
 
   /// No description provided for @noMatchingRoutes.
