@@ -81,11 +81,8 @@ class AppLocalizationsFr extends AppLocalizations {
       'La session enregistrée ne peut pas être ouverte. Reconnectez-vous.';
 
   @override
-  String get localDev => 'Dev local (Docker)';
-
-  @override
   String missingApiUrl(Object arg1, Object arg2) {
-    return '$arg1 : renseignez API_URL dans $arg2, puis relancez F5. Le mode hors ligne nécessite une première connexion réussie.';
+    return '$arg1 : renseignez API_URL dans $arg2, puis recompilez l’application. Le mode hors ligne nécessite une première connexion réussie.';
   }
 
   @override
@@ -203,12 +200,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get demo => 'Démonstration';
-
-  @override
-  String get demoFlorence => 'Démonstration · Florence';
-
-  @override
   String get damagedGpx =>
       'Ce fichier de parcours contient un nom ou un texte dont l’encodage est abîmé. Corrigez-le dans le fichier d’origine avant de l’importer.';
 
@@ -233,9 +224,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get libraryClosed => 'Bibliothèque fermée';
-
-  @override
-  String get downloadStalled => 'Téléchargement sans progression';
 
   @override
   String get invalidMapCatalog => 'Catalogue cartographique invalide.';
@@ -362,7 +350,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get invalidUsername => '3 à 32 lettres, chiffres ou caractères _.';
 
   @override
-  String get invalidEmail => 'Saisissez une adresse e-mail valide.';
+  String get invalidEmail => 'Saisissez une adresse email valide.';
 
   @override
   String get invalidPassword =>
@@ -455,9 +443,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get mapNeedsPreparation => 'Carte à préparer';
-
-  @override
-  String get savedPlaces => 'Lieux enregistrés sur le téléphone';
 
   @override
   String get days => 'Journées';
@@ -679,7 +664,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get apiConfigurationInfo =>
-      'L’adresse API se règle dans le fichier local du profil de lancement, puis en relançant F5.';
+      'L’adresse de l’API se règle dans le fichier de configuration local du build, puis en recompilant l’application.';
 
   @override
   String get resolveConflicts =>
@@ -772,9 +757,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get finish => 'Terminer';
-
-  @override
-  String get liveStats => 'Mes données en direct';
 
   @override
   String get startRoute => 'Démarrer un parcours';
@@ -1050,9 +1032,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get currentWalk => 'Ma marche en cours';
-
-  @override
-  String get walkControls => 'Pause, terminer et historique';
 
   @override
   String get planDays => 'Planifier mes journées';
@@ -1489,11 +1468,6 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String showTrail(String name) {
-    return 'Afficher $name';
-  }
-
-  @override
   String get closeTrail => 'Fermer le parcours';
 
   @override
@@ -1715,7 +1689,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get reviewCompletionRequired =>
-      'Parcourez tout le sentier avec l’enregistrement Gpix, en une ou plusieurs fois, pour donner votre avis.';
+      'Faites tout le parcours avec l’enregistrement Gpix, en une ou plusieurs fois, pour donner votre avis.';
 
   @override
   String reviewProgress(int percent) {
@@ -1786,7 +1760,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get completionRequired =>
-      'Parcourez tout le sentier, en une ou plusieurs fois, avant de donner votre avis.';
+      'Faites tout le parcours, en une ou plusieurs fois, avant de donner votre avis.';
 
   @override
   String get invalidRating => 'Choisissez une note de 1 à 5 étoiles.';
@@ -1809,7 +1783,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Il est placé à votre position actuelle et partagé avec tous les marcheurs de ce parcours.';
 
   @override
-  String get placeName => 'Nom (par exemple : Belle vue)';
+  String get placeName => 'Nom (par exemple : Point de vue)';
 
   @override
   String get save => 'Enregistrer';
@@ -1870,12 +1844,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get catalogueTrailsLegend => 'Catalogue';
-
-  @override
-  String get ownTrailLabel => 'votre parcours';
-
-  @override
-  String get catalogueTrailLabel => 'parcours du catalogue';
 
   @override
   String get itinerary => 'Itinéraire';
@@ -2169,7 +2137,7 @@ class AppLocalizationsFr extends AppLocalizations {
         intl.NumberFormat.decimalPattern(localeName);
     final String caloriesString = caloriesNumberFormat.format(calories);
 
-    return '$caloriesString kcal actives brûlées, estimation.';
+    return 'Environ $caloriesString kcal actives brûlées.';
   }
 
   @override
@@ -2211,7 +2179,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get caloriesNeedWeight =>
-      'Indiquez votre poids dans les paramètres pour estimer les calories actives.';
+      'Indiquez votre poids dans les réglages pour estimer les calories actives.';
 
   @override
   String healthWeightUsed(String weight) {
@@ -2240,15 +2208,15 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible d’ajouter la sortie à Health Connect. Vous pouvez la renvoyer depuis sa page d’historique.';
 
   @override
-  String get pointsFileNotAttached => 'Non rattaché à une trace';
+  String get pointsFileNotAttached => 'Non rattaché à un parcours';
 
   @override
   String pointsFilesBanner(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count fichiers de points ne sont rattachés à aucune trace',
-      one: '1 fichier de points n’est rattaché à aucune trace',
+      other: '$count fichiers de points ne sont rattachés à aucun parcours',
+      one: '1 fichier de points n’est rattaché à aucun parcours',
     );
     return '$_temp0';
   }
@@ -2260,7 +2228,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get showAllItems => 'Tout afficher';
 
   @override
-  String get attachToTrail => 'Rattacher à une trace';
+  String get attachToTrail => 'Rattacher à un parcours';
 
   @override
   String get addPoints => 'Ajouter des points';
@@ -2272,7 +2240,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addPointsFromLibrary => 'Fichiers de points de ma bibliothèque';
 
   @override
-  String get attachPointsTitle => 'Rattacher des points à une trace';
+  String get attachPointsTitle => 'Rattacher des points à un parcours';
 
   @override
   String attachPointsFrom(int count, String files) {
@@ -2287,14 +2255,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String attachPointsTo(String trail) {
-    return 'Trace : $trail';
+    return 'Parcours : $trail';
   }
 
   @override
-  String get changeTrail => 'Changer de trace';
+  String get changeTrail => 'Changer de parcours';
 
   @override
-  String get chooseAttachTrail => 'Choisir la trace';
+  String get chooseAttachTrail => 'Choisir le parcours';
 
   @override
   String pointsWithinReach(int inRange, int total) {
@@ -2302,10 +2270,10 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get recommendedTrail => 'Recommandée';
+  String get recommendedTrail => 'Recommandé';
 
   @override
-  String get catalogueTrailChoice => 'Trace partagée, absente du téléphone';
+  String get catalogueTrailChoice => 'Parcours partagé, absent du téléphone';
 
   @override
   String attachAdded(int count) {
@@ -2324,8 +2292,8 @@ class AppLocalizationsFr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count points déjà présents sur la trace',
-      one: '1 point déjà présent sur la trace',
+      other: '$count points déjà présents sur le parcours',
+      one: '1 point déjà présent sur le parcours',
     );
     return '$_temp0';
   }
@@ -2364,7 +2332,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noTrailNearPoints =>
-      'Aucune trace de votre bibliothèque ou des environs ne passe à moins de 5 km de ces points.';
+      'Aucun parcours de votre bibliothèque ou des environs ne passe à moins de 5 km de ces points.';
 
   @override
   String pointsAttached(int added, int known, int left) {
@@ -2389,7 +2357,7 @@ class AppLocalizationsFr extends AppLocalizations {
       one: '1 point reste dans le fichier.',
       zero: 'Plus rien dans le fichier.',
     );
-    return '$_temp0 sur la trace, $_temp1. $_temp2';
+    return '$_temp0 sur le parcours, $_temp1. $_temp2';
   }
 
   @override
@@ -2460,7 +2428,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String speedVsUsual(String difference, String usual) {
-    return '$difference par rapport à votre habitude de $usual';
+    return '$difference par rapport à votre moyenne habituelle de $usual';
   }
 
   @override
@@ -2526,7 +2494,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get deleteAllWalksInfo =>
-      'Le parcours lui-même est conservé, tout comme les sentiers partagés. La suppression sera synchronisée avec votre compte.';
+      'Le parcours lui-même est conservé, tout comme les parcours partagés. La suppression sera synchronisée avec votre compte.';
 
   @override
   String get walkA => 'Sortie A';
@@ -2549,7 +2517,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String gapAhead(String distance, String time) {
-    return 'À $distance, A a $time d\'avance';
+    return 'À $distance, A a $time d’avance';
   }
 
   @override
@@ -2564,11 +2532,11 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get gapOppositeDirections =>
-      'Ces sorties ont été faites dans des sens opposés. Choisissez deux sorties dans le même sens pour suivre l\'écart.';
+      'Ces sorties ont été faites dans des sens opposés. Choisissez deux sorties dans le même sens pour suivre l’écart.';
 
   @override
   String get gapUnavailable =>
-      'Ces sorties n\'ont pas assez de parcours en commun, avec leurs temps, pour suivre l\'écart.';
+      'Ces sorties n’ont pas assez de parcours en commun, avec leurs temps, pour suivre l’écart.';
 
   @override
   String minutesSeconds(int minutes, int seconds) {
@@ -2594,7 +2562,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get progressNeedsTwo =>
-      'Parcourez encore une fois ce parcours en entier pour voir votre progression.';
+      'Refaites ce parcours en entier une fois de plus pour voir votre progression.';
 
   @override
   String get totalActiveTime => 'Durée active totale';

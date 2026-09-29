@@ -24,8 +24,7 @@
   "mapSaved": "Map verified and saved offline",
   "syncRetry": "Saved on this phone · sync will resume",
   "sessionRestoreFailed": "Cannot open the saved session. Please sign in again.",
-  "localDev": "Local Dev (Docker)",
-  "missingApiUrl": "{arg1}: set API_URL in {arg2}, then restart F5. Offline access requires a successful first sign-in.",
+  "missingApiUrl": "{arg1}: set API_URL in {arg2}, then rebuild the app. Offline access requires a successful first sign-in.",
   "@missingApiUrl": {
     "placeholders": {
       "arg1": {
@@ -136,8 +135,6 @@
       }
     }
   },
-  "demo": "Demo",
-  "demoFlorence": "Demo · Florence",
   "damagedGpx": "This trail file contains damaged text. Correct it in the original file before importing.",
   "gpxSizeLimit": "Limit: 50 MB per trail file.",
   "incompleteUtf16": "Incomplete UTF-16 file.",
@@ -159,8 +156,7 @@
     }
   },
   "libraryClosed": "Library closed",
-  "downloadStalled": "Download stalled",
-  "invalidMapCatalog": "Invalid map catalog.",
+  "invalidMapCatalog": "Invalid map catalogue.",
   "downloadRunning": "Download already in progress.",
   "mapHttpsRequired": "Package rejected: HTTPS required, except HTTP from the same Dev LAN server.",
   "incorrectPackageSize": "Incorrect package size.",
@@ -251,7 +247,6 @@
   },
   "mapReady": "Map ready offline",
   "mapNeedsPreparation": "Map needs preparation",
-  "savedPlaces": "Places saved on this phone",
   "days": "Days",
   "deleteItemQuestion": "Delete this item?",
   "deleteItemBody": "This deletion will also be synced with your server.",
@@ -260,7 +255,7 @@
   "resumePreparation": "Resume preparation",
   "readyOffline": "Ready offline",
   "preparingMaps": "Automatic preparation running or pending",
-  "loadCatalog": "Load my server's catalog",
+  "loadCatalog": "Load my server's catalogue",
   "prepareTrails": "Prepare my trails · {arg1} MB",
   "@prepareTrails": {
     "placeholders": {
@@ -271,7 +266,7 @@
   },
   "completeElevations": "Complete elevations for the open trail",
   "onMyPhone": "On my phone",
-  "noInstalledMaps": "No map installed. Configure your server and its catalog in settings. Trails remain viewable.",
+  "noInstalledMaps": "No map installed. Configure your server and its catalogue in settings. Trails remain viewable.",
   "deleteMap": "Delete this map",
   "availableRegions": "Available regions",
   "coversOpenTrail": " · covers the open trail",
@@ -364,7 +359,7 @@
   "confirmNewPassword": "Confirm new password",
   "passwordChanged": "Password changed.",
   "changePassword": "Change password",
-  "apiConfigurationInfo": "Set the API address in the launch profile's local file, then restart F5.",
+  "apiConfigurationInfo": "Set the API address in the build's local configuration file, then rebuild the app.",
   "resolveConflicts": "Resolve conflicts: keep both copies",
   "signOutInfo": "Signing out locks this space on this phone. Your local trails are kept for your next sign-in.",
   "requiredField": "This field is required.",
@@ -403,7 +398,6 @@
   "pause": "Pause",
   "resume": "Resume",
   "finish": "Finish",
-  "liveStats": "My live data",
   "startRoute": "Start a route",
   "walkCountDistance": "{arg1, plural, =0{0 walks} =1{1 walk} other{{arg1} walks}} · {arg2}",
   "@walkCountDistance": {
@@ -587,7 +581,6 @@
   "reverseDirection": "Reverse direction · change",
   "gpxDirection": "Original direction · change",
   "currentWalk": "My current walk",
-  "walkControls": "Pause, finish and history",
   "planDays": "Plan my days",
   "editDays": "{arg1, plural, =0{My days} =1{My day} other{My {arg1} days}} · edit",
   "@editDays": {
@@ -769,7 +762,7 @@
   "voiceGuidanceNotSaved": "Voice guidance preference not saved on this phone.",
   "menu": "Menu",
   "backToMap": "Back to the map",
-  "searchPlaces": "Search a town, an address…",
+  "searchPlaces": "Search for a town, an address…",
   "clearSearch": "Clear search",
   "noPlaceFound": "No place found.",
   "placeSearchUnavailable": "Place search needs a connection. Try again once online.",
@@ -786,14 +779,6 @@
     "placeholders": {
       "count": {
         "type": "int"
-      }
-    }
-  },
-  "showTrail": "Show {name}",
-  "@showTrail": {
-    "placeholders": {
-      "name": {
-        "type": "String"
       }
     }
   },
@@ -1072,8 +1057,6 @@
   "myGroups": "My groups",
   "ownTrailsLegend": "Saved",
   "catalogueTrailsLegend": "Catalogue",
-  "ownTrailLabel": "your trail",
-  "catalogueTrailLabel": "catalogue trail",
   "itinerary": "Itinerary",
   "collection": "Collection",
   "itineraryInfo": "Trails in order, as stages walked one after another.",
@@ -1223,7 +1206,7 @@
       }
     }
   },
-  "recapCalories": "{calories} active kcal burned, estimated.",
+  "recapCalories": "About {calories} active kcal burned.",
   "@recapCalories": {
     "placeholders": {
       "calories": {
@@ -1390,7 +1373,7 @@
       }
     }
   },
-  "searchRoutes": "Search a route",
+  "searchRoutes": "Search for a route",
   "noMatchingRoutes": "No route matches this search.",
   "routeLastWalked": "{date} · {count, plural, =1{walked once} other{walked {count} times}}",
   "@routeLastWalked": {

@@ -1,0 +1,64 @@
+name: Release APK
+# Pushing a tag vX.Y.Z (matching pubspec.yaml's version) builds the Prod APK,
+# signs it with the release key and publishes it on a GitHub Release.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: release
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+      - name: Check that the tag matches the app version
+        run: |
+          version=$(sed -n 's/^version: *\([^+]*\).*/\1/p' pubspec.yaml)
+          test "v$version" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME does not match pubspec version $version" >&2; exit 1; }
+      - run: flutter pub get
+      - run: flutter test
+      - name: Prepare signing key and server address
+        env:
+          KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          API_URL: ${{ secrets.PROD_API_URL }}
+        run: |
+          for name in KEYSTORE_BASE64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD API_URL; do
+            eval "test -n \"\$$name\"" || { echo "Missing release secret for $name" >&2; exit 1; }
+          done
+          umask 077
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          printf 'storeFile=%s\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+            "$RUNNER_TEMP/release.jks" "$KEYSTORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > android/key.properties
+          jq -n --arg url "$API_URL" '{API_URL: $url}' > config/prod.local.json
+      - name: Build the signed Prod APK
+        run: flutter build apk --release --flavor prod --dart-define-from-file=config/prod.local.json
+      - name: Publish the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          apk="gpix-$GITHUB_REF_NAME.apk"
+          cp build/app/outputs/flutter-apk/app-prod-release.apk "$apk"
+          sha256sum "$apk" > "$apk.sha256"
+          gh release create "$GITHUB_REF_NAME" "$apk" "$apk.sha256" \
+            --repo "$GITHUB_REPOSITORY" --title "Gpix $GITHUB_REF_NAME" --generate-notes
+      - name: Remove signing material
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.jks" android/key.properties config/prod.local.json

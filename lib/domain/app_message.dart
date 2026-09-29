@@ -69,7 +69,6 @@ class AppMessage {
   static AppMessage unsupportedGpxEncoding(Object? arg1) =>
       AppMessage('unsupportedGpxEncoding', [arg1]);
   static const libraryClosed = AppMessage('libraryClosed');
-  static const downloadStalled = AppMessage('downloadStalled');
   static const invalidMapCatalog = AppMessage('invalidMapCatalog');
   static const downloadRunning = AppMessage('downloadRunning');
   static const mapHttpsRequired = AppMessage('mapHttpsRequired');

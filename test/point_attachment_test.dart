@@ -570,9 +570,9 @@ void main() {
     ),
     (
       'fr',
-      'Rattacher des points à une trace',
+      'Rattacher des points à un parcours',
       '4 nouveaux lieux',
-      '1 point déjà présent sur la trace',
+      '1 point déjà présent sur le parcours',
       '1 point à plus de 5 km reste dans le fichier',
       'Rattacher',
       'Ces lieux seront visibles par tous les marcheurs. Je confirme pouvoir les partager.',
@@ -630,7 +630,7 @@ void main() {
       expect(
         find.text(
           language == 'fr'
-              ? '1 fichier de points n’est rattaché à aucune trace'
+              ? '1 fichier de points n’est rattaché à aucun parcours'
               : '1 points file is not attached to a trail',
         ),
         findsOneWidget,
@@ -638,7 +638,7 @@ void main() {
       expect(
         find.text(
           language == 'fr'
-              ? 'Non rattaché à une trace'
+              ? 'Non rattaché à un parcours'
               : 'Not attached to a trail',
         ),
         findsOneWidget,
@@ -660,9 +660,9 @@ void main() {
       expect(find.text(title), findsOneWidget);
       expect(find.text(added), findsOneWidget);
       expect(find.text(known), findsOneWidget, reason: 'the hostel twice');
-      expect(find.text(far), findsOneWidget);
       await tester.drag(find.text(title), const Offset(0, -400));
       await tester.pumpAndSettle();
+      expect(find.text(far), findsOneWidget);
       final button = find.ancestor(
         of: find.text(attach),
         matching: find.byWidgetPredicate((w) => w is FilledButton),

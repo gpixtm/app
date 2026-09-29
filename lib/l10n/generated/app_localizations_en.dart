@@ -77,11 +77,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Cannot open the saved session. Please sign in again.';
 
   @override
-  String get localDev => 'Local Dev (Docker)';
-
-  @override
   String missingApiUrl(Object arg1, Object arg2) {
-    return '$arg1: set API_URL in $arg2, then restart F5. Offline access requires a successful first sign-in.';
+    return '$arg1: set API_URL in $arg2, then rebuild the app. Offline access requires a successful first sign-in.';
   }
 
   @override
@@ -199,12 +196,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get demo => 'Demo';
-
-  @override
-  String get demoFlorence => 'Demo · Florence';
-
-  @override
   String get damagedGpx =>
       'This trail file contains damaged text. Correct it in the original file before importing.';
 
@@ -231,10 +222,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryClosed => 'Library closed';
 
   @override
-  String get downloadStalled => 'Download stalled';
-
-  @override
-  String get invalidMapCatalog => 'Invalid map catalog.';
+  String get invalidMapCatalog => 'Invalid map catalogue.';
 
   @override
   String get downloadRunning => 'Download already in progress.';
@@ -452,9 +440,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapNeedsPreparation => 'Map needs preparation';
 
   @override
-  String get savedPlaces => 'Places saved on this phone';
-
-  @override
   String get days => 'Days';
 
   @override
@@ -482,7 +467,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preparingMaps => 'Automatic preparation running or pending';
 
   @override
-  String get loadCatalog => 'Load my server\'s catalog';
+  String get loadCatalog => 'Load my server\'s catalogue';
 
   @override
   String prepareTrails(Object arg1) {
@@ -497,7 +482,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noInstalledMaps =>
-      'No map installed. Configure your server and its catalog in settings. Trails remain viewable.';
+      'No map installed. Configure your server and its catalogue in settings. Trails remain viewable.';
 
   @override
   String get deleteMap => 'Delete this map';
@@ -671,7 +656,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get apiConfigurationInfo =>
-      'Set the API address in the launch profile\'s local file, then restart F5.';
+      'Set the API address in the build\'s local configuration file, then rebuild the app.';
 
   @override
   String get resolveConflicts => 'Resolve conflicts: keep both copies';
@@ -760,9 +745,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get finish => 'Finish';
-
-  @override
-  String get liveStats => 'My live data';
 
   @override
   String get startRoute => 'Start a route';
@@ -1033,9 +1015,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currentWalk => 'My current walk';
-
-  @override
-  String get walkControls => 'Pause, finish and history';
 
   @override
   String get planDays => 'Plan my days';
@@ -1431,7 +1410,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backToMap => 'Back to the map';
 
   @override
-  String get searchPlaces => 'Search a town, an address…';
+  String get searchPlaces => 'Search for a town, an address…';
 
   @override
   String get clearSearch => 'Clear search';
@@ -1463,11 +1442,6 @@ class AppLocalizationsEn extends AppLocalizations {
       one: '1 trail here',
     );
     return '$_temp0';
-  }
-
-  @override
-  String showTrail(String name) {
-    return 'Show $name';
   }
 
   @override
@@ -1845,12 +1819,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get catalogueTrailsLegend => 'Catalogue';
 
   @override
-  String get ownTrailLabel => 'your trail';
-
-  @override
-  String get catalogueTrailLabel => 'catalogue trail';
-
-  @override
   String get itinerary => 'Itinerary';
 
   @override
@@ -2137,7 +2105,7 @@ class AppLocalizationsEn extends AppLocalizations {
         intl.NumberFormat.decimalPattern(localeName);
     final String caloriesString = caloriesNumberFormat.format(calories);
 
-    return '$caloriesString active kcal burned, estimated.';
+    return 'About $caloriesString active kcal burned.';
   }
 
   @override
@@ -2400,7 +2368,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get searchRoutes => 'Search a route';
+  String get searchRoutes => 'Search for a route';
 
   @override
   String get noMatchingRoutes => 'No route matches this search.';

@@ -1,6 +1,6 @@
 # Gpix mobile — agent instructions
 
-These instructions apply to this standalone Flutter repository (`gpixtm/app`). They preserve the accepted project decisions as of 27 September 2026. Explicit new user instructions take precedence; update the affected rule and its reference when a decision changes.
+These instructions apply to this public, GPL-3.0 Flutter repository (`gpixtm/app`). They preserve the accepted project decisions as of 28 September 2026. Human contributors follow [CONTRIBUTING.md](CONTRIBUTING.md). Explicit new user instructions take precedence; update the affected rule and its reference when a decision changes.
 
 ## Absolute language rules
 
@@ -22,6 +22,7 @@ Commit messages, tags, PR titles and descriptions never mention the coding assis
 4. **Ask separately whether to merge `develop` into `main`.** Commit permission does not authorize a merge. Present the tested result and remaining limitations first.
 5. Once the user approves the merge, refresh remote references, inspect the complete merge scope, merge into `main`, and **push**. The approved merge includes that push. Also publish the approved `develop` commits. Revalidate affected behavior after conflict resolution; never force shared branches. Return to `develop` and report the actual remote/CI result.
 6. Before any push, review the staged files and diff for credentials, private configuration, signing keys, user GPX/history, databases and build outputs. Keep secrets in ignored local files. A mobile push does not authorize an API production deployment.
+7. **Never commit information about the production server**: its domain or URL, IP addresses, host or account names, paths or provider accounts. The Prod `API_URL` exists only in the ignored `config/prod.local.json` and the `PROD_API_URL` release secret; tracked files use placeholders such as `https://api.example.org`.
 
 ## Architecture and code
 
@@ -78,8 +79,8 @@ Read [product decisions](docs/PRODUCT.md) for map UX, navigation, day planning, 
 - Prod uses HTTPS with certificate validation. Its profile has no demo credentials. Local URL/config files and optional Dev prefill stay ignored. Environment selection comes from the launch/build configuration, not stale persisted settings.
 - For an API/production task, read the API repository's own `AGENTS.md` and relevant production instructions. Its `main` push can deploy; this repository's commit authorization does not cover that action.
 - Format changed Dart files, regenerate localization, run `flutter analyze` and relevant tests, then build affected native variants when required. Use meaningful regression tests for geometry, sync, authentication, encoding, recording and localization; distinguish skipped HTTP integration from a passing real-server test.
-- Only `lib/main.dart` is a user APK entry point. `tool/maps_smoke.dart` and `tool/approach_smoke.dart` are test tools. A Prod flavor is a server selection, not evidence of store signing; the current release signing configuration still needs production keys.
-- Update checksums and validation notes when producing a binary delivery. Install on a personal phone only when requested. A docs-only change needs content/link checks, not APK rebuilding.
+- Only `lib/main.dart` is a user APK entry point. `tool/maps_smoke.dart` and `tool/approach_smoke.dart` are test tools. A Prod flavor is a server selection, not evidence of release signing: release builds use `android/key.properties` when present and fall back to the debug key otherwise.
+- Public APKs are published by pushing a `vX.Y.Z` tag matching `pubspec.yaml`'s version: `.github/workflows/release.yaml` builds the Prod flavor, signs it with the release key from repository secrets and attaches the APK and its SHA-256 to the GitHub Release. Never commit APKs. Install on a personal phone only when requested. A docs-only change needs content/link checks, not APK rebuilding.
 - Report automated tests, compilation, emulator, device and field checks separately. Compilation cannot establish heading stability, battery life, Zepp exports or physical watch compatibility.
 
 ## Task references
@@ -91,4 +92,4 @@ Read [product decisions](docs/PRODUCT.md) for map UX, navigation, day planning, 
 | SDK, LAN, launch profiles, build and delivery | [Development](docs/DEBUG-VSCODE.md) |
 | API contracts, database changes or deployment | The separate `gpixtm/api` repository's `AGENTS.md` |
 
-Historical V1 documents excluded features subsequently accepted (automatic maps, day planning, history, screen-off recording, approach routing and health integration). These current rules supersede those exclusions. Keep current invariants here, feature details in the linked guide, and dated observations in validation notes.
+Historical V1 documents excluded features subsequently accepted (automatic maps, day planning, history, screen-off recording, approach routing and health integration). These current rules supersede those exclusions. Keep current invariants here and feature details in the linked guide.

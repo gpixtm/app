@@ -67,3 +67,6 @@ local.properties
 *.part
 .vscode/settings.json
 untranslated_messages.json
+
+# Puro environment selection is per developer.
+.puro.json

@@ -281,7 +281,7 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.byType(NavigationBar), findsNothing);
-    expect(find.text('Search a town, an address…'), findsOneWidget);
+    expect(find.text('Search for a town, an address…'), findsOneWidget);
     expect(find.text('Import a trail'), findsOneWidget);
     await tester.tap(find.byTooltip('Menu'));
     await tester.pumpAndSettle();
@@ -290,7 +290,7 @@ void main() {
     expect(find.textContaining('No map installed'), findsOneWidget);
     await tester.tap(find.byTooltip('Back to the map'));
     await tester.pumpAndSettle();
-    expect(find.text('Search a town, an address…'), findsOneWidget);
+    expect(find.text('Search for a town, an address…'), findsOneWidget);
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox());
     app.dispose();

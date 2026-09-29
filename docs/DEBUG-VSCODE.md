@@ -13,7 +13,7 @@ puro create gpix 3.47.5
 puro use gpix
 ```
 
-`puro use` writes a local `.puro.json` (listed in `.git/info/exclude`, not committed) and points VS Code's `dart.flutterSdkPath` and `dart.sdkPath` at the environment in `.vscode/settings.json`. Restart VS Code afterwards. The next `puro flutter pub get` rewrites `flutter.sdk` in the ignored `android/local.properties`.
+`puro use` writes a local `.puro.json` (ignored by Git) and points VS Code's `dart.flutterSdkPath` and `dart.sdkPath` at the environment in `.vscode/settings.json`. Restart VS Code afterwards. The next `puro flutter pub get` rewrites `flutter.sdk` in the ignored `android/local.properties`.
 
 Check the active SDK with `puro flutter --version`. If `flutter` on `PATH` points to another installation, keep calling `puro flutter` / `puro dart` explicitly rather than the bare commands. Outside this repository (for example the sibling API's `make dev`), there is no `.puro.json`, so tools pass the environment explicitly: `puro -e gpix dart …`.
 
@@ -23,11 +23,11 @@ Copy `config/dev.example.json` and `config/prod.example.json` to the correspondi
 
 The two launch profiles use `lib/main.dart` and the matching `dev`/`prod` flavor. Both are debug builds: Prod is a server selection, not a release signature. Changing compile-time values requires stopping and restarting F5.
 
-Do not take an F5 session on a walk. The debugger starts every isolate paused and resumes it itself; once the phone is unplugged, nothing resumes new isolates, so any work sent to one waits forever (observed 28 September 2026: the map stopped redrawing when a large GeoJSON source was encoded in the background, and finishing a route hung on its route computation). On the Flutter/Android merged thread a paused main isolate also shows as “not responding”. For field tests run `make install-prod` (add `DEVICE=<id>` when several phones are connected): it builds Prod in release mode, installs it over the current app and starts it, with no debugger attached, so the phone can be unplugged. The release build is still signed with this computer's debug key, so it installs over the F5 build and keeps its local data.
+Do not take an F5 session on a walk. The debugger starts every isolate paused and resumes it itself; once the phone is unplugged, nothing resumes new isolates, so any work sent to one waits forever (observed 28 September 2026: the map stopped redrawing when a large GeoJSON source was encoded in the background, and finishing a route hung on its route computation). On the Flutter/Android merged thread a paused main isolate also shows as “not responding”. For field tests run `make install-prod` (add `DEVICE=<id>` when several phones are connected): it builds Prod in release mode, installs it over the current app and starts it, with no debugger attached, so the phone can be unplugged. Without `android/key.properties` the release build is signed with this computer's debug key, so it installs over the F5 build and keeps its local data.
 
 ## API over the LAN
 
-Clone `gpixtm/api` separately. In the full workspace it is the sibling `backend/`; its `make dev` or `dart tools/dev_backend.dart` prepares Docker on the explicit private IPv4 interface from the mobile configuration. See that repository's instructions before installing or changing the API. A standalone app clone can use any compatible separately running API.
+Clone [gpixtm/api](https://github.com/gpixtm/api) separately. In the full workspace it is the sibling `backend/`; its `make dev` or `dart tools/dev_backend.dart` prepares Docker on the explicit private IPv4 interface from the mobile configuration. See that repository's instructions before installing or changing the API. A standalone app clone can use any compatible separately running API.
 
 Phone and computer must share the LAN. Use a normal private address without tunnels or `adb reverse`. `localhost` on a phone means the phone, and `10.0.2.2` is emulator-specific. Check `/health` from the phone. Docker Desktop can prevent the computer reaching its own published LAN address while the phone succeeds. `make up`, `make mailpit` and `make dev-off` restore loopback; run `make dev` again for a physical phone. The Dev launch profile runs `tool/start_dev_api.dart` before F5. It starts the sibling API when available; in a standalone clone it leaves API startup to your separately configured server.
 
@@ -48,6 +48,27 @@ puro flutter build apk --debug --target=lib/main.dart --flavor dev --dart-define
 puro flutter build apk --debug --target=lib/main.dart --flavor prod --dart-define-from-file=config/prod.local.json --target-platform android-arm64 --split-per-abi
 ```
 
-Integration tests requiring a live API must be configured explicitly; a skipped integration test is not a server validation. `tool/*_smoke.dart` entry points are test harnesses and must never replace the real app in a delivery. Use a full restart after native changes. Personal-device installation requires a user request.
+Integration tests requiring a live API must be configured explicitly; a skipped integration test is not a server validation. `tool/*_smoke.dart` entry points are test harnesses and must never replace the real app in a delivery. Use a full restart after native changes.
 
-Read [AGENTS.md](../AGENTS.md) before development and follow its commit/merge approval sequence. Keep user data, local configurations, build outputs, signing keys and credentials out of Git.
+## Signed release builds
+
+Published APKs are signed with the project's release key, so each new version installs over the previous one. Android refuses an update signed by another key: switching a phone from a debug-signed build to the release-signed build (or back) requires uninstalling first, which erases data not yet synced to the account.
+
+To sign locally, create a keystore once and keep it and its passwords outside Git (losing it means users can no longer update):
+
+```sh
+keytool -genkeypair -v -keystore ../gpix-release.jks -keyalg RSA -keysize 4096 -validity 10000 -alias gpix
+```
+
+This command, run from the repository root, stores the keystore next to the repository. Then write the ignored `android/key.properties` (paths are relative to `android/`):
+
+```properties
+storeFile=../../gpix-release.jks
+storePassword=…
+keyAlias=gpix
+keyPassword=…
+```
+
+`make build-prod` then produces `build/app/outputs/flutter-apk/app-prod-release.apk` signed with that key and pointed at the `API_URL` of `config/prod.local.json`. The [release workflow](../.github/workflows/release.yaml) does the same on GitHub for a `v*` tag, from repository secrets, and attaches the APK and its SHA-256 to the GitHub Release.
+
+Read [CONTRIBUTING.md](../CONTRIBUTING.md) before contributing. Keep user data, local configurations, build outputs, signing keys and credentials out of Git.

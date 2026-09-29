@@ -131,7 +131,7 @@ class OfflineMaps implements MapRepository {
       }
       final response = await server.download(uri, client);
       if (response.statusCode != 200) {
-        throw HttpException('Carte : HTTP ${response.statusCode}');
+        throw HttpException('Map download: HTTP ${response.statusCode}');
       }
       final sink = archive.openWrite();
       var received = 0;

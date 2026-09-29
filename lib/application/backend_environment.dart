@@ -2,14 +2,15 @@ import '../domain/app_message.dart';
 
 enum BackendMode { dev, prod }
 
-/// Pure configuration policy, shared by the app and the local Docker launcher.
+/// Pure configuration policy for the API the app talks to.
 class BackendEnvironment {
   const BackendEnvironment(this.mode, this.apiUrl);
   final BackendMode mode;
   final String apiUrl;
 
-  String get label => mode == BackendMode.dev ? "Local Dev (Docker)" : 'Prod';
-  String get configFile => 'mobile/config/${mode.name}.local.json';
+  /// Also part of the session identity: changing it would detach saved sessions.
+  String get label => mode == BackendMode.dev ? 'Local Dev (Docker)' : 'Prod';
+  String get configFile => 'config/${mode.name}.local.json';
   String get normalizedUrl => apiUrl.trim().replaceFirst(RegExp(r'/+$'), '');
 
   AppMessage? get problem {
