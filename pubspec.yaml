@@ -3,7 +3,7 @@ description: "Offline-first hiking, GPX navigation and walk recording."
 publish_to: 'none'
 
 # <versionName>+<versionCode>; a release tag is v<versionName>.
-version: 1.0.0+1
+version: 1.1.0+2
 
 environment:
   sdk: ^3.13.4
