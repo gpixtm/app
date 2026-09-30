@@ -3,6 +3,7 @@ import 'localization.dart';
 import 'package:flutter/material.dart';
 
 import '../application/app_controller.dart';
+import '../domain/guidance.dart';
 import '../domain/health_data.dart';
 import '../domain/walk_recap.dart';
 import 'guidance_text.dart';
@@ -20,12 +21,19 @@ class SettingsView extends StatelessWidget {
       const SizedBox(height: 20),
       if (app.guide != null)
         Card(
-          child: SwitchListTile(
-            secondary: const Icon(Icons.record_voice_over_outlined),
-            title: Text(context.l10n.voiceGuidance),
-            subtitle: Text(context.l10n.voiceGuidanceInfo),
-            value: app.voiceGuidance,
-            onChanged: app.setVoiceGuidance,
+          child: Column(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.turn_right),
+                title: Text(context.l10n.directionGuidance),
+                subtitle: Text(context.l10n.directionGuidanceInfo),
+              ),
+              ..._announcementSwitches(
+                context,
+                voice: AnnouncementSetting.directionVoice,
+                notification: AnnouncementSetting.directionNotification,
+              ),
+            ],
           ),
         ),
       if (app.profiles != null) WalkerProfileCard(app),
@@ -50,12 +58,17 @@ class SettingsView extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(context.l10n.recapSettingsInfo),
               ),
+              ..._announcementSwitches(
+                context,
+                voice: AnnouncementSetting.recapVoice,
+                notification: AnnouncementSetting.recapNotification,
+              ),
               for (final item in RecapItem.values)
                 CheckboxListTile(
                   dense: true,
                   title: Text(recapItemLabel(context.l10n, item)),
                   value: app.spokenRecap.contains(item),
-                  onChanged: app.voiceGuidance
+                  onChanged: app.announces(AnnouncementSetting.recapVoice)
                       ? (spoken) => app.setSpokenRecap(item, spoken == true)
                       : null,
                 ),
@@ -102,6 +115,25 @@ class SettingsView extends StatelessWidget {
       ),
     ],
   );
+
+  List<Widget> _announcementSwitches(
+    BuildContext context, {
+    required AnnouncementSetting voice,
+    required AnnouncementSetting notification,
+  }) => [
+    SwitchListTile(
+      secondary: const Icon(Icons.record_voice_over_outlined),
+      title: Text(context.l10n.announcementVoice),
+      value: app.announces(voice),
+      onChanged: (enabled) => app.setAnnouncement(voice, enabled),
+    ),
+    SwitchListTile(
+      secondary: const Icon(Icons.notifications_outlined),
+      title: Text(context.l10n.announcementNotification),
+      value: app.announces(notification),
+      onChanged: (enabled) => app.setAnnouncement(notification, enabled),
+    ),
+  ];
 }
 
 class HealthSettings extends StatefulWidget {

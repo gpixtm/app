@@ -19,6 +19,7 @@ import 'data/shared_trail_api.dart';
 import 'data/trail_identity_hash.dart';
 import 'application/announce_progress.dart';
 import 'application/guide_navigation.dart';
+import 'domain/guidance.dart';
 import 'domain/walk_recap.dart';
 import 'application/record_walk.dart';
 import 'data/recording_store.dart';
@@ -135,7 +136,27 @@ class _LibraryRuntime {
     final db = await openLocalDatabase(storage.databasePath);
     // Device preference: speech depends on this phone's audio, not the account.
     const preferences = SecureCredentials();
-    final voice = await preferences.read('gpix.voiceGuidance') != 'false';
+    String announcementKey(AnnouncementSetting setting) => switch (setting) {
+      AnnouncementSetting.directionVoice => 'gpix.voiceGuidance',
+      AnnouncementSetting.directionNotification => 'gpix.guidanceNotification',
+      AnnouncementSetting.recapVoice => 'gpix.recapVoice',
+      AnnouncementSetting.recapNotification => 'gpix.recapNotification',
+    };
+    Future<bool?> announcement(AnnouncementSetting setting) async =>
+        switch (await preferences.read(announcementKey(setting))) {
+          'true' => true,
+          'false' => false,
+          _ => null,
+        };
+    final voice =
+        await announcement(AnnouncementSetting.directionVoice) ?? true;
+    // The summary voice once followed the direction voice switch: keep it.
+    final recapVoice =
+        await announcement(AnnouncementSetting.recapVoice) ?? voice;
+    final directionNotification =
+        await announcement(AnnouncementSetting.directionNotification) ?? true;
+    final recapNotification =
+        await announcement(AnnouncementSetting.recapNotification) ?? true;
     final spokenRecap = RecapItem.parse(
       await preferences.read('gpix.spokenRecap'),
     );
@@ -206,14 +227,20 @@ class _LibraryRuntime {
       setAwake: (on) => WakelockPlus.toggle(enable: on),
       vibrate: HapticFeedback.heavyImpact,
       connectionDetails: () => server.details,
-      guide: GuideNavigation(guidance, voice: voice),
-      saveVoiceGuidance: (enabled) =>
-          preferences.write('gpix.voiceGuidance', '$enabled'),
+      guide: GuideNavigation(
+        guidance,
+        voice: voice,
+        notify: directionNotification,
+      ),
+      saveAnnouncement: (setting, enabled) =>
+          preferences.write(announcementKey(setting), '$enabled'),
       statistics: statistics,
       recap: AnnounceProgress(
         guidance,
         statistics: statistics,
         spoken: spokenRecap,
+        voice: recapVoice,
+        notify: recapNotification,
       ),
       saveSpokenRecap: (items) =>
           preferences.write('gpix.spokenRecap', RecapItem.format(items)),

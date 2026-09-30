@@ -60,7 +60,6 @@ Future<DateTime> walkNorth(
   required double to,
   required double kmh,
   required DateTime start,
-  bool voice = true,
   bool foreground = false,
   TrackingSession? session,
 }) async {
@@ -73,7 +72,6 @@ Future<DateTime> walkNorth(
     await progress.update(
       walk,
       now: time,
-      voice: voice,
       foreground: foreground,
       session: session,
     );
@@ -113,7 +111,7 @@ void main() {
     'voice off and visible app: silent summary without notification',
     () async {
       final output = RecordingOutput();
-      final progress = AnnounceProgress(output);
+      final progress = AnnounceProgress(output, voice: false);
       final walk = recording();
       final start = DateTime(2026, 9, 28, 8);
       walk.resume(start);
@@ -124,11 +122,26 @@ void main() {
         to: 1010,
         kmh: 5,
         start: start,
-        voice: false,
         foreground: true,
       );
       expect(output.recaps.single.$2, isEmpty);
       expect(output.recaps.single.$3, isFalse);
+    },
+  );
+
+  test(
+    'summary notification off: spoken off-screen, nothing posted or cleared',
+    () async {
+      final output = RecordingOutput();
+      final progress = AnnounceProgress(output, notify: false);
+      final walk = recording();
+      final start = DateTime(2026, 9, 28, 8);
+      walk.resume(start);
+      await walkNorth(progress, walk, from: 0, to: 1010, kmh: 5, start: start);
+      expect(output.recaps.single.$2, RecapItem.spokenByDefault);
+      expect(output.recaps.single.$3, isFalse);
+      await progress.leave();
+      expect(output.cleared, 0);
     },
   );
 
@@ -237,6 +250,23 @@ void main() {
       );
     },
   );
+
+  test('the finished walk summary is titled in English and French', () {
+    final done = WalkRecap(
+      kilometre: 12,
+      metres: 12400,
+      activeSeconds: 10800,
+      clock: DateTime(2026, 9, 30, 17),
+      averageKmh: 4.1,
+      finished: true,
+    );
+    expect(describeRecap(en, done).title, 'Trail finished');
+    expect(describeRecap(fr, done).title, 'Parcours terminé');
+    expect(
+      describeRecap(fr, done).lines[RecapItem.distance],
+      '12,4 km parcourus.',
+    );
+  });
 
   test(
     'only selected items are spoken; the notification lists them all',

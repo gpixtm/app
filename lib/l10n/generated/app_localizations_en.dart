@@ -1393,15 +1393,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nextDirection => 'Next direction';
 
   @override
-  String get voiceGuidance => 'Voice guidance';
+  String get directionGuidance => 'Directions';
 
   @override
-  String get voiceGuidanceInfo =>
-      'Speaks each direction change about 100 m ahead during navigation, even with the screen off. While Gpix is in the background, a notification also shows the direction.';
+  String get directionGuidanceInfo =>
+      'During navigation, each direction change is announced about 100 m ahead, even with the screen off.';
 
   @override
-  String get voiceGuidanceNotSaved =>
-      'Voice guidance preference not saved on this phone.';
+  String get announcementVoice => 'Spoken announcement';
+
+  @override
+  String get announcementNotification =>
+      'Notification while Gpix is in the background';
+
+  @override
+  String get announcementNotSaved =>
+      'Announcement preference not saved on this phone.';
 
   @override
   String get menu => 'Menu';
@@ -1596,7 +1603,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recapSettingsInfo =>
-      'Every kilometre walked, a summary is spoken and, while Gpix is in the background, shown in a notification. Choose what the voice reads. Comparisons need earlier walks on the same trail; remaining distance and arrival need a followed trail.';
+      'Every kilometre walked, a summary can be spoken and, while Gpix is in the background, shown in a notification, independently of directions. Choose what the voice reads. Comparisons need earlier walks on the same trail; remaining distance and arrival need a followed trail.';
 
   @override
   String get recapItemDistance => 'Distance walked';
@@ -2556,20 +2563,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nextStage => 'Next stage';
 
   @override
-  String get trailEndReached => 'End of the trail reached';
+  String get trailFinished =>
+      'End of the trail: the walk finished by itself and is saved.';
 
   @override
-  String stageEndReached(int stage) {
-    return 'End of stage $stage reached';
-  }
-
-  @override
-  String get finishStageInfo => 'Finish to save this walk and its statistics.';
-
-  @override
-  String finishAndStartStage(int stage) {
-    return 'Finish and start stage $stage';
-  }
+  String get recapFinishedTitle => 'Trail finished';
 
   @override
   String get continueRoute => 'Continue from here';

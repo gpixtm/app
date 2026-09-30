@@ -14,6 +14,7 @@ class GuideNavigation {
   GuideNavigation(
     this.output, {
     this.voice = true,
+    this.notify = true,
     this.announceDistance = 100,
     this.immediateDistance = 20,
     this.arrivalDistance = 30,
@@ -21,6 +22,9 @@ class GuideNavigation {
   final GuidanceOutput output;
   final double announceDistance, immediateDistance, arrivalDistance;
   bool voice;
+
+  /// Whether a notification shows the direction while Gpix is not visible.
+  bool notify;
 
   TrailGeometry? _geometry;
   List<Maneuver> _maneuvers = const [];
@@ -132,9 +136,10 @@ class GuideNavigation {
 
   Future<void> _say(GuidanceInstruction instruction, bool foreground) async {
     // The visible map already shows the instruction; notify only off-screen.
-    if (!foreground) _posted = true;
+    final notify = this.notify && !foreground;
+    if (notify) _posted = true;
     try {
-      await output.announce(instruction, speak: voice, notify: !foreground);
+      await output.announce(instruction, speak: voice, notify: notify);
     } catch (_) {
       // Guidance delivery must never interrupt position tracking.
     }

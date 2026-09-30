@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gpix/application/announce_progress.dart';
 import 'package:gpix/application/app_controller.dart';
 import 'package:gpix/application/guide_navigation.dart';
 import 'package:gpix/application/library.dart';
@@ -179,6 +180,57 @@ void main() {
       // Visible map: no notification; voice preference disabled: silent.
       expect(output.said.single.notify, isFalse);
       expect(output.said.single.speak, isFalse);
+    },
+  );
+
+  test(
+    'direction notification off: spoken off-screen, nothing posted or cleared',
+    () async {
+      final output = RecordingOutput();
+      final guide = GuideNavigation(output, notify: false);
+      final session = TrackingSession(TrailGeometry(corner()))..resume();
+      await walk(guide, session, northThenEast());
+      expect(output.said, hasLength(3));
+      expect(output.said.every((a) => a.speak && !a.notify), isTrue);
+      await guide.leave();
+      expect(output.cleared, 0);
+    },
+  );
+
+  test(
+    'directions and kilometre summary switch voice and notification apart',
+    () async {
+      final saved = <(AnnouncementSetting, bool)>[];
+      final guide = GuideNavigation(RecordingOutput());
+      final recap = AnnounceProgress(RecordingOutput());
+      final app = AppController(
+        library: Library(Repository(), XmlGpxDecoder(), Elevation()),
+        maps: Maps(),
+        gps: StreamGps(const Stream.empty()),
+        sync: Sync(),
+        setAwake: (_) async {},
+        vibrate: () async {},
+        guide: guide,
+        recap: recap,
+        saveAnnouncement: (setting, enabled) async =>
+            saved.add((setting, enabled)),
+      );
+      await app.setAnnouncement(AnnouncementSetting.directionVoice, false);
+      await app.setAnnouncement(
+        AnnouncementSetting.directionNotification,
+        false,
+      );
+      expect((guide.voice, guide.notify), (false, false));
+      expect((recap.voice, recap.notify), (true, true));
+      expect(app.announces(AnnouncementSetting.recapVoice), isTrue);
+      await app.setAnnouncement(AnnouncementSetting.recapNotification, false);
+      expect((recap.voice, recap.notify), (true, false));
+      expect(saved, const [
+        (AnnouncementSetting.directionVoice, false),
+        (AnnouncementSetting.directionNotification, false),
+        (AnnouncementSetting.recapNotification, false),
+      ]);
+      app.dispose();
     },
   );
 

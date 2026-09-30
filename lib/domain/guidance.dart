@@ -160,6 +160,14 @@ List<_Sample> _resample(
 double _bearing(_Sample a, _Sample b) =>
     (math.atan2(b.x - a.x, b.y - a.y) * 180 / math.pi + 360) % 360;
 
+/// Independent device switches for what is announced outside the visible map.
+enum AnnouncementSetting {
+  directionVoice,
+  directionNotification,
+  recapVoice,
+  recapNotification,
+}
+
 /// Delivers turn-by-turn instructions (voice, notification) outside the UI.
 abstract interface class GuidanceOutput {
   /// Request delivery permissions. False only means notifications are blocked.

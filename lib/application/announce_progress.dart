@@ -11,12 +11,18 @@ class AnnounceProgress {
     this.output, {
     this.statistics,
     Set<RecapItem>? spoken,
+    this.voice = true,
+    this.notify = true,
     this.every = 1000,
   }) : spoken = spoken ?? RecapItem.spokenByDefault;
   final GuidanceOutput output;
   final TrailStatisticsStore? statistics;
   final double every;
   Set<RecapItem> spoken;
+
+  /// Independent of direction guidance: the summary has its own switches.
+  bool voice;
+  bool notify;
 
   WalkRecording? _recording;
   int _kilometre = 0;
@@ -28,7 +34,6 @@ class AnnounceProgress {
   Future<void> update(
     WalkRecording recording, {
     required DateTime now,
-    required bool voice,
     required bool foreground,
     TrackingSession? session,
   }) async {
@@ -58,15 +63,49 @@ class AnnounceProgress {
           ? null
           : walked / (seconds - split) * 3.6,
     );
-    if (!foreground) _posted = true;
+    final notify = this.notify && !foreground;
+    if (notify) _posted = true;
     try {
       await output.summarize(
         recap,
         spoken: voice ? spoken : const {},
-        notify: !foreground,
+        notify: notify,
       );
     } catch (_) {
       // Delivery must never interrupt the recording.
+    }
+  }
+
+  /// Last summary of the whole walk, when it finishes at the end of the
+  /// followed trail. Nothing is left to walk, so remaining distance, arrival
+  /// and the partial kilometre's speed are left out. Said after any direction
+  /// change in progress; its notification stays once the walk is finished.
+  Future<void> conclude(
+    WalkRecording recording, {
+    required DateTime now,
+    required bool foreground,
+  }) async {
+    _recording = null;
+    final recap = await _recap(
+      recording,
+      (recording.metres / every).floor(),
+      recording.seconds(now),
+      now,
+      null,
+      null,
+      finished: true,
+    );
+    final notify = this.notify && !foreground;
+    // The finished walk's summary replaces the last kilometre's: keep it.
+    _posted = false;
+    try {
+      await output.summarize(
+        recap,
+        spoken: voice ? spoken : const {},
+        notify: notify,
+      );
+    } catch (_) {
+      // Delivery must never prevent saving the walk.
     }
   }
 
@@ -76,8 +115,9 @@ class AnnounceProgress {
     int seconds,
     DateTime now,
     TrackingSession? session,
-    double? splitKmh,
-  ) async {
+    double? splitKmh, {
+    bool finished = false,
+  }) async {
     final snapshot = recording.snapshot(now);
     final metrics = WalkMetrics(snapshot, now: now);
     final average = seconds > 0 ? recording.metres / seconds * 3.6 : null;
@@ -108,6 +148,7 @@ class AnnounceProgress {
       ascent: metrics.hasElevation ? metrics.ascent : null,
       steps: snapshot.walk!.steps,
       calories: snapshot.walk!.estimatedCalories,
+      finished: finished,
     );
   }
 

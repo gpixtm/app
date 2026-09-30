@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gpix/application/announce_progress.dart';
 import 'package:gpix/application/app_controller.dart';
 import 'package:gpix/application/collaborative_trails.dart';
 import 'package:gpix/application/library.dart';
@@ -17,14 +18,15 @@ import 'package:gpix/domain/ports.dart';
 import 'package:gpix/domain/shared_trails.dart';
 import 'package:gpix/domain/stages.dart';
 import 'package:gpix/domain/trail_geometry.dart';
+import 'package:gpix/domain/walk_recap.dart';
 import 'package:gpix/domain/walk_recording.dart';
 import 'package:gpix/l10n/generated/app_localizations.dart';
 import 'package:gpix/presentation/trail_details.dart';
-import 'package:gpix/presentation/walk_controls.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:uuid/uuid.dart';
 
 import 'collaborative_trails_test.dart' show FakeTransport;
+import 'guidance_test.dart' show RecordingOutput;
 import 'lifecycle_test.dart' show Maps, Gps, Elevation, Sync, Repository;
 
 /// A line due north along longitude 6, from [from] to [to] degrees of
@@ -384,7 +386,11 @@ void main() {
     late AppController app;
 
     late LiveGps gps;
-    AppController controller({bool recording = false}) => AppController(
+    AppController controller({
+      bool recording = false,
+      AnnounceProgress? recap,
+    }) => AppController(
+      recap: recap,
       library: Library(repository, XmlGpxDecoder(), Elevation()),
       maps: Maps(),
       gps: Gps(),
@@ -499,10 +505,11 @@ void main() {
       expect((app.message as AppMessage).arguments, [3]);
     });
 
-    test('at the end of a stage, its walk is saved and the next stage '
-        'starts', () async {
+    test('at the end of a stage, its walk finishes by itself with a last '
+        'summary, then the next stage continues from there', () async {
       app.dispose();
-      app = controller(recording: true);
+      final output = RecordingOutput();
+      app = controller(recording: true, recap: AnnounceProgress(output));
       await app.initialize();
       await app.openShared('stage-6');
       await app.launch(app.focused!);
@@ -512,19 +519,27 @@ void main() {
       // Walked from the start of stage 6 to its north end.
       app.session!.startAlong = 0;
       gps.positions.add(Fix(const GeoPoint(45.0099, 6.0), 6, DateTime.now()));
-      await Future<void>.delayed(const Duration(milliseconds: 50));
-      expect(app.atTrailEnd, isTrue);
-      final next = app.nextStage!;
-      expect(next.trailId, 'stage-7');
-      expect(next.member.stage, 3);
-      await app.finishStage(next);
+      for (var i = 0; i < 100 && app.recorder!.current != null; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+      }
+      expect(app.recorder!.current, isNull, reason: 'finished by itself');
+      await pumpEventQueue();
       final walks = (await repository.all()).where((t) => t.walk != null);
       final finished = walks.where((t) => t.walk!.ended != null).single;
       expect(finished.walk!.sourceTrailId, 'stage-6');
+      expect((app.message as AppMessage).code, 'trailFinished');
+      final last = output.recaps.single;
+      expect(last.$1.finished, isTrue);
+      expect(last.$1.remainingMetres, isNull);
+      expect(last.$1.arrival, isNull);
+      expect(last.$2, RecapItem.spokenByDefault);
+      expect(output.cleared, 0, reason: 'the last summary stays');
+      // History's "Continue from here" goes on with the next stage.
+      final route = app.trails.firstWhere((t) => t.id == 'stage-6');
+      await app.continueRoute(route, reversed: false);
       expect(app.selected!.id, 'stage-7');
       expect(app.session!.reverse, isTrue, reason: 'stage 7 is drawn north');
-      expect(app.recorder!.current!.saved.walk!.sourceTrailId, 'stage-7');
-      expect(app.showHistory, isFalse);
+      app.stop();
       await app.recorder!.close();
     });
 
@@ -588,23 +603,5 @@ void main() {
         app.dispose();
       });
     }
-
-    testWidgets('the end card offers only finishing without a next stage', (
-      tester,
-    ) async {
-      final app = AppController(
-        library: Library(Repository(), XmlGpxDecoder(), Elevation()),
-        maps: Maps(),
-        gps: Gps(),
-        sync: Sync(),
-        setAwake: (_) async {},
-        vibrate: () async {},
-      );
-      await tester.pumpWidget(host(TrailEndCard(app), const Locale('fr')));
-      expect(find.text('Fin du parcours atteinte'), findsOneWidget);
-      expect(find.text('Terminer'), findsOneWidget);
-      expect(find.textContaining('lancer l’étape'), findsNothing);
-      app.dispose();
-    });
   });
 }
