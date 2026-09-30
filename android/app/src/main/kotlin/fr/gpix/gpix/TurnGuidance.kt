@@ -16,6 +16,8 @@ import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import java.util.Locale
@@ -33,12 +35,21 @@ class TurnGuidance(context: Context) : TextToSpeech.OnInitListener {
         .setUsage(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
         .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
         .build()
+    private val main = Handler(Looper.getMainLooper())
     private val focus = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
         .setAudioAttributes(attributes)
+        .setOnAudioFocusChangeListener({ change -> onFocusChange(change) }, main)
         .build()
     private var engine: TextToSpeech? = null
     private var ready = false
     private var pending: Triple<String, String, Boolean>? = null
+
+    // Main-thread state: announcements queued or being spoken, and how many
+    // times focus was taken back from a media app during them.
+    private val speaking = mutableSetOf<String>()
+    private var utterances = 0
+    private var reclaims = 0
+    private val release = Runnable { finishAll() }
 
     fun canNotify(): Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
         context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
@@ -62,7 +73,7 @@ class TurnGuidance(context: Context) : TextToSpeech.OnInitListener {
         engine = null
         ready = false
         pending = null
-        audio.abandonAudioFocusRequest(focus)
+        finishAll()
     }
 
     private fun say(text: String, language: String, interrupt: Boolean) {
@@ -88,9 +99,12 @@ class TurnGuidance(context: Context) : TextToSpeech.OnInitListener {
         tts.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {}
             // Bell and pause are queued before the words; release audio after the words.
-            override fun onDone(utteranceId: String?) { if (utteranceId == UTTERANCE_ID) audio.abandonAudioFocusRequest(focus) }
+            override fun onDone(utteranceId: String?) = finished(utteranceId)
             @Deprecated("Deprecated in Java")
-            override fun onError(utteranceId: String?) { audio.abandonAudioFocusRequest(focus) }
+            override fun onError(utteranceId: String?) = finished(utteranceId)
+            override fun onError(utteranceId: String?, errorCode: Int) = finished(utteranceId)
+            // A direction change flushes what was queued or being said.
+            override fun onStop(utteranceId: String?, interrupted: Boolean) = finished(utteranceId)
         })
         pending?.let { speakNow(it.first, it.second, it.third) }
         pending = null
@@ -100,11 +114,44 @@ class TurnGuidance(context: Context) : TextToSpeech.OnInitListener {
         val tts = engine ?: return
         val locale = Locale.forLanguageTag(language.ifBlank { "en" })
         if (tts.isLanguageAvailable(locale) >= TextToSpeech.LANG_AVAILABLE) tts.language = locale
+        val id = "$UTTERANCE_ID-${++utterances}"
+        if (speaking.isEmpty()) reclaims = 0
         audio.requestAudioFocus(focus)
+        speaking.add(id)
+        // Never keep other audio ducked if the engine stops reporting progress.
+        main.removeCallbacks(release)
+        main.postDelayed(release, MAX_SPEECH_MS)
         // Like a sports coach: a bell, one second of silence, then the words.
-        tts.playEarcon(BELL, if (interrupt) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD, null, "$UTTERANCE_ID-bell")
-        tts.playSilentUtterance(BELL_PAUSE_MS, TextToSpeech.QUEUE_ADD, "$UTTERANCE_ID-pause")
-        tts.speak(text, TextToSpeech.QUEUE_ADD, null, UTTERANCE_ID)
+        tts.playEarcon(BELL, if (interrupt) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD, null, "$id-bell")
+        tts.playSilentUtterance(BELL_PAUSE_MS, TextToSpeech.QUEUE_ADD, "$id-pause")
+        tts.speak(text, TextToSpeech.QUEUE_ADD, null, id)
+    }
+
+    /** Progress callbacks arrive on a binder thread; audio state lives on the main thread. */
+    private fun finished(utteranceId: String?) {
+        main.post {
+            if (utteranceId != null && speaking.remove(utteranceId) && speaking.isEmpty()) finishAll()
+        }
+    }
+
+    private fun finishAll() {
+        main.removeCallbacks(release)
+        speaking.clear()
+        audio.abandonAudioFocusRequest(focus)
+    }
+
+    /**
+     * A media player such as Deezer takes audio focus back when it starts its
+     * next track, which would restore its full volume over the announcement.
+     * Take focus back while words remain, so the music is ducked again. Calls
+     * and other transient requests (assistants, other guidance) are respected.
+     */
+    private fun onFocusChange(change: Int) {
+        if (change != AudioManager.AUDIOFOCUS_LOSS || speaking.isEmpty() || reclaims >= MAX_RECLAIMS) return
+        val mode = audio.mode
+        if (mode == AudioManager.MODE_IN_CALL || mode == AudioManager.MODE_IN_COMMUNICATION || mode == AudioManager.MODE_RINGTONE) return
+        reclaims++
+        audio.requestAudioFocus(focus)
     }
 
     private fun localized(language: String): Context {
@@ -183,6 +230,8 @@ class TurnGuidance(context: Context) : TextToSpeech.OnInitListener {
         private const val UTTERANCE_ID = "gpix-guidance"
         private const val BELL = "[gpix-bell]"
         private const val BELL_PAUSE_MS = 1000L
+        private const val MAX_SPEECH_MS = 60_000L
+        private const val MAX_RECLAIMS = 5
         private const val FOREST = 0xFF174B38.toInt()
         private val ICONS = mapOf(
             "slightLeft" to R.drawable.ic_guidance_slight_left,

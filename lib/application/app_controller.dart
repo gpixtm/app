@@ -16,6 +16,7 @@ import '../domain/trail_geometry.dart';
 import '../domain/coverage.dart';
 import '../domain/connection_settings.dart';
 import '../domain/day_plan.dart';
+import '../domain/guidance.dart';
 import '../domain/health_data.dart';
 import '../domain/approach.dart';
 import '../domain/catalogue.dart';
@@ -43,7 +44,7 @@ class AppController {
     this.health,
     this.approachSource,
     this.guide,
-    this.saveVoiceGuidance,
+    this.saveAnnouncement,
     this.placeSearch,
     this.recap,
     this.statistics,
@@ -807,7 +808,7 @@ class AppController {
     try {
       await saveSpokenRecap?.call(recap!.spoken);
     } catch (_) {
-      message = AppMessage.voiceGuidanceNotSaved;
+      message = AppMessage.announcementNotSaved;
       notifyListeners();
     }
   }
@@ -820,7 +821,6 @@ class AppController {
       recap!.update(
         recording,
         now: DateTime.now(),
-        voice: voiceGuidance,
         foreground: foreground,
         session: approach == null && s != null && s.active ? s : null,
       ),
@@ -841,16 +841,35 @@ class AppController {
   }
 
   final GuideNavigation? guide;
-  final Future<void> Function(bool)? saveVoiceGuidance;
-  bool get voiceGuidance => guide?.voice ?? false;
-  Future<void> setVoiceGuidance(bool enabled) async {
-    if (guide == null) return;
-    guide!.voice = enabled;
+  final Future<void> Function(AnnouncementSetting, bool)? saveAnnouncement;
+  bool announces(AnnouncementSetting setting) => switch (setting) {
+    AnnouncementSetting.directionVoice => guide?.voice ?? false,
+    AnnouncementSetting.directionNotification => guide?.notify ?? false,
+    AnnouncementSetting.recapVoice => recap?.voice ?? false,
+    AnnouncementSetting.recapNotification => recap?.notify ?? false,
+  };
+  Future<void> setAnnouncement(
+    AnnouncementSetting setting,
+    bool enabled,
+  ) async {
+    final guide = this.guide, recap = this.recap;
+    switch (setting) {
+      case AnnouncementSetting.directionVoice when guide != null:
+        guide.voice = enabled;
+      case AnnouncementSetting.directionNotification when guide != null:
+        guide.notify = enabled;
+      case AnnouncementSetting.recapVoice when recap != null:
+        recap.voice = enabled;
+      case AnnouncementSetting.recapNotification when recap != null:
+        recap.notify = enabled;
+      default:
+        return;
+    }
     notifyListeners();
     try {
-      await saveVoiceGuidance?.call(enabled);
+      await saveAnnouncement?.call(setting, enabled);
     } catch (_) {
-      message = AppMessage.voiceGuidanceNotSaved;
+      message = AppMessage.announcementNotSaved;
       notifyListeners();
     }
   }
@@ -879,6 +898,34 @@ class AppController {
         ),
       );
     }
+    if (atTrailEnd) unawaited(_finishAtTrailEnd());
+  }
+
+  bool _endingWalk = false;
+
+  /// Reaching the end of the followed trail finishes the walk by itself, even
+  /// screen-off, with a last summary of the whole walk. The next stage of an
+  /// itinerary starts from history's "Continue from here".
+  Future<void> _finishAtTrailEnd() async {
+    final recording = recorder?.current;
+    if (_endingWalk || busy || recording == null) return;
+    _endingWalk = true;
+    try {
+      await recap?.conclude(
+        recording,
+        now: DateTime.now(),
+        foreground: foreground,
+      );
+      await finishWalk();
+      if (_disposed || recorder?.current != null) return;
+      // A failed Health Connect share still needs saying.
+      if (message != AppMessage.healthShareFailed) {
+        message = AppMessage.trailFinished;
+      }
+      notifyListeners();
+    } finally {
+      _endingWalk = false;
+    }
   }
 
   final ApproachSource? approachSource;
@@ -898,23 +945,6 @@ class AppController {
         s != null &&
         recorder?.active == true &&
         trailEndReached(s, DateTime.now());
-  }
-
-  /// The stage to propose once the followed stage is walked: the neighbour
-  /// with an end where the walker stands.
-  NextStage? get nextStage {
-    final point = session?.fix?.point;
-    return point == null ? null : stagesOf(selected)?.following(point);
-  }
-
-  /// Finish the walk of a stage, then start [next] from where it ends. Each
-  /// stage is its own walk, with its statistics.
-  Future<void> finishStage([NextStage? next]) async {
-    await finishWalk();
-    if (next == null || _disposed || recorder?.current != null) return;
-    showHistory = false;
-    final trail = await _openStage(next);
-    if (trail != null) await launch(trail, reverse: next.reverse);
   }
 
   Future<Trail?> _openStage(NextStage next) async {

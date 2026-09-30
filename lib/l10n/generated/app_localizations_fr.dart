@@ -1416,15 +1416,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get nextDirection => 'Prochaine direction';
 
   @override
-  String get voiceGuidance => 'Guidage vocal';
+  String get directionGuidance => 'Indications de direction';
 
   @override
-  String get voiceGuidanceInfo =>
-      'Annonce chaque changement de direction environ 100 m avant pendant la navigation, même écran éteint. Quand Gpix est en arrière-plan, une notification indique aussi la direction.';
+  String get directionGuidanceInfo =>
+      'Pendant la navigation, chaque changement de direction est annoncé environ 100 m avant, même écran éteint.';
 
   @override
-  String get voiceGuidanceNotSaved =>
-      'Préférence de guidage vocal non enregistrée sur ce téléphone.';
+  String get announcementVoice => 'Annonce vocale';
+
+  @override
+  String get announcementNotification =>
+      'Notification quand Gpix est en arrière-plan';
+
+  @override
+  String get announcementNotSaved =>
+      'Préférence d’annonce non enregistrée sur ce téléphone.';
 
   @override
   String get menu => 'Menu';
@@ -1619,7 +1626,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get recapSettingsInfo =>
-      'À chaque kilomètre parcouru, un bilan est annoncé et, quand Gpix est en arrière-plan, affiché dans une notification. Choisissez ce que la voix lit. Les comparaisons nécessitent des sorties précédentes sur le même parcours ; la distance restante et l’arrivée, un parcours suivi.';
+      'À chaque kilomètre parcouru, un bilan peut être annoncé et, quand Gpix est en arrière-plan, affiché dans une notification, indépendamment des directions. Choisissez ce que la voix lit. Les comparaisons nécessitent des sorties précédentes sur le même parcours ; la distance restante et l’arrivée, un parcours suivi.';
 
   @override
   String get recapItemDistance => 'Distance parcourue';
@@ -2588,21 +2595,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get nextStage => 'Étape suivante';
 
   @override
-  String get trailEndReached => 'Fin du parcours atteinte';
+  String get trailFinished =>
+      'Fin du parcours : la marche s’est terminée d’elle-même et est enregistrée.';
 
   @override
-  String stageEndReached(int stage) {
-    return 'Fin de l’étape $stage atteinte';
-  }
-
-  @override
-  String get finishStageInfo =>
-      'Terminez pour enregistrer cette marche et ses statistiques.';
-
-  @override
-  String finishAndStartStage(int stage) {
-    return 'Terminer et lancer l’étape $stage';
-  }
+  String get recapFinishedTitle => 'Parcours terminé';
 
   @override
   String get continueRoute => 'Continuer d’ici';

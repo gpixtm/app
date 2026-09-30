@@ -84,7 +84,8 @@ class AppMessage {
   static const truncatedPmtiles = AppMessage('truncatedPmtiles');
   static const unsupportedMapStyle = AppMessage('unsupportedMapStyle');
   static const localPmtilesRequired = AppMessage('localPmtilesRequired');
-  static const voiceGuidanceNotSaved = AppMessage('voiceGuidanceNotSaved');
+  static const announcementNotSaved = AppMessage('announcementNotSaved');
+  static const trailFinished = AppMessage('trailFinished');
   static const profileNotSaved = AppMessage('profileNotSaved');
   static const healthShared = AppMessage('healthShared');
   static const healthSharePermission = AppMessage('healthSharePermission');

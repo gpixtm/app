@@ -50,8 +50,12 @@ class WalkRecap {
     this.ascent,
     this.steps,
     this.calories,
+    this.finished = false,
   });
   final int? steps;
+
+  /// Last summary of the whole walk, once the followed trail is completed.
+  final bool finished;
 
   /// Active kcal estimated from the track and the walker's weight.
   final double? calories;

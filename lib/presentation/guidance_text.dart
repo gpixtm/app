@@ -56,7 +56,12 @@ typedef GuidanceText = ({String title, String body, String speech});
       RecapItem.ascent: l10n.recapAscent(ascent.round()),
     RecapItem.clock: l10n.recapClock(time.format(recap.clock)),
   };
-  return (title: l10n.recapTitle(recap.kilometre), lines: lines);
+  return (
+    title: recap.finished
+        ? l10n.recapFinishedTitle
+        : l10n.recapTitle(recap.kilometre),
+    lines: lines,
+  );
 }
 
 String recapItemLabel(AppLocalizations l10n, RecapItem item) => switch (item) {

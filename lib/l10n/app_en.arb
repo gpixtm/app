@@ -757,9 +757,11 @@
   "guidanceOffTrailBody": "Check the map to rejoin it.",
   "guidanceNow": "Now",
   "nextDirection": "Next direction",
-  "voiceGuidance": "Voice guidance",
-  "voiceGuidanceInfo": "Speaks each direction change about 100 m ahead during navigation, even with the screen off. While Gpix is in the background, a notification also shows the direction.",
-  "voiceGuidanceNotSaved": "Voice guidance preference not saved on this phone.",
+  "directionGuidance": "Directions",
+  "directionGuidanceInfo": "During navigation, each direction change is announced about 100 m ahead, even with the screen off.",
+  "announcementVoice": "Spoken announcement",
+  "announcementNotification": "Notification while Gpix is in the background",
+  "announcementNotSaved": "Announcement preference not saved on this phone.",
   "menu": "Menu",
   "backToMap": "Back to the map",
   "searchPlaces": "Search for a town, an address…",
@@ -946,7 +948,7 @@
     }
   },
   "recapSettings": "Kilometre summary",
-  "recapSettingsInfo": "Every kilometre walked, a summary is spoken and, while Gpix is in the background, shown in a notification. Choose what the voice reads. Comparisons need earlier walks on the same trail; remaining distance and arrival need a followed trail.",
+  "recapSettingsInfo": "Every kilometre walked, a summary can be spoken and, while Gpix is in the background, shown in a notification, independently of directions. Choose what the voice reads. Comparisons need earlier walks on the same trail; remaining distance and arrival need a followed trail.",
   "recapItemDistance": "Distance walked",
   "recapItemDuration": "Walking time",
   "recapItemCurrentSpeed": "Current speed (last kilometre)",
@@ -1545,24 +1547,8 @@
   },
   "previousStage": "Previous stage",
   "nextStage": "Next stage",
-  "trailEndReached": "End of the trail reached",
-  "stageEndReached": "End of stage {stage} reached",
-  "@stageEndReached": {
-    "placeholders": {
-      "stage": {
-        "type": "int"
-      }
-    }
-  },
-  "finishStageInfo": "Finish to save this walk and its statistics.",
-  "finishAndStartStage": "Finish and start stage {stage}",
-  "@finishAndStartStage": {
-    "placeholders": {
-      "stage": {
-        "type": "int"
-      }
-    }
-  },
+  "trailFinished": "End of the trail: the walk finished by itself and is saved.",
+  "recapFinishedTitle": "Trail finished",
   "continueRoute": "Continue from here",
   "continueRouteInfo": "Starts from where you are, in the direction of your last walk. Past the end of a stage, the next stage starts."
 }

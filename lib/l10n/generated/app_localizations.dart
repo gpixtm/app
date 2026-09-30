@@ -2348,23 +2348,35 @@ abstract class AppLocalizations {
   /// **'Next direction'**
   String get nextDirection;
 
-  /// No description provided for @voiceGuidance.
+  /// No description provided for @directionGuidance.
   ///
   /// In en, this message translates to:
-  /// **'Voice guidance'**
-  String get voiceGuidance;
+  /// **'Directions'**
+  String get directionGuidance;
 
-  /// No description provided for @voiceGuidanceInfo.
+  /// No description provided for @directionGuidanceInfo.
   ///
   /// In en, this message translates to:
-  /// **'Speaks each direction change about 100 m ahead during navigation, even with the screen off. While Gpix is in the background, a notification also shows the direction.'**
-  String get voiceGuidanceInfo;
+  /// **'During navigation, each direction change is announced about 100 m ahead, even with the screen off.'**
+  String get directionGuidanceInfo;
 
-  /// No description provided for @voiceGuidanceNotSaved.
+  /// No description provided for @announcementVoice.
   ///
   /// In en, this message translates to:
-  /// **'Voice guidance preference not saved on this phone.'**
-  String get voiceGuidanceNotSaved;
+  /// **'Spoken announcement'**
+  String get announcementVoice;
+
+  /// No description provided for @announcementNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification while Gpix is in the background'**
+  String get announcementNotification;
+
+  /// No description provided for @announcementNotSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcement preference not saved on this phone.'**
+  String get announcementNotSaved;
 
   /// No description provided for @menu.
   ///
@@ -2585,7 +2597,7 @@ abstract class AppLocalizations {
   /// No description provided for @recapSettingsInfo.
   ///
   /// In en, this message translates to:
-  /// **'Every kilometre walked, a summary is spoken and, while Gpix is in the background, shown in a notification. Choose what the voice reads. Comparisons need earlier walks on the same trail; remaining distance and arrival need a followed trail.'**
+  /// **'Every kilometre walked, a summary can be spoken and, while Gpix is in the background, shown in a notification, independently of directions. Choose what the voice reads. Comparisons need earlier walks on the same trail; remaining distance and arrival need a followed trail.'**
   String get recapSettingsInfo;
 
   /// No description provided for @recapItemDistance.
@@ -3980,29 +3992,17 @@ abstract class AppLocalizations {
   /// **'Next stage'**
   String get nextStage;
 
-  /// No description provided for @trailEndReached.
+  /// No description provided for @trailFinished.
   ///
   /// In en, this message translates to:
-  /// **'End of the trail reached'**
-  String get trailEndReached;
+  /// **'End of the trail: the walk finished by itself and is saved.'**
+  String get trailFinished;
 
-  /// No description provided for @stageEndReached.
+  /// No description provided for @recapFinishedTitle.
   ///
   /// In en, this message translates to:
-  /// **'End of stage {stage} reached'**
-  String stageEndReached(int stage);
-
-  /// No description provided for @finishStageInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Finish to save this walk and its statistics.'**
-  String get finishStageInfo;
-
-  /// No description provided for @finishAndStartStage.
-  ///
-  /// In en, this message translates to:
-  /// **'Finish and start stage {stage}'**
-  String finishAndStartStage(int stage);
+  /// **'Trail finished'**
+  String get recapFinishedTitle;
 
   /// No description provided for @continueRoute.
   ///
