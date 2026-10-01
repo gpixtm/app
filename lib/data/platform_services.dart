@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../domain/app_message.dart';
 
 import 'package:geolocator/geolocator.dart';
@@ -32,9 +34,9 @@ class GpsPositionSource implements PositionSource {
   }
 
   @override
-  Stream<Fix> watch() =>
-      Geolocator.getPositionStream(
-        locationSettings: AndroidSettings(
+  Stream<Fix> watch() => SharedPositions.instance
+      .watch(
+        AndroidSettings(
           accuracy: LocationAccuracy.best,
           distanceFilter: 0,
           intervalDuration: const Duration(seconds: 5),
@@ -52,7 +54,9 @@ class GpsPositionSource implements PositionSource {
                 )
               : null,
         ),
-      ).map(
+        recording: recording,
+      )
+      .map(
         (p) => Fix(
           GeoPoint(
             p.latitude,
@@ -64,6 +68,78 @@ class GpsPositionSource implements PositionSource {
           heading: p.heading,
         ),
       );
+}
+
+/// Geolocator keeps a single position stream per app and hands it to every
+/// later caller, ignoring their settings. A map stream opened first would then
+/// feed the walk recording without its foreground service: Android freezes
+/// the app screen-off and the walk stops counting. Every caller shares one
+/// stream here instead, reopened with the foreground service whenever a
+/// recording listens, whatever the order of the calls.
+class SharedPositions {
+  SharedPositions(this._open);
+  static final instance = SharedPositions(
+    (settings) => Geolocator.getPositionStream(locationSettings: settings),
+  );
+  final Stream<Position> Function(LocationSettings) _open;
+  final _plain = <StreamController<Position>>{};
+  final _recording = <StreamController<Position>>{};
+  LocationSettings? _plainSettings, _recordingSettings;
+  StreamSubscription<Position>? _source;
+  bool? _sourceRecording;
+  Future<void> _switching = Future.value();
+
+  Stream<Position> watch(LocationSettings settings, {required bool recording}) {
+    late final StreamController<Position> controller;
+    controller = StreamController<Position>(
+      onListen: () {
+        if (recording) {
+          _recordingSettings = settings;
+          _recording.add(controller);
+        } else {
+          _plainSettings = settings;
+          _plain.add(controller);
+        }
+        _refresh();
+      },
+      onCancel: () {
+        _recording.remove(controller);
+        _plain.remove(controller);
+        _refresh();
+      },
+    );
+    return controller.stream;
+  }
+
+  void _refresh() {
+    _switching = _switching.then((_) async {
+      final wanted = _recording.isNotEmpty
+          ? true
+          : _plain.isNotEmpty
+          ? false
+          : null;
+      if (wanted == _sourceRecording && _source != null) return;
+      final previous = _source;
+      _source = null;
+      _sourceRecording = null;
+      // Geolocator forgets its stream only once the last listener is gone.
+      await previous?.cancel();
+      if (wanted == null) return;
+      _sourceRecording = wanted;
+      _source = _open(wanted ? _recordingSettings! : _plainSettings!).listen(
+        (position) {
+          for (final c in [..._recording, ..._plain]) {
+            c.add(position);
+          }
+        },
+        onError: (Object error, StackTrace stack) {
+          for (final c in [..._recording, ..._plain]) {
+            c.addError(error, stack);
+          }
+        },
+      );
+    });
+  }
 }
 
 class ApiElevationSource implements ElevationSource {
