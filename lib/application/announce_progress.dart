@@ -77,9 +77,10 @@ class AnnounceProgress {
   }
 
   /// Last summary of the whole walk, when it finishes at the end of the
-  /// followed trail. Nothing is left to walk, so remaining distance, arrival
-  /// and the partial kilometre's speed are left out. Said after any direction
-  /// change in progress; its notification stays once the walk is finished.
+  /// followed trail, with the average speed of the whole walk. Nothing is left
+  /// to walk, so remaining distance and arrival are left out. Said after any
+  /// direction change in progress; its notification stays once the walk is
+  /// finished.
   Future<void> conclude(
     WalkRecording recording, {
     required DateTime now,
@@ -137,8 +138,8 @@ class AnnounceProgress {
       metres: recording.metres,
       activeSeconds: seconds,
       clock: now,
-      splitKmh: splitKmh,
-      averageKmh: average,
+      // Each kilometre announces its own pace; the finished walk its whole one.
+      averageKmh: finished ? average : splitKmh,
       remainingMetres: remaining,
       arrival: remaining != null && average != null && average > .5
           ? now.add(Duration(seconds: (remaining / (average / 3.6)).round()))

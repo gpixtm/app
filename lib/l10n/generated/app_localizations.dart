@@ -2528,12 +2528,6 @@ abstract class AppLocalizations {
   /// **'{hours, plural, =1{Walking for 1 hour} other{Walking for {hours} hours}} and {minutes, plural, =1{1 minute} other{{minutes} minutes}}.'**
   String recapDurationHours(int hours, int minutes);
 
-  /// No description provided for @recapCurrentSpeed.
-  ///
-  /// In en, this message translates to:
-  /// **'Last kilometre at {speed} km/h.'**
-  String recapCurrentSpeed(String speed);
-
   /// No description provided for @recapAverageSpeed.
   ///
   /// In en, this message translates to:
@@ -2611,12 +2605,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Walking time'**
   String get recapItemDuration;
-
-  /// No description provided for @recapItemCurrentSpeed.
-  ///
-  /// In en, this message translates to:
-  /// **'Current speed (last kilometre)'**
-  String get recapItemCurrentSpeed;
 
   /// No description provided for @recapItemAverageSpeed.
   ///

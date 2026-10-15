@@ -96,7 +96,6 @@ void main() {
       await walkNorth(progress, walk, from: 0, to: 2050, kmh: 5, start: start);
       expect(output.recaps.map((r) => r.$1.kilometre), [1, 2]);
       final second = output.recaps.last.$1;
-      expect(second.splitKmh, closeTo(5, .1));
       expect(second.averageKmh, closeTo(5, .1));
       // Free walk: nothing to compare with and no destination.
       expect(second.difference, isNull);
@@ -146,7 +145,7 @@ void main() {
   );
 
   test(
-    'a restored recording continues counting without a false current speed',
+    'a restored recording continues counting without a false average speed',
     () async {
       final output = RecordingOutput();
       final progress = AnnounceProgress(output);
@@ -162,7 +161,11 @@ void main() {
         start: start,
       );
       expect(output.recaps.single.$1.kilometre, 3);
-      expect(output.recaps.single.$1.splitKmh, isNull);
+      expect(output.recaps.single.$1.averageKmh, isNull);
+      expect(
+        output.recaps.single.$1.available,
+        isNot(contains(RecapItem.averageSpeed)),
+      );
     },
   );
 
@@ -204,6 +207,67 @@ void main() {
   });
 
   test(
+    'each kilometre announces its own average and compares it with the usual '
+    'speed; arrival and the finished walk use the whole walk',
+    () async {
+      final output = RecordingOutput();
+      final statistics = MemoryStatistics()
+        ..values[usualTrail] = const TrailStatistics(
+          usualTrail,
+          4,
+          20000,
+          14400,
+        );
+      final progress = AnnounceProgress(output, statistics: statistics);
+      final trail = Trail(
+        id: usualTrail,
+        name: 'Usual',
+        segments: [
+          [at(0, 0), at(5000, 0)],
+        ],
+        pois: [],
+      );
+      final session = TrackingSession(TrailGeometry(trail))..resume();
+      final walk = recording(source: usualTrail);
+      final start = DateTime(2026, 9, 28, 8);
+      walk.resume(start);
+      var time = await walkNorth(
+        progress,
+        walk,
+        from: 0,
+        to: 990,
+        kmh: 6,
+        start: start,
+        session: session,
+      );
+      time = await walkNorth(
+        progress,
+        walk,
+        from: 1000,
+        to: 2010,
+        kmh: 4,
+        start: time,
+        session: session,
+      );
+      expect(output.recaps.map((r) => r.$1.kilometre), [1, 2]);
+      final second = output.recaps.last.$1;
+      expect(second.averageKmh, closeTo(4, .1));
+      expect(second.difference, closeTo(-1, .1));
+      final whole = second.metres / second.activeSeconds * 3.6;
+      expect(whole, closeTo(4.8, .1));
+      expect(
+        second.arrival!.difference(second.clock).inSeconds,
+        closeTo(second.remainingMetres! / (whole / 3.6), 1),
+      );
+      await progress.conclude(walk, now: time, foreground: false);
+      final done = output.recaps.last.$1;
+      expect(done.finished, isTrue);
+      expect(done.averageKmh, closeTo(4.8, .1));
+      expect(done.difference, closeTo(-.2, .1));
+    },
+  );
+
+  test(
     'summary sentences in English and French, faster, slower and as usual',
     () {
       WalkRecap recap(double average, {int seconds = 3900}) => WalkRecap(
@@ -211,7 +275,6 @@ void main() {
         metres: 5000,
         activeSeconds: seconds,
         clock: DateTime(2026, 9, 28, 14, 5),
-        splitKmh: 5.4,
         averageKmh: average,
         usualKmh: 5,
         previousWalks: 3,
@@ -226,7 +289,7 @@ void main() {
         faster[RecapItem.duration],
         'En marche depuis 1 heure et 5 minutes.',
       );
-      expect(faster[RecapItem.currentSpeed], 'Dernier kilomètre à 5,4 km/h.');
+      expect(faster[RecapItem.averageSpeed], 'Vitesse moyenne 5,2 km/h.');
       expect(
         faster[RecapItem.comparison],
         '0,2 km/h plus rapide que votre moyenne habituelle de 5,0 km/h. '

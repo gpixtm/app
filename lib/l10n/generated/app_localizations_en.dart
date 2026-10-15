@@ -1543,11 +1543,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String recapCurrentSpeed(String speed) {
-    return 'Last kilometre at $speed km/h.';
-  }
-
-  @override
   String recapAverageSpeed(String speed) {
     return 'Average speed $speed km/h.';
   }
@@ -1610,9 +1605,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recapItemDuration => 'Walking time';
-
-  @override
-  String get recapItemCurrentSpeed => 'Current speed (last kilometre)';
 
   @override
   String get recapItemAverageSpeed => 'Average speed';
