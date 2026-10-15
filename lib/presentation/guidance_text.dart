@@ -27,8 +27,6 @@ typedef GuidanceText = ({String title, String body, String speech});
     if (recap.steps case final steps?) RecapItem.steps: l10n.recapSteps(steps),
     if (recap.calories case final calories?)
       RecapItem.calories: l10n.recapCalories(calories.round()),
-    if (recap.splitKmh case final split?)
-      RecapItem.currentSpeed: l10n.recapCurrentSpeed(speed.format(split)),
     if (recap.averageKmh case final average?)
       RecapItem.averageSpeed: l10n.recapAverageSpeed(speed.format(average)),
     if (difference != null)
@@ -69,7 +67,6 @@ String recapItemLabel(AppLocalizations l10n, RecapItem item) => switch (item) {
   RecapItem.duration => l10n.recapItemDuration,
   RecapItem.steps => l10n.recapItemSteps,
   RecapItem.calories => l10n.recapItemCalories,
-  RecapItem.currentSpeed => l10n.recapItemCurrentSpeed,
   RecapItem.averageSpeed => l10n.recapItemAverageSpeed,
   RecapItem.comparison => l10n.recapItemComparison,
   RecapItem.remaining => l10n.recapItemRemaining,

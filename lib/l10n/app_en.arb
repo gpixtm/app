@@ -861,14 +861,6 @@
       }
     }
   },
-  "recapCurrentSpeed": "Last kilometre at {speed} km/h.",
-  "@recapCurrentSpeed": {
-    "placeholders": {
-      "speed": {
-        "type": "String"
-      }
-    }
-  },
   "recapAverageSpeed": "Average speed {speed} km/h.",
   "@recapAverageSpeed": {
     "placeholders": {
@@ -951,7 +943,6 @@
   "recapSettingsInfo": "Every kilometre walked, a summary can be spoken and, while Gpix is in the background, shown in a notification, independently of directions. Choose what the voice reads. Comparisons need earlier walks on the same trail; remaining distance and arrival need a followed trail.",
   "recapItemDistance": "Distance walked",
   "recapItemDuration": "Walking time",
-  "recapItemCurrentSpeed": "Current speed (last kilometre)",
   "recapItemAverageSpeed": "Average speed",
   "recapItemComparison": "Comparison with your usual speed",
   "recapItemRemaining": "Remaining distance",

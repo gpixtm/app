@@ -4,7 +4,6 @@ enum RecapItem {
   duration,
   steps,
   calories,
-  currentSpeed,
   averageSpeed,
   comparison,
   remaining,
@@ -41,7 +40,6 @@ class WalkRecap {
     required this.metres,
     required this.activeSeconds,
     required this.clock,
-    this.splitKmh,
     this.averageKmh,
     this.remainingMetres,
     this.arrival,
@@ -63,11 +61,14 @@ class WalkRecap {
   final double metres;
   final int activeSeconds;
   final DateTime clock;
-  final double? splitKmh, averageKmh, remainingMetres, usualKmh, ascent;
+
+  /// Over the kilometre just walked, or over the whole walk once finished.
+  final double? averageKmh;
+  final double? remainingMetres, usualKmh, ascent;
   final DateTime? arrival;
   final int? previousWalks;
 
-  /// Current average minus the usual average of this GPX, in km/h.
+  /// Announced average minus the usual average of this GPX, in km/h.
   double? get difference =>
       averageKmh == null || usualKmh == null ? null : averageKmh! - usualKmh!;
 
@@ -76,7 +77,6 @@ class WalkRecap {
     RecapItem.duration,
     if (steps != null) RecapItem.steps,
     if (calories != null) RecapItem.calories,
-    if (splitKmh != null) RecapItem.currentSpeed,
     if (averageKmh != null) RecapItem.averageSpeed,
     if (difference != null) RecapItem.comparison,
     if (remainingMetres != null) RecapItem.remaining,

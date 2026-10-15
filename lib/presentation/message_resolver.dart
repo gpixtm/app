@@ -476,9 +476,6 @@ String resolveAppMessage(
     message.arguments[0] as int,
     message.arguments[1] as int,
   ),
-  'recapCurrentSpeed' => l10n.recapCurrentSpeed(
-    argument(message.arguments[0]).toString(),
-  ),
   'recapAverageSpeed' => l10n.recapAverageSpeed(
     argument(message.arguments[0]).toString(),
   ),
@@ -506,7 +503,6 @@ String resolveAppMessage(
   'recapSettingsInfo' => l10n.recapSettingsInfo,
   'recapItemDistance' => l10n.recapItemDistance,
   'recapItemDuration' => l10n.recapItemDuration,
-  'recapItemCurrentSpeed' => l10n.recapItemCurrentSpeed,
   'recapItemAverageSpeed' => l10n.recapItemAverageSpeed,
   'recapItemComparison' => l10n.recapItemComparison,
   'recapItemRemaining' => l10n.recapItemRemaining,
