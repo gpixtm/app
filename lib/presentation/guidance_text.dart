@@ -32,13 +32,25 @@ typedef GuidanceText = ({String title, String body, String speech});
     if (difference != null)
       RecapItem.comparison: [
         // Compare at the announced precision so "0.0 faster" never occurs.
-        switch (double.parse(difference.toStringAsFixed(1))) {
-          0 => l10n.recapAsUsual(speed.format(recap.usualKmh)),
-          > 0 => l10n.recapFaster(
+        switch ((
+          double.parse(difference.toStringAsFixed(1)),
+          recap.usualOfKilometre,
+        )) {
+          (0, false) => l10n.recapAsUsual(speed.format(recap.usualKmh)),
+          (0, true) => l10n.recapAsUsualKilometre(speed.format(recap.usualKmh)),
+          (> 0, false) => l10n.recapFaster(
             speed.format(difference),
             speed.format(recap.usualKmh),
           ),
-          _ => l10n.recapSlower(
+          (> 0, true) => l10n.recapFasterKilometre(
+            speed.format(difference),
+            speed.format(recap.usualKmh),
+          ),
+          (_, false) => l10n.recapSlower(
+            speed.format(-difference),
+            speed.format(recap.usualKmh),
+          ),
+          (_, true) => l10n.recapSlowerKilometre(
             speed.format(-difference),
             speed.format(recap.usualKmh),
           ),

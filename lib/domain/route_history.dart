@@ -432,26 +432,12 @@ class RouteIndex {
       }
       return result;
     }
-    final metres = WalkMetrics(walk).metres;
-    final speed = details.seconds > 0 && metres > 0
-        ? metres / details.seconds
-        : 1.3;
-    var active = 0.0;
+    final times = activeTimeline(walk);
     for (var i = 0; i < samples.length; i++) {
-      if (i > 0) {
-        final a = samples[i - 1], b = samples[i];
-        final seconds = math.max(
-          0.0,
-          b.time.difference(a.time).inMilliseconds / 1000,
-        );
-        active += a.segment == b.segment
-            ? seconds
-            : math.min(seconds, distance(a.point, b.point) / speed);
-      }
       final lastOfSegment =
           i == samples.length - 1 ||
           samples[i + 1].segment != samples[i].segment;
-      keep(samples[i].point, active, force: lastOfSegment);
+      keep(samples[i].point, times[i], force: lastOfSegment);
     }
     return result;
   }

@@ -490,6 +490,17 @@ String resolveAppMessage(
   'recapAsUsual' => l10n.recapAsUsual(
     argument(message.arguments[0]).toString(),
   ),
+  'recapFasterKilometre' => l10n.recapFasterKilometre(
+    argument(message.arguments[0]).toString(),
+    argument(message.arguments[1]).toString(),
+  ),
+  'recapSlowerKilometre' => l10n.recapSlowerKilometre(
+    argument(message.arguments[0]).toString(),
+    argument(message.arguments[1]).toString(),
+  ),
+  'recapAsUsualKilometre' => l10n.recapAsUsualKilometre(
+    argument(message.arguments[0]).toString(),
+  ),
   'recapPreviousWalks' => l10n.recapPreviousWalks(message.arguments[0] as int),
   'recapRemaining' => l10n.recapRemaining(
     argument(message.arguments[0]).toString(),
