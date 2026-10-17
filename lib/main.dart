@@ -238,6 +238,7 @@ class _LibraryRuntime {
       recap: AnnounceProgress(
         guidance,
         statistics: statistics,
+        library: library.repository,
         spoken: spokenRecap,
         voice: recapVoice,
         notify: recapNotification,

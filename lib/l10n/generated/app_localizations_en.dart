@@ -1563,6 +1563,21 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String recapFasterKilometre(String difference, String usual) {
+    return '$difference km/h faster than usual on this kilometre, $usual km/h.';
+  }
+
+  @override
+  String recapSlowerKilometre(String difference, String usual) {
+    return '$difference km/h slower than usual on this kilometre, $usual km/h.';
+  }
+
+  @override
+  String recapAsUsualKilometre(String usual) {
+    return 'Same speed as usual on this kilometre, $usual km/h.';
+  }
+
+  @override
   String recapPreviousWalks(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

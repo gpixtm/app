@@ -61,3 +61,31 @@ class WalkMetrics {
       lastAltitude;
   bool get hasElevation => lastAltitude != null;
 }
+
+/// Active seconds since the start at each of [walk]'s samples. A pause adds
+/// no time; a GPS gap adds the time its distance takes at the walk's average
+/// speed.
+List<double> activeTimeline(Trail walk) {
+  final details = walk.walk!;
+  final samples = details.samples;
+  final metres = TrailGeometry(walk).total;
+  final speed = details.seconds > 0 && metres > 0
+      ? metres / details.seconds
+      : 1.3;
+  final result = <double>[];
+  var active = 0.0;
+  for (var i = 0; i < samples.length; i++) {
+    if (i > 0) {
+      final a = samples[i - 1], b = samples[i];
+      final seconds = math.max(
+        0.0,
+        b.time.difference(a.time).inMilliseconds / 1000,
+      );
+      active += a.segment == b.segment
+          ? seconds
+          : math.min(seconds, distance(a.point, b.point) / speed);
+    }
+    result.add(active);
+  }
+  return result;
+}

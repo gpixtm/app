@@ -2552,6 +2552,24 @@ abstract class AppLocalizations {
   /// **'Same speed as usual, {usual} km/h.'**
   String recapAsUsual(String usual);
 
+  /// No description provided for @recapFasterKilometre.
+  ///
+  /// In en, this message translates to:
+  /// **'{difference} km/h faster than usual on this kilometre, {usual} km/h.'**
+  String recapFasterKilometre(String difference, String usual);
+
+  /// No description provided for @recapSlowerKilometre.
+  ///
+  /// In en, this message translates to:
+  /// **'{difference} km/h slower than usual on this kilometre, {usual} km/h.'**
+  String recapSlowerKilometre(String difference, String usual);
+
+  /// No description provided for @recapAsUsualKilometre.
+  ///
+  /// In en, this message translates to:
+  /// **'Same speed as usual on this kilometre, {usual} km/h.'**
+  String recapAsUsualKilometre(String usual);
+
   /// No description provided for @recapPreviousWalks.
   ///
   /// In en, this message translates to:

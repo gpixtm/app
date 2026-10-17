@@ -899,6 +899,36 @@
       }
     }
   },
+  "recapFasterKilometre": "{difference} km/h faster than usual on this kilometre, {usual} km/h.",
+  "@recapFasterKilometre": {
+    "placeholders": {
+      "difference": {
+        "type": "String"
+      },
+      "usual": {
+        "type": "String"
+      }
+    }
+  },
+  "recapSlowerKilometre": "{difference} km/h slower than usual on this kilometre, {usual} km/h.",
+  "@recapSlowerKilometre": {
+    "placeholders": {
+      "difference": {
+        "type": "String"
+      },
+      "usual": {
+        "type": "String"
+      }
+    }
+  },
+  "recapAsUsualKilometre": "Same speed as usual on this kilometre, {usual} km/h.",
+  "@recapAsUsualKilometre": {
+    "placeholders": {
+      "usual": {
+        "type": "String"
+      }
+    }
+  },
   "recapPreviousWalks": "{count, plural, =1{Walked once before.} other{Walked {count} times before.}}",
   "@recapPreviousWalks": {
     "placeholders": {

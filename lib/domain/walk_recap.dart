@@ -49,6 +49,7 @@ class WalkRecap {
     this.steps,
     this.calories,
     this.finished = false,
+    this.usualOfKilometre = false,
   });
   final int? steps;
 
@@ -68,7 +69,11 @@ class WalkRecap {
   final DateTime? arrival;
   final int? previousWalks;
 
-  /// Announced average minus the usual average of this GPX, in km/h.
+  /// Whether [usualKmh] is the usual speed of this kilometre rather than of
+  /// the whole route.
+  final bool usualOfKilometre;
+
+  /// Announced average minus the usual one, in km/h.
   double? get difference =>
       averageKmh == null || usualKmh == null ? null : averageKmh! - usualKmh!;
 

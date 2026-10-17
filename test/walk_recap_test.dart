@@ -14,12 +14,14 @@ import 'package:gpix/domain/models.dart';
 import 'package:gpix/domain/sync.dart';
 import 'package:gpix/domain/trail_geometry.dart';
 import 'package:gpix/domain/trail_statistics.dart';
+import 'package:gpix/domain/usual_kilometres.dart';
 import 'package:gpix/domain/walk_recap.dart';
 import 'package:gpix/domain/walk_recording.dart';
 import 'package:gpix/l10n/generated/app_localizations.dart';
 import 'package:gpix/presentation/guidance_text.dart';
 
 import 'guidance_test.dart' show RecordingOutput, at;
+import 'lifecycle_test.dart' show Repository;
 
 const usualTrail = '3f0c6c4e-5b1a-4c55-9d3e-2a0b7f6a1c01';
 
@@ -50,6 +52,49 @@ class MemoryStatistics implements TrailStatisticsStore {
     ..addEntries(statistics.map((s) => MapEntry(s.trailId, s)));
   @override
   Future<void> addWalk(Trail walk) async {}
+}
+
+/// The usual 5 km trail, due north.
+Trail usualRoute() => Trail(
+  id: usualTrail,
+  name: 'Usual',
+  segments: [
+    [at(0, 0), at(5000, 0)],
+  ],
+  pois: [],
+);
+
+/// A finished earlier walk of the usual trail, sampled every 10 m, at
+/// [kmh] for each successive kilometre; walked south when [reversed].
+Trail earlierWalk(String id, List<double> kmh, {bool reversed = false}) {
+  final start = DateTime(2026, 9, 20, 8);
+  final samples = <WalkSample>[];
+  var seconds = 0.0;
+  for (var d = 0.0; d <= kmh.length * 1000; d += 10) {
+    if (d > 0) seconds += 10 / (kmh[((d - 10) / 1000).floor()] / 3.6);
+    final north = reversed ? kmh.length * 1000 - d : d;
+    samples.add(
+      WalkSample(
+        start.add(Duration(milliseconds: (seconds * 1000).round())),
+        at(north, 0),
+        5,
+        0,
+      ),
+    );
+  }
+  return Trail(
+    id: id,
+    name: 'Walk $id',
+    segments: [samples.map((s) => s.point).toList()],
+    pois: [],
+    walk: WalkDetails(
+      started: start,
+      ended: samples.last.time,
+      seconds: seconds.round(),
+      sourceTrailId: usualTrail,
+      samples: samples,
+    ),
+  );
 }
 
 /// Walk north from [from] metres in 10 m steps at [kmh], feeding [progress].
@@ -169,7 +214,7 @@ void main() {
     },
   );
 
-  test('a usual GPX compares with its stored average and gives remaining and arrival', () async {
+  test('without earlier walks on the phone a kilometre is not compared; remaining and arrival remain', () async {
     final output = RecordingOutput();
     final statistics = MemoryStatistics()
       ..values[usualTrail] = const TrailStatistics(usualTrail, 4, 20000, 14400);
@@ -196,9 +241,10 @@ void main() {
       session: session,
     );
     final recap = output.recaps.single.$1;
-    expect(recap.usualKmh, closeTo(5, 1e-9));
-    expect(recap.previousWalks, 4);
-    expect(recap.difference, closeTo(.2, .05));
+    // Never against the whole route's 5 km/h: that is what each kilometre
+    // used to hear, climbs and flats alike.
+    expect(recap.usualKmh, isNull);
+    expect(recap.available, isNot(contains(RecapItem.comparison)));
     expect(recap.remainingMetres, closeTo(4000, 10));
     expect(
       recap.arrival!.difference(recap.clock).inMinutes,
@@ -206,10 +252,14 @@ void main() {
     );
   });
 
-  test(
-    'each kilometre announces its own average and compares it with the usual '
-    'speed; arrival and the finished walk use the whole walk',
-    () async {
+  group('each kilometre against the usual speed of that kilometre', () {
+    ({
+      RecordingOutput output,
+      AnnounceProgress progress,
+      WalkRecording walk,
+      TrackingSession session,
+    })
+    usualWalk(List<Trail> earlier) {
       final output = RecordingOutput();
       final statistics = MemoryStatistics()
         ..values[usualTrail] = const TrailStatistics(
@@ -218,54 +268,146 @@ void main() {
           20000,
           14400,
         );
-      final progress = AnnounceProgress(output, statistics: statistics);
-      final trail = Trail(
-        id: usualTrail,
-        name: 'Usual',
-        segments: [
-          [at(0, 0), at(5000, 0)],
-        ],
-        pois: [],
+      final library = Repository()..list.addAll([usualRoute(), ...earlier]);
+      return (
+        output: output,
+        progress: AnnounceProgress(
+          output,
+          statistics: statistics,
+          library: library,
+        ),
+        walk: recording(source: usualTrail),
+        session: TrackingSession(TrailGeometry(usualRoute()))..resume(),
       );
-      final session = TrackingSession(TrailGeometry(trail))..resume();
-      final walk = recording(source: usualTrail);
+    }
+
+    test('a slow climb and a fast flat are each compared with their own usual; '
+        'arrival and the finished walk use the whole walk', () async {
+      final (:output, :progress, :walk, :session) = usualWalk([
+        earlierWalk('a', [4, 6, 5, 5, 5]),
+        earlierWalk('b', [4, 6, 5, 5, 5]),
+      ]);
       final start = DateTime(2026, 9, 28, 8);
       walk.resume(start);
-      var time = await walkNorth(
+      final time = await walkNorth(
         progress,
         walk,
         from: 0,
-        to: 990,
-        kmh: 6,
+        to: 2010,
+        kmh: 5,
         start: start,
         session: session,
       );
-      time = await walkNorth(
-        progress,
-        walk,
-        from: 1000,
-        to: 2010,
-        kmh: 4,
-        start: time,
-        session: session,
-      );
       expect(output.recaps.map((r) => r.$1.kilometre), [1, 2]);
-      final second = output.recaps.last.$1;
-      expect(second.averageKmh, closeTo(4, .1));
+      final first = output.recaps.first.$1, second = output.recaps.last.$1;
+      expect(first.averageKmh, closeTo(5, .1));
+      expect(first.usualKmh, closeTo(4, .05));
+      expect(first.difference, closeTo(1, .1));
+      expect(first.usualOfKilometre, isTrue);
+      expect(second.usualKmh, closeTo(6, .05));
       expect(second.difference, closeTo(-1, .1));
-      final whole = second.metres / second.activeSeconds * 3.6;
-      expect(whole, closeTo(4.8, .1));
+      expect(second.previousWalks, 4);
       expect(
         second.arrival!.difference(second.clock).inSeconds,
-        closeTo(second.remainingMetres! / (whole / 3.6), 1),
+        closeTo(second.remainingMetres! / (5 / 3.6), 15),
       );
       await progress.conclude(walk, now: time, foreground: false);
       final done = output.recaps.last.$1;
       expect(done.finished, isTrue);
-      expect(done.averageKmh, closeTo(4.8, .1));
-      expect(done.difference, closeTo(-.2, .1));
-    },
-  );
+      expect(done.usualOfKilometre, isFalse);
+      expect(done.usualKmh, closeTo(5, 1e-9));
+      expect(done.difference, closeTo(0, .1));
+    });
+
+    test(
+      'walks in the other direction and partial walks are left out',
+      () async {
+        final (:output, :progress, :walk, :session) = usualWalk([
+          earlierWalk('a', [4, 6, 5, 5, 5]),
+          earlierWalk('back', [2, 2, 2, 2, 2], reversed: true),
+          earlierWalk('partial', [9]),
+        ]);
+        final start = DateTime(2026, 9, 28, 8);
+        walk.resume(start);
+        await walkNorth(
+          progress,
+          walk,
+          from: 0,
+          to: 1010,
+          kmh: 5,
+          start: start,
+          session: session,
+        );
+        expect(output.recaps.single.$1.usualKmh, closeTo(4, .05));
+      },
+    );
+
+    test('a kilometre no earlier walk covered is not compared', () async {
+      final (:output, :progress, :walk, :session) = usualWalk([
+        earlierWalk('a', [5, 5, 5, 5, 5]),
+      ]);
+      final start = DateTime(2026, 9, 28, 8);
+      walk.resume(start);
+      // Going on past the trail's end makes this walk longer than usual.
+      await walkNorth(
+        progress,
+        walk,
+        from: 0,
+        to: 6010,
+        kmh: 5,
+        start: start,
+        session: session,
+      );
+      final recaps = output.recaps.map((r) => r.$1).toList();
+      expect(recaps.map((r) => r.kilometre), [1, 2, 3, 4, 5, 6]);
+      expect(recaps.first.usualKmh, closeTo(5, .05));
+      expect(recaps.last.usualKmh, isNull);
+      expect(recaps.last.available, isNot(contains(RecapItem.comparison)));
+    });
+  });
+
+  test('kilometre times count recorded distance and active time only', () {
+    final start = DateTime(2026, 9, 20, 8);
+    const speed = 5 / 3.6;
+    // 600 m at 5 km/h, a ten-minute pause where it stopped, then 600 m more.
+    final samples = [
+      for (var d = 0; d <= 1200; d += 10)
+        WalkSample(
+          start.add(
+            Duration(
+              milliseconds: ((d / speed + (d > 600 ? 600 : 0)) * 1000).round(),
+            ),
+          ),
+          at(d.toDouble(), 0),
+          5,
+          d > 600 ? 1 : 0,
+        ),
+    ];
+    final walk = Trail(
+      id: 'paused',
+      name: 'Paused',
+      segments: [
+        for (final segment in [0, 1])
+          [
+            for (final s in samples)
+              if (s.segment == segment) s.point,
+          ],
+      ],
+      pois: [],
+      walk: WalkDetails(
+        started: start,
+        ended: samples.last.time,
+        seconds: (1190 / speed).round(),
+        samples: samples,
+      ),
+    );
+    final times = kilometreTimes(walk);
+    expect(times, hasLength(2));
+    // The pause adds no time; the 10 m between segments add time, no distance.
+    expect(times.last, closeTo(1010 / speed, 3));
+    expect(UsualKilometres([walk]).kmh(0, 1), closeTo(5 * 1000 / 1010, .05));
+    expect(UsualKilometres([walk]).kmh(1, 2), isNull);
+  });
 
   test(
     'summary sentences in English and French, faster, slower and as usual',
@@ -310,6 +452,45 @@ void main() {
       expect(
         describeRecap(en, recap(5, seconds: 60)).lines[RecapItem.duration],
         'Walking for 1 minute.',
+      );
+      WalkRecap kilometre(double average) => WalkRecap(
+        kilometre: 3,
+        metres: 3000,
+        activeSeconds: 1900,
+        clock: DateTime(2026, 9, 28, 14, 5),
+        averageKmh: average,
+        usualKmh: 5.6,
+        usualOfKilometre: true,
+        previousWalks: 22,
+      );
+      String compared(AppLocalizations l10n, double average) =>
+          describeRecap(l10n, kilometre(average)).lines[RecapItem.comparison]!;
+      expect(
+        compared(fr, 5.8),
+        '0,2 km/h plus rapide que d’habitude sur ce kilomètre, 5,6 km/h. '
+        'Parcours déjà fait 22 fois.',
+      );
+      expect(
+        compared(fr, 5.3),
+        startsWith(
+          '0,3 km/h plus lent que d’habitude sur ce kilomètre, 5,6 km/h.',
+        ),
+      );
+      expect(
+        compared(fr, 5.62),
+        startsWith('Même vitesse que d’habitude sur ce kilomètre, 5,6 km/h.'),
+      );
+      expect(
+        compared(en, 5.8),
+        startsWith('0.2 km/h faster than usual on this kilometre, 5.6 km/h.'),
+      );
+      expect(
+        compared(en, 5.3),
+        startsWith('0.3 km/h slower than usual on this kilometre, 5.6 km/h.'),
+      );
+      expect(
+        compared(en, 5.6),
+        startsWith('Same speed as usual on this kilometre, 5.6 km/h.'),
       );
     },
   );

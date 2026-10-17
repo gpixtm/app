@@ -1,7 +1,10 @@
 import '../domain/guidance.dart';
+import '../domain/ports.dart';
+import '../domain/route_history.dart';
 import '../domain/trail_statistics.dart';
 import '../domain/trail_geometry.dart';
 import '../domain/walk_metrics.dart';
+import '../domain/usual_kilometres.dart';
 import '../domain/walk_recap.dart';
 import '../domain/walk_recording.dart';
 
@@ -10,6 +13,7 @@ class AnnounceProgress {
   AnnounceProgress(
     this.output, {
     this.statistics,
+    this.library,
     Set<RecapItem>? spoken,
     this.voice = true,
     this.notify = true,
@@ -17,6 +21,9 @@ class AnnounceProgress {
   }) : spoken = spoken ?? RecapItem.spokenByDefault;
   final GuidanceOutput output;
   final TrailStatisticsStore? statistics;
+
+  /// Earlier walks, for the usual speed of each kilometre.
+  final TrailRepository? library;
   final double every;
   Set<RecapItem> spoken;
 
@@ -28,6 +35,7 @@ class AnnounceProgress {
   int _kilometre = 0;
   int? _boundarySeconds;
   bool _posted = false;
+  Future<UsualKilometres?>? _usual;
 
   /// [session] is the followed GPX, if any; approach routes have no remaining
   /// GPX distance of their own.
@@ -40,6 +48,7 @@ class AnnounceProgress {
     if (!identical(recording, _recording)) {
       // New or restored recording: start counting from where it already is.
       _recording = recording;
+      _usual = null;
       _kilometre = (recording.metres / every).floor();
       _boundarySeconds = recording.metres < every / 10
           ? recording.seconds(now)
@@ -50,7 +59,7 @@ class AnnounceProgress {
     if (kilometre <= _kilometre) return;
     final seconds = recording.seconds(now);
     final walked = (kilometre - _kilometre) * every;
-    final split = _boundarySeconds;
+    final split = _boundarySeconds, from = _kilometre;
     _kilometre = kilometre;
     _boundarySeconds = seconds;
     final recap = await _recap(
@@ -62,6 +71,7 @@ class AnnounceProgress {
       split == null || seconds <= split
           ? null
           : walked / (seconds - split) * 3.6,
+      from: from,
     );
     final notify = this.notify && !foreground;
     if (notify) _posted = true;
@@ -117,6 +127,7 @@ class AnnounceProgress {
     DateTime now,
     TrackingSession? session,
     double? splitKmh, {
+    int? from,
     bool finished = false,
   }) async {
     final snapshot = recording.snapshot(now);
@@ -133,6 +144,16 @@ class AnnounceProgress {
         usual = await statistics?.find(source);
       } catch (_) {}
     }
+    // A kilometre is compared with the usual speed of that same kilometre;
+    // without one it is not compared, rather than with the whole route.
+    final usualKmh = finished
+        ? usual?.averageKmh
+        : splitKmh == null || from == null
+        ? null
+        : (await (_usual ??= _usualKilometres(
+            recording,
+            now,
+          )))?.kmh(from, kilometre);
     return WalkRecap(
       kilometre: kilometre,
       metres: recording.metres,
@@ -144,13 +165,46 @@ class AnnounceProgress {
       arrival: remaining != null && average != null && average > .5
           ? now.add(Duration(seconds: (remaining / (average / 3.6)).round()))
           : null,
-      usualKmh: usual?.averageKmh,
+      usualKmh: usualKmh,
+      usualOfKilometre: !finished,
       previousWalks: usual?.walks,
       ascent: metrics.hasElevation ? metrics.ascent : null,
       steps: snapshot.walk!.steps,
       calories: snapshot.walk!.estimatedCalories,
       finished: finished,
     );
+  }
+
+  /// Usual speed of each kilometre over the counted walks of the same route
+  /// in the same direction, measured once per recording.
+  Future<UsualKilometres?> _usualKilometres(
+    WalkRecording recording,
+    DateTime now,
+  ) async {
+    final library = this.library;
+    final source = recording.saved.walk?.statisticsTrailId;
+    if (library == null || source == null) return null;
+    try {
+      final trails = await library.all();
+      final history = groupWalks(
+        trails.where(
+          (t) =>
+              t.walk?.statisticsTrailId == source && t.id != recording.saved.id,
+        ),
+        trails.where((t) => t.id == source),
+      ).firstOrNull;
+      if (history == null) return null;
+      final route = history.route;
+      final reversed = route == null
+          ? null
+          : RouteIndex(route).measure(recording.snapshot(now)).reversed;
+      return UsualKilometres([
+        for (final walk in history.counted)
+          if (reversed == null || walk.reversed == reversed) walk.walk,
+      ], every: every);
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> leave() async {
